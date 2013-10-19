@@ -104,9 +104,12 @@
 //#define CONF_BOARD_SMC_PSRAM
 
 /* Configure LCD EBI pins */
-//#define CONF_BOARD_HX8347A
+#define CONF_BOARD_HX8347A
+
+/* Chip select number for HX8347A */
+#define CONF_BOARD_HX8347A_LCD_CS      2
 
 /* Configure Backlight control pin */
-//#define CONF_BOARD_AAT3194
+#define CONF_BOARD_AAT3194
 
 #endif /* CONF_BOARD_H_INCLUDED */

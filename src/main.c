@@ -100,10 +100,8 @@
 /** LED0 blinking control. */
 volatile bool g_b_led0_active = true;
 
-#ifdef LED1_GPIO
 /** LED1 blinking control. */
 volatile bool g_b_led1_active = true;
-#endif
 
 /** Global g_ul_ms_ticks in milliseconds since start of application */
 volatile uint32_t g_ul_ms_ticks = 0;
@@ -115,6 +113,14 @@ extern "C" {
 #endif
 /**INDENT-ON**/
 /// @endcond
+
+/* Convert 24-bits color to 16-bits color */
+static hx8347a_color_t rgb24_to_rgb16(uint32_t ul_color)
+{
+	hx8347a_color_t result_color;
+	result_color = (((ul_color >> 8) & 0xF800) | ((ul_color >> 5) & 0x7E0) | ((ul_color >> 3) & 0x1F));
+	return result_color;
+}
 
 /**
  *  \brief Process Buttons Events
@@ -128,9 +134,7 @@ static void ProcessButtonEvt(uint8_t uc_button)
 		if (!g_b_led0_active) {
 			ioport_set_pin_level(LED0_GPIO, IOPORT_PIN_LEVEL_HIGH);
 		}
-	}
-#ifdef LED1_GPIO 
-	else {
+	} else {
 		g_b_led1_active = !g_b_led1_active;
 
 		/* Enable LED#2 and TC if they were enabled */
@@ -144,7 +148,6 @@ static void ProcessButtonEvt(uint8_t uc_button)
 			tc_stop(TC0, 0);
 		}
 	}
-#endif
 }
 
 /**
@@ -170,7 +173,6 @@ static void Button1_Handler(uint32_t id, uint32_t mask)
 	}
 }
 
-#ifndef BOARD_NO_PUSHBUTTON_2
 /**
  *  \brief Handler for Button 2 falling edge interrupt.
  *
@@ -182,7 +184,6 @@ static void Button2_Handler(uint32_t id, uint32_t mask)
 		ProcessButtonEvt(1);
 	}
 }
-#endif
 
 /**
  *  \brief Configure the Pushbuttons
@@ -196,25 +197,19 @@ static void configure_buttons(void)
 	pmc_enable_periph_clk(PIN_PUSHBUTTON_1_ID);
 	pio_set_debounce_filter(PIN_PUSHBUTTON_1_PIO, PIN_PUSHBUTTON_1_MASK, 10);
 	/* Interrupt on rising edge  */
-	pio_handler_set(PIN_PUSHBUTTON_1_PIO, PIN_PUSHBUTTON_1_ID,
-			PIN_PUSHBUTTON_1_MASK, PIN_PUSHBUTTON_1_ATTR, Button1_Handler);
+	pio_handler_set(PIN_PUSHBUTTON_1_PIO, PIN_PUSHBUTTON_1_ID, PIN_PUSHBUTTON_1_MASK, PIN_PUSHBUTTON_1_ATTR, Button1_Handler);
 	NVIC_EnableIRQ((IRQn_Type) PIN_PUSHBUTTON_1_ID);
-	pio_handler_set_priority(PIN_PUSHBUTTON_1_PIO,
-			(IRQn_Type) PIN_PUSHBUTTON_1_ID, IRQ_PRIOR_PIO);
+	pio_handler_set_priority(PIN_PUSHBUTTON_1_PIO, (IRQn_Type) PIN_PUSHBUTTON_1_ID, IRQ_PRIOR_PIO);
 	pio_enable_interrupt(PIN_PUSHBUTTON_1_PIO, PIN_PUSHBUTTON_1_MASK);
 
-#ifndef BOARD_NO_PUSHBUTTON_2
 	/* Configure Pushbutton 2 */
 	pmc_enable_periph_clk(PIN_PUSHBUTTON_2_ID);
 	pio_set_debounce_filter(PIN_PUSHBUTTON_2_PIO, PIN_PUSHBUTTON_2_MASK, 10);
 	/* Interrupt on falling edge */
-	pio_handler_set(PIN_PUSHBUTTON_2_PIO, PIN_PUSHBUTTON_2_ID,
-			PIN_PUSHBUTTON_2_MASK, PIN_PUSHBUTTON_2_ATTR, Button2_Handler);
+	pio_handler_set(PIN_PUSHBUTTON_2_PIO, PIN_PUSHBUTTON_2_ID, PIN_PUSHBUTTON_2_MASK, PIN_PUSHBUTTON_2_ATTR, Button2_Handler);
 	NVIC_EnableIRQ((IRQn_Type) PIN_PUSHBUTTON_2_ID);
-	pio_handler_set_priority(PIN_PUSHBUTTON_2_PIO,
-			(IRQn_Type) PIN_PUSHBUTTON_2_ID, IRQ_PRIOR_PIO);
+	pio_handler_set_priority(PIN_PUSHBUTTON_2_PIO, (IRQn_Type) PIN_PUSHBUTTON_2_ID, IRQ_PRIOR_PIO);
 	pio_enable_interrupt(PIN_PUSHBUTTON_2_PIO, PIN_PUSHBUTTON_2_MASK);
-#endif
 }
 
 /**
@@ -230,10 +225,16 @@ void TC0_Handler(void)
 	/* Avoid compiler warning */
 	UNUSED(ul_dummy);
 
-#ifdef LED1_GPIO
 	/** Toggle LED state. */
 	ioport_toggle_pin_level(LED1_GPIO);
-#endif
+
+	/* Toggle a block on the screen */
+	if (ioport_get_pin_level(LED1_GPIO)) {
+		hx8347a_set_foreground_color(rgb24_to_rgb16(COLOR_BLACK));
+	} else {
+		hx8347a_set_foreground_color(rgb24_to_rgb16(COLOR_RED));
+	}
+	hx8347a_draw_filled_rectangle(130, 64, 230, 96);
 
 	printf("2 ");
 }
@@ -259,14 +260,10 @@ static void configure_tc(void)
 	NVIC_EnableIRQ((IRQn_Type) ID_TC0);
 	tc_enable_interrupt(TC0, 0, TC_IER_CPCS);
 
-#ifdef LED1_GPIO
 	/** Start the counter if LED1 is enabled. */
 	if (g_b_led1_active) {
 		tc_start(TC0, 0);
 	}
-#else
-	tc_start(TC0, 0);
-#endif
 }
 
 /**
@@ -282,6 +279,41 @@ static void configure_console(void)
 	/* Configure console UART. */
 	sysclk_enable_peripheral_clock(CONSOLE_UART_ID);
 	stdio_serial_init(CONF_UART, &uart_serial_options);
+}
+
+/**
+ *  Configure Display.
+ */
+static void configure_display(void)
+{
+	/* Configure SMC interface for Lcd */
+	smc_set_setup_timing(SMC, CONF_BOARD_HX8347A_LCD_CS, SMC_SETUP_NWE_SETUP(1) | SMC_SETUP_NCS_WR_SETUP(1) | SMC_SETUP_NRD_SETUP(9) | SMC_SETUP_NCS_RD_SETUP(9));
+	smc_set_pulse_timing(SMC, CONF_BOARD_HX8347A_LCD_CS, SMC_PULSE_NWE_PULSE(4) | SMC_PULSE_NCS_WR_PULSE(4) | SMC_PULSE_NRD_PULSE(36) | SMC_PULSE_NCS_RD_PULSE(36));
+	smc_set_cycle_timing(SMC, CONF_BOARD_HX8347A_LCD_CS, SMC_CYCLE_NWE_CYCLE(10) | SMC_CYCLE_NRD_CYCLE(45));
+	smc_set_mode(SMC, CONF_BOARD_HX8347A_LCD_CS, SMC_MODE_READ_MODE | SMC_MODE_WRITE_MODE | SMC_MODE_DBW_BIT_16);
+
+	/* Initialize display parameter */
+	struct hx8347a_opt_t display_options = {
+		.ul_width = HX8347A_LCD_WIDTH,
+		.ul_height = HX8347A_LCD_HEIGHT,
+		.foreground_color = rgb24_to_rgb16(COLOR_WHITE),
+		.background_color = rgb24_to_rgb16(COLOR_BLACK)
+	};
+
+	/* Switch off backlight */
+	aat31xx_disable_backlight();
+
+	/* Configure the hx8347a display controller */
+	hx8347a_init(&display_options);
+
+	/* Set backlight level */
+	aat31xx_set_backlight(AAT31XX_AVG_BACKLIGHT_LEVEL);
+
+	/* Clear the screen */
+	hx8347a_fill(rgb24_to_rgb16(COLOR_BLACK));
+
+	/* Turn on LCD */
+	hx8347a_display_on();
 }
 
 /**
@@ -312,11 +344,22 @@ int main(void)
 	/* Initialize the console uart */
 	configure_console();
 
+	/* Enable peripheral clock */
+	pmc_enable_periph_clk(ID_SMC);
+
+	/* Initialize the display */
+	configure_display();
+
 	/* Output example information */
 	puts("\r\n" \
 		"-- Nixie Clock Firmware v"VERSION" --\r\n" \
 		"-- "BOARD_NAME" --\r\n" \
 		"-- Compiled: "__DATE__" "__TIME__" --\r");
+
+	/* Write the version on the LCD */
+	hx8347a_set_foreground_color(rgb24_to_rgb16(COLOR_WHITE));
+	hx8347a_draw_string(0, 0, (uint8_t *)"Nixie Clock FW");
+	hx8347a_draw_string(10, 16, (uint8_t *)"v"VERSION);
 
 	/* Configure systick for 1 ms */
 	puts("Configure system tick to get 1ms tick period.\r");
@@ -331,14 +374,6 @@ int main(void)
 	puts("Configure buttons with debouncing.\r");
 	configure_buttons();
 
-	printf("Press %s to Start/Stop the %s blinking.\r\n",
-			PUSHBUTTON_1_NAME, LED_0_NAME);
-
-#ifndef BOARD_NO_PUSHBUTTON_2
-	printf("Press %s to Start/Stop the %s blinking.\r\n",
-			PUSHBUTTON_2_NAME, LED_1_NAME);
-#endif
-
 	while (1) {
 		/* Wait for LED to be active */
 		while (!g_b_led0_active);
@@ -348,6 +383,14 @@ int main(void)
 			ioport_toggle_pin_level(LED0_GPIO);
 			printf("1 ");
 		}
+
+		/* Toggle a block on the screen */
+		if (ioport_get_pin_level(LED0_GPIO)) {
+			hx8347a_set_foreground_color(rgb24_to_rgb16(COLOR_BLACK));
+		} else {
+			hx8347a_set_foreground_color(rgb24_to_rgb16(COLOR_GREEN));
+		}
+		hx8347a_draw_filled_rectangle(10, 64, 110, 96);
 
 		/* Wait for 500ms */
 		mdelay(500);
