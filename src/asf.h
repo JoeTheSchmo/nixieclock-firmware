@@ -56,11 +56,23 @@
 #include <compiler.h>
 #include <status_codes.h>
 
+// From module: DMAC - DMAC Controller
+#include <dmac.h>
+
+// From module: Delay routines
+#include <delay.h>
+
 // From module: Display - AAT31XX Backlight Controller
 #include <aat31xx.h>
 
 // From module: Display - HX8347A LCD Controller
 #include <hx8347a.h>
+
+// From module: FatFS file system
+#include <diskio.h>
+#include <ff.h>
+#include <ffconf.h>
+#include <integer.h>
 
 // From module: GPIO - General purpose Input/Output
 #include <gpio.h>
@@ -68,11 +80,17 @@
 // From module: Generic board support
 #include <board.h>
 
+// From module: High Speed Multimedia Card Interface
+#include <hsmci.h>
+
 // From module: IOPORT - General purpose I/O service
 #include <ioport.h>
 
 // From module: Interrupt management - SAM implementation
 #include <interrupt.h>
+
+// From module: Memory Control Access Interface
+#include <ctrl_access.h>
 
 // From module: PIO - Parallel Input/Output Controller
 #include <pio.h>
@@ -84,6 +102,9 @@
 // From module: Part identification macros
 #include <parts.h>
 
+// From module: RTC - Real Time Clock
+#include <rtc.h>
+
 // From module: SAM3U EK LED support enabled
 #include <led.h>
 
@@ -93,14 +114,32 @@
 // From module: SMC - Static Memory Controller
 #include <smc.h>
 
+// From module: SD/MMC stack + Memory Control Access (aka ctrl_access, required for file system or USB)
+#include <sd_mmc_mem.h>
+
+// From module: SD/MMC stack on Multimedia Card interface
+#include <sd_mmc.h>
+
 // From module: Standard serial I/O (stdio) - SAM implementation
 #include <stdio_serial.h>
+
+// From module: Supported ports of FatFS
+#include <diskio.h>
 
 // From module: System Clock Control - SAM3U implementation
 #include <sysclk.h>
 
 // From module: TC - Timer Counter
 #include <tc.h>
+
+// From module: TWI - Two-Wire Interface - SAM implementation
+#include <sam_twi/twi_master.h>
+#include <sam_twi/twi_slave.h>
+#include <twi_master.h>
+#include <twi_slave.h>
+
+// From module: TWI - Two-wire Interface
+#include <twi.h>
 
 // From module: UART - Univ. Async Rec/Trans
 #include <uart.h>
@@ -110,6 +149,9 @@
 
 // From module: USART - Univ. Syn Async Rec/Trans
 #include <usart.h>
+
+// From module: WM8731 Audio Codec
+#include <wm8731.h>
 
 // From module: pio_handler support enabled
 #include <pio_handler.h>

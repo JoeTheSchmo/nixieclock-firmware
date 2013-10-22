@@ -95,21 +95,16 @@
 /* Configure USART synchronous communication SCK pin */
 //#define CONF_BOARD_USART_SCK
 
-/* Configure IrDA transceiver shutdown pin */
-//#define CONF_BOARD_TFDU4300_SD
+/** Enable SD MMC interface pins through HSMCI */
+#define CONF_BOARD_SD_MMC_HSMCI
 
-/* Configure RS485 transceiver RE pin */
-//#define CONF_BOARD_ADM3485_RE
-
-//#define CONF_BOARD_SMC_PSRAM
-
-/* Configure LCD EBI pins */
+/** Configure LCD EBI pins */
 #define CONF_BOARD_HX8347A
 
-/* Chip select number for HX8347A */
+/** Chip select number for HX8347A */
 #define CONF_BOARD_HX8347A_LCD_CS      2
 
-/* Configure Backlight control pin */
+/** Configure Backlight control pin */
 #define CONF_BOARD_AAT3194
 
 #endif /* CONF_BOARD_H_INCLUDED */

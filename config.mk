@@ -59,27 +59,40 @@ TARGET_SRAM = nixie-$(VERSION)_sram.elf
 
 # List of C source files.
 CSRCS = \
+       common/components/memory/sd_mmc/sd_mmc.c           \
+       common/components/memory/sd_mmc/sd_mmc_mem.c       \
        common/services/clock/sam3u/sysclk.c               \
+       common/services/delay/sam/cycle_counter.c          \
        common/services/serial/usart_serial.c              \
+       common/services/storage/ctrl_access/ctrl_access.c  \
        common/utils/interrupt/interrupt_sam_nvic.c        \
        common/utils/stdio/read.c                          \
        common/utils/stdio/write.c                         \
        sam/boards/sam3u_ek/init.c                         \
        sam/boards/sam3u_ek/led.c                          \
+       sam/components/audio/codec/wm8731/wm8731.c         \
        sam/components/display/aat31xx/aat31xx.c           \
        sam/components/display/hx8347a/hx8347a.c           \
+       sam/drivers/dmac/dmac.c                            \
        sam/drivers/ebi/smc/smc.c                          \
+       sam/drivers/hsmci/hsmci.c                          \
        sam/drivers/pio/pio.c                              \
        sam/drivers/pio/pio_handler.c                      \
        sam/drivers/pmc/pmc.c                              \
        sam/drivers/pmc/sleep.c                            \
+       sam/drivers/rtc/rtc.c                              \
        sam/drivers/tc/tc.c                                \
+       sam/drivers/twi/twi.c                              \
        sam/drivers/uart/uart.c                            \
        sam/drivers/usart/usart.c                          \
        sam/utils/cmsis/sam3u/source/templates/exceptions.c \
        sam/utils/cmsis/sam3u/source/templates/gcc/startup_sam3u.c \
        sam/utils/cmsis/sam3u/source/templates/system_sam3u.c \
        sam/utils/syscalls/gcc/syscalls.c                  \
+       thirdparty/fatfs/fatfs-port-r0.09/diskio.c         \
+       thirdparty/fatfs/fatfs-port-r0.09/sam/fattime_rtc.c \
+       thirdparty/fatfs/fatfs-r0.09/src/ff.c              \
+       thirdparty/fatfs/fatfs-r0.09/src/option/ccsbcs.c    \
        ../src/main.c
 
 # List of assembler source files.
@@ -88,20 +101,31 @@ ASSRCS =
 # List of include paths.
 INC_PATH = \
        common/boards                                      \
+       common/components/memory/sd_mmc                    \
        common/services/clock                              \
+       common/services/delay                              \
        common/services/gpio                               \
        common/services/ioport                             \
        common/services/serial                             \
+       common/services/serial/sam_uart                    \
+       common/services/storage/ctrl_access                \
+       common/services/twi                                \
+       common/services/twi/sam_twi                        \
        common/utils                                       \
        common/utils/stdio/stdio_serial                    \
        sam/boards                                         \
        sam/boards/sam3u_ek                                \
+       sam/components/audio/codec/wm8731                  \
        sam/components/display/aat31xx                     \
        sam/components/display/hx8347a                     \
+       sam/drivers/dmac                                   \
        sam/drivers/ebi/smc                                \
+       sam/drivers/hsmci                                  \
        sam/drivers/pio                                    \
        sam/drivers/pmc                                    \
+       sam/drivers/rtc                                    \
        sam/drivers/tc                                     \
+       sam/drivers/twi                                    \
        sam/drivers/uart                                   \
        sam/drivers/usart                                  \
        sam/utils                                          \
@@ -110,7 +134,10 @@ INC_PATH = \
        sam/utils/header_files                             \
        sam/utils/preprocessor                             \
        thirdparty/CMSIS/Include                           \
-       ../src/config
+       thirdparty/fatfs/fatfs-port-r0.09/sam              \
+       thirdparty/fatfs/fatfs-r0.09/src                   \
+       ../src/config                                      \
+       ../src
 
 # Additional search paths for libraries.
 LIB_PATH =  \
@@ -159,9 +186,17 @@ CFLAGS =
 #   BOARD      Target board in use, see boards/board.h for a list.
 #   EXT_BOARD  Optional extension board in use, see boards/board.h for a list.
 CPPFLAGS = \
-       -D VERSION=\"$(VERSION)\"                    \
+       -D VERSION=\"$(VERSION)\"                          \
        -D ARM_MATH_CM3=true                               \
        -D BOARD=SAM3U_EK                                  \
+       -D VIRTUAL_MEMORY_ENABLE=false                     \
+       -D AT45DBX_ENABLE=false                            \
+       -D SD_MMC_SPI_ENABLE=false                         \
+       -D SD_MMC_MCI_ENABLE=false                         \
+       -D SD_MMC_ENABLE=true                              \
+       -D USB_MASS_STORAGE_ENABLE=false                   \
+       -D ACCESS_USB_ENABLED=false                        \
+       -D ACCESS_MEM_TO_RAM_ENABLED=true                  \
        -D __SAM3U4E__                                     \
        -D printf=iprintf
 
