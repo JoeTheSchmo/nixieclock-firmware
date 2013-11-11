@@ -67,6 +67,9 @@
 /* Configure USART synchronous communication SCK pin */
 //#define CONF_BOARD_USART_SCK
 
+/** SPI MACRO definition */
+#define CONF_BOARD_SPI
+
 /** Configure PCK0 pin */
 #define CONF_BOARD_PCK0
 

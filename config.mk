@@ -64,6 +64,7 @@ CSRCS = \
        common/services/clock/sam3u/sysclk.c               \
        common/services/delay/sam/cycle_counter.c          \
        common/services/serial/usart_serial.c              \
+       common/services/spi/sam_spi/spi_master.c           \
        common/services/storage/ctrl_access/ctrl_access.c  \
        common/utils/interrupt/interrupt_sam_nvic.c        \
        common/utils/stdio/read.c                          \
@@ -81,6 +82,7 @@ CSRCS = \
        sam/drivers/pmc/pmc.c                              \
        sam/drivers/pmc/sleep.c                            \
        sam/drivers/rtc/rtc.c                              \
+       sam/drivers/spi/spi.c                              \
        sam/drivers/ssc/ssc.c                              \
        sam/drivers/tc/tc.c                                \
        sam/drivers/twi/twi.c                              \
@@ -109,6 +111,8 @@ INC_PATH = \
        common/services/ioport                             \
        common/services/serial                             \
        common/services/serial/sam_uart                    \
+       common/services/spi                                \
+       common/services/spi/sam_spi                        \
        common/services/storage/ctrl_access                \
        common/services/twi                                \
        common/services/twi/sam_twi                        \
@@ -125,6 +129,7 @@ INC_PATH = \
        sam/drivers/pio                                    \
        sam/drivers/pmc                                    \
        sam/drivers/rtc                                    \
+       sam/drivers/spi                                    \
        sam/drivers/ssc                                    \
        sam/drivers/tc                                     \
        sam/drivers/twi                                    \
