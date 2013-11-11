@@ -48,4 +48,14 @@
 /** TWI Bus Clock 400kHz */
 #define TWI_WM8731_CLK     400000
 
+/** DMA Channel used for playback */
+#define DMA_WM8731_CH      0
+
+/** Wav feature. */
+#define WM8731_SAMPLE_RATE             (48000)
+/** Wav slot per frame */
+#define WM8731_SLOT_BY_FRAME           (2)
+/** Bits per slot */
+#define WM8731_BITS_BY_SLOT            (16)
+
 #endif  /* CONF_WM8731_H_INCLUDED */

@@ -120,6 +120,9 @@
 // From module: SD/MMC stack on Multimedia Card interface
 #include <sd_mmc.h>
 
+// From module: SSC - Synchronous Serial Controller
+#include <ssc.h>
+
 // From module: Standard serial I/O (stdio) - SAM implementation
 #include <stdio_serial.h>
 

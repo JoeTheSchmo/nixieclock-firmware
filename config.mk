@@ -81,6 +81,7 @@ CSRCS = \
        sam/drivers/pmc/pmc.c                              \
        sam/drivers/pmc/sleep.c                            \
        sam/drivers/rtc/rtc.c                              \
+       sam/drivers/ssc/ssc.c                              \
        sam/drivers/tc/tc.c                                \
        sam/drivers/twi/twi.c                              \
        sam/drivers/uart/uart.c                            \
@@ -92,7 +93,7 @@ CSRCS = \
        thirdparty/fatfs/fatfs-port-r0.09/diskio.c         \
        thirdparty/fatfs/fatfs-port-r0.09/sam/fattime_rtc.c \
        thirdparty/fatfs/fatfs-r0.09/src/ff.c              \
-       thirdparty/fatfs/fatfs-r0.09/src/option/ccsbcs.c    \
+       thirdparty/fatfs/fatfs-r0.09/src/option/ccsbcs.c   \
        ../src/main.c
 
 # List of assembler source files.
@@ -124,6 +125,7 @@ INC_PATH = \
        sam/drivers/pio                                    \
        sam/drivers/pmc                                    \
        sam/drivers/rtc                                    \
+       sam/drivers/ssc                                    \
        sam/drivers/tc                                     \
        sam/drivers/twi                                    \
        sam/drivers/uart                                   \

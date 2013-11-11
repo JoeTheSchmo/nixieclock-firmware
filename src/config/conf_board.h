@@ -49,34 +49,6 @@
 #define CONF_BOARD_UART_CONSOLE
 
 /*
- * PB0 is configured for LED not for ADC trigger by default.
- * You can enable them according to application.
- */
-/* Configure ADC example pins */
-//#define CONF_BOARD_ADC
-
-/*
- * LED pins are not configured for PWM function here.
- * Because those LED pins are enabled for PIO function by default.
- * You can enable them according to application.
- */
-/* Configure PWM LED0 pin */
-//#define CONF_BOARD_PWM_LED0
-
-/* Configure PWM LED1 pin */
-//#define CONF_BOARD_PWM_LED1
-
-/* Configure PWM LED2 pin */
-//#define CONF_BOARD_PWM_LED2
-
-/* Configure SPI pins */
-//#define CONF_BOARD_SPI
-//#define CONF_BOARD_SPI_NPCS0
-//#define CONF_BOARD_SPI_NPCS1
-//#define CONF_BOARD_SPI_NPCS2
-//#define CONF_BOARD_SPI_NPCS3
-
-/*
  * USART pins are configured as basic serial port by default.
  * You can enable other pins according application.
  */
@@ -94,6 +66,15 @@
 
 /* Configure USART synchronous communication SCK pin */
 //#define CONF_BOARD_USART_SCK
+
+/** Configure PCK0 pin */
+#define CONF_BOARD_PCK0
+
+/** Configure TWI0 pins */
+#define CONF_BOARD_TWI0
+
+/** Configure SSC pins */
+#define CONF_BOARD_SSC
 
 /** Enable SD MMC interface pins through HSMCI */
 #define CONF_BOARD_SD_MMC_HSMCI
