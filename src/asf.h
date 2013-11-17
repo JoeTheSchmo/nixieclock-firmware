@@ -83,6 +83,9 @@
 // From module: High Speed Multimedia Card Interface
 #include <hsmci.h>
 
+// Local Driver: hv5530 shift register
+#include <hv5530.h>
+
 // From module: IOPORT - General purpose I/O service
 #include <ioport.h>
 
