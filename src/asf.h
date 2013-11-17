@@ -65,6 +65,9 @@
 // From module: Delay routines
 #include <delay.h>
 
+// Local Service: Display
+#include <display.h>
+
 // From module: Display - AAT31XX Backlight Controller
 #include <aat31xx.h>
 

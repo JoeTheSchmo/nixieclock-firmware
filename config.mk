@@ -97,6 +97,7 @@ CSRCS = \
        ../src/boards/user_board/init.c                    \
        ../src/drivers/hv5530/hv5530.c                     \
        ../src/services/audio/audio.c                      \
+       ../src/services/display/display.c                  \
        ../src/main.c
 
 # List of assembler source files.
@@ -148,6 +149,7 @@ INC_PATH = \
        ../src/drivers                                     \
        ../src/drivers/hv5530                              \
        ../src/services/audio                              \
+       ../src/services/display/                           \
        ../src
 
 # Additional search paths for libraries.
