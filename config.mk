@@ -96,6 +96,7 @@ CSRCS = \
        thirdparty/fatfs/fatfs-r0.09/src/option/ccsbcs.c   \
        ../src/boards/user_board/init.c                    \
        ../src/drivers/hv5530/hv5530.c                     \
+       ../src/services/audio/audio.c                      \
        ../src/main.c
 
 # List of assembler source files.
@@ -146,6 +147,7 @@ INC_PATH = \
        ../src/config                                      \
        ../src/drivers                                     \
        ../src/drivers/hv5530                              \
+       ../src/services/audio                              \
        ../src
 
 # Additional search paths for libraries.
