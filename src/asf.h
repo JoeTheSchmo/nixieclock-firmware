@@ -105,9 +105,6 @@
 // From module: RTC - Real Time Clock
 #include <rtc.h>
 
-// From module: SAM3U EK LED support enabled
-#include <led.h>
-
 // From module: SAM3U startup code
 #include <exceptions.h>
 

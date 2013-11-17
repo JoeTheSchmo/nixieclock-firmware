@@ -69,8 +69,6 @@ CSRCS = \
        common/utils/interrupt/interrupt_sam_nvic.c        \
        common/utils/stdio/read.c                          \
        common/utils/stdio/write.c                         \
-       sam/boards/sam3u_ek/init.c                         \
-       sam/boards/sam3u_ek/led.c                          \
        sam/components/audio/codec/wm8731/wm8731.c         \
        sam/components/display/aat31xx/aat31xx.c           \
        sam/components/display/hx8347a/hx8347a.c           \
@@ -96,6 +94,7 @@ CSRCS = \
        thirdparty/fatfs/fatfs-port-r0.09/sam/fattime_rtc.c \
        thirdparty/fatfs/fatfs-r0.09/src/ff.c              \
        thirdparty/fatfs/fatfs-r0.09/src/option/ccsbcs.c   \
+       ../src/boards/user_board/init.c                    \
        ../src/main.c
 
 # List of assembler source files.
@@ -118,8 +117,6 @@ INC_PATH = \
        common/services/twi/sam_twi                        \
        common/utils                                       \
        common/utils/stdio/stdio_serial                    \
-       sam/boards                                         \
-       sam/boards/sam3u_ek                                \
        sam/components/audio/codec/wm8731                  \
        sam/components/display/aat31xx                     \
        sam/components/display/hx8347a                     \
@@ -143,6 +140,8 @@ INC_PATH = \
        thirdparty/CMSIS/Include                           \
        thirdparty/fatfs/fatfs-port-r0.09/sam              \
        thirdparty/fatfs/fatfs-r0.09/src                   \
+       ../src/boards                                      \
+       ../src/boards/user_board                           \
        ../src/config                                      \
        ../src
 
@@ -160,8 +159,8 @@ LINKER_SCRIPT_FLASH = sam/utils/linker_scripts/sam3u/sam3u4/gcc/flash.ld
 LINKER_SCRIPT_SRAM  = sam/utils/linker_scripts/sam3u/sam3u4/gcc/sram.ld
 
 # Path relative to top level directory pointing to a linker script.
-DEBUG_SCRIPT_FLASH = sam/boards/sam3u_ek/debug_scripts/gcc/sam3u_ek_flash.gdb
-DEBUG_SCRIPT_SRAM  = sam/boards/sam3u_ek/debug_scripts/gcc/sam3u_ek_sram.gdb
+DEBUG_SCRIPT_FLASH = ../src/boards/user_board/debug_scripts/gcc/sam3u_ek_flash.gdb
+DEBUG_SCRIPT_SRAM  = ../src/boards/user_board/debug_scripts/gcc/sam3u_ek_sram.gdb
 
 # Project type parameter: all, sram or flash
 PROJECT_TYPE        = flash
@@ -195,7 +194,7 @@ CFLAGS =
 CPPFLAGS = \
        -D VERSION=\"$(VERSION)\"                          \
        -D ARM_MATH_CM3=true                               \
-       -D BOARD=SAM3U_EK                                  \
+       -D BOARD=USER_BOARD                                \
        -D VIRTUAL_MEMORY_ENABLE=false                     \
        -D AT45DBX_ENABLE=false                            \
        -D SD_MMC_SPI_ENABLE=false                         \
