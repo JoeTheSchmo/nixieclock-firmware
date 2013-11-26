@@ -12,5 +12,6 @@
 
 extern void display_init(void);
 extern void display_hx8347a_test(void);
+extern void display_hx8347a_show_rtc(void);
 
 #endif // DISPLAY_H

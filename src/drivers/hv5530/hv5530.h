@@ -11,6 +11,7 @@
 #define HV5530_H
 
 extern void hv5530_init(void);
-extern void hv5530_test(void);
+extern void hv5530_set_registers(uint8_t *data);
+extern void hv5530_set_from_rtc(void);
 
 #endif // HV5530_H

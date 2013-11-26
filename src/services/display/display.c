@@ -19,6 +19,19 @@ static hx8347a_color_t rgb24_to_rgb16(uint32_t ul_color)
 	return result_color;
 }
 
+void display_hx8347a_show_rtc(void) {
+	uint32_t ul_hour, ul_minute, ul_second;
+	rtc_get_time(RTC, &ul_hour, &ul_minute, &ul_second);
+
+	char time[9];
+	snprintf(time, 9, "%02lu:%02lu:%02lu", ul_hour, ul_minute, ul_second);
+
+	hx8347a_set_foreground_color(rgb24_to_rgb16(COLOR_BLUE));
+	hx8347a_draw_filled_rectangle(0, 64, 96, 80);
+	hx8347a_set_foreground_color(rgb24_to_rgb16(COLOR_GREEN));
+	hx8347a_draw_string(0, 64, (uint8_t *)time);
+}
+
 void display_hx8347a_test(void) {
 	/* Write the version on the LCD */
 	hx8347a_set_foreground_color(rgb24_to_rgb16(COLOR_WHITE));
