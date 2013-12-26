@@ -84,7 +84,7 @@ void RTC_Handler(void) {
 		/* Disable RTC interrupt */
 		rtc_disable_interrupt(RTC, RTC_IDR_SECDIS);
 
-		hv5530_set_from_rtc();
+		//hv5530_set_from_rtc();
 		display_hx8347a_show_rtc();
 
 		rtc_clear_status(RTC, RTC_SCCR_SECCLR);
@@ -169,7 +169,16 @@ int main(void)
 	/* Main Loop */
 	while(1) {
 		/* Do Something */
-		delay_ms(1000);
+		// delay_ms(1000);
+
+		/* Test output to the hv5530 shift registers */
+		int i;
+		for (i = 0; i < 64; i++) {
+			uint8_t hv5530_test[8] = {255,255,255,255,255,255,255,255};
+			hv5530_test[7 - (i / 8)] &= ~(1 << (i % 8));
+			hv5530_set_registers(hv5530_test);
+			delay_ms(250);
+		}
 	};
 
 	return 0;
