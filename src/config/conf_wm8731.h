@@ -3,8 +3,8 @@
  *
  * \brief WM8731 Configuration.
  *
- * Copyright (c) 2011-2012 Atmel Corporation. All rights reserved.
- * Copyright (c) 2013 Joe Ciccone. All rights reserved.
+ * Copyright (c) 2011 - 2012 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2013 - 2014 Joe Ciccone. All rights reserved.
  *
  * \asf_license_start
  *
@@ -46,10 +46,10 @@
 #define CONF_WM8731_H_INCLUDED
 
 /** TWI Bus Clock 400kHz */
-#define TWI_WM8731_CLK     400000
+#define WM8731_TWI_CLK     400000
 
 /** DMA Channel used for playback */
-#define DMA_WM8731_CH      0
+#define WM8731_DMA_CH      0
 
 /** Wav feature. */
 #define WM8731_SAMPLE_RATE             (48000)

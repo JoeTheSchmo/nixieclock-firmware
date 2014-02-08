@@ -3,7 +3,7 @@
  *
  * \brief Nixie Clock Firmware
  *
- * Copyright (c) 2013 Joe Ciccone. All rights reserved.
+ * Copyright (c) 2013 - 2014 Joe Ciccone. All rights reserved.
  *
  */
 
@@ -16,12 +16,13 @@
  */
 static void init_audio_twi_wm8731(void)
 {
-	twi_options_t opt;
-
 	/* Configure the options of TWI driver */
-	opt.master_clk = sysclk_get_peripheral_hz();
-	opt.speed	   = TWI_WM8731_CLK;
-	opt.chip	   = WM8731_SLAVE_ADDRESS;
+	twi_options_t opt = {
+		.master_clk = sysclk_get_peripheral_hz(),
+		.speed = WM8731_TWI_CLK,
+		.chip = WM8731_SLAVE_ADDRESS
+	};
+
 	twi_master_setup(TWI_WM8731, &opt);
 }
 
@@ -118,7 +119,7 @@ static void init_audio_dma(void)
 	dmac_enable(DMAC);
 
 	/* Disable the DMA channel for SSC */
-	dmac_channel_disable(DMAC, DMA_WM8731_CH);
+	dmac_channel_disable(DMAC, WM8731_DMA_CH);
 
 	/* Set channel configuration register */
 	cfg = DMAC_CFG_SOD_ENABLE |        /* Enable stop on done */
@@ -127,11 +128,11 @@ static void init_audio_dma(void)
 			DMAC_CFG_AHB_PROT(1) |     /* Set AHB Protection */
 			DMAC_CFG_FIFOCFG_ALAP_CFG; /* FIFO Configuration */
 
-	dmac_channel_set_configuration(DMAC, DMA_WM8731_CH, cfg);
+	dmac_channel_set_configuration(DMAC, WM8731_DMA_CH, cfg);
 
 	/* Set interrupt */
 	NVIC_EnableIRQ(DMAC_IRQn);
-	dmac_enable_interrupt(DMAC, (DMAC_EBCIER_CBTC0 << DMA_WM8731_CH));
+	dmac_enable_interrupt(DMAC, (DMAC_EBCIER_CBTC0 << WM8731_DMA_CH));
 }
 
 /**
