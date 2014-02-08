@@ -133,6 +133,9 @@
 // From module: SPI - Serial Peripheral Interface
 #include <spi.h>
 
+// Local Driver: ssd1306 - OLED Display Driver
+#include <ssd1306.h>
+
 // From module: SSC - Synchronous Serial Controller
 #include <ssc.h>
 

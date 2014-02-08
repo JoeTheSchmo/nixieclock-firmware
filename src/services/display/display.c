@@ -74,6 +74,37 @@ static void configure_hx8347a(void)
 	hx8347a_display_on();
 }
 
+/**
+ * Init TWI interface for SSD1306 .
+ */
+static void display_init_ssd1306_twi(void)
+{	/* Configure the options of TWI driver */
+	twi_options_t opt = {
+		.master_clk = sysclk_get_peripheral_hz(),
+		.speed = SSD1306_TWI_CLK,
+		.chip = SSD1306_SLAVE_ADDRESS
+	};
+
+	twi_master_setup(TWI_SSD1306, &opt);
+}
+
+/**
+ * Configure the SSD1306 Display Controller .
+ */
+static void display_init_ssd1306(void) {
+	display_init_ssd1306_twi();
+	ssd1306_init();
+
+	// Set Horizontal Addressing Mode, Window = { Col 0 - 127, Page 0 - 3 }
+	ssd1306_set_mem_addr_mode(0x0);
+	ssd1306_set_column_addr(0x0, 0x7F);
+	ssd1306_set_page_addr(0x0, 0x3);
+}
+
+/**
+ * Init the Display Service
+ */
 void display_init(void) {
 	configure_hx8347a();
+	display_init_ssd1306();
 }

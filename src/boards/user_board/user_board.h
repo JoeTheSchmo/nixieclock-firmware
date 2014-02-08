@@ -565,6 +565,12 @@
 #define WM8731_SLAVE_ADDRESS        0x1b
 
 /** TWI interface for WM8731 */
-#define TWI_WM8731  TWI0
+#define TWI_WM8731   TWI0
+
+/* SSD1306 Slave address */
+#define SSD1306_SLAVE_ADDRESS       0x3c
+
+/** TWI interface for WM8731 */
+#define TWI_SSD1306  TWI0
 
 #endif  // _USER_BOARD_H_

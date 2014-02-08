@@ -96,6 +96,8 @@ CSRCS = \
        thirdparty/fatfs/fatfs-r0.09/src/option/ccsbcs.c   \
        ../src/boards/user_board/init.c                    \
        ../src/drivers/hv5530/hv5530.c                     \
+       ../src/drivers/ssd1306/ssd1306.c                   \
+       ../src/drivers/ssd1306/ssd1306_font8x8.c           \
        ../src/services/audio/audio.c                      \
        ../src/services/display/display.c                  \
        ../src/main.c
@@ -148,6 +150,7 @@ INC_PATH = \
        ../src/config                                      \
        ../src/drivers                                     \
        ../src/drivers/hv5530                              \
+       ../src/drivers/ssd1306                             \
        ../src/services/audio                              \
        ../src/services/display/                           \
        ../src
