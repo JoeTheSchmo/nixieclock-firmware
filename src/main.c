@@ -4,7 +4,7 @@
  * \brief Nixie Clock Firmware
  *
  * Copyright (c) 2011 - 2013 Atmel Corporation. All rights reserved.
- * Copyright (c) 2013 Joe Ciccone. All rights reserved.
+ * Copyright (c) 2013 - 2014 Joe Ciccone. All rights reserved.
  *
  * \asf_license_start
  *
@@ -74,26 +74,6 @@
 #include "conf_clock.h"
 
 /**
- * \brief Interrupt handler for the RTC. Refresh the display.
- */
-void RTC_Handler(void) {
-	uint32_t ul_status = rtc_get_status(RTC);
-
-	/* Second increment interrupt */
-	if ((ul_status & RTC_SR_SEC) == RTC_SR_SEC) {
-		/* Disable RTC interrupt */
-		rtc_disable_interrupt(RTC, RTC_IDR_SECDIS);
-
-		//hv5530_set_from_rtc();
-		display_hx8347a_show_rtc();
-
-		rtc_clear_status(RTC, RTC_SCCR_SECCLR);
-
-		rtc_enable_interrupt(RTC, RTC_IER_SECEN);
-	}
-}
-
-/**
  *  Configure UART console.
  */
 static void configure_console(void)
@@ -135,11 +115,11 @@ int main(void)
 		"-- "BOARD_NAME" --\r\n" \
 		"-- Compiled: "__DATE__" "__TIME__" --\r\n");
 
-	/* Initialize the clock display shift registers */
-	hv5530_init();
-
-	/* Initialize the graphical display */
+	/* Initialize the Display Service */
 	display_init();
+
+	/* Initialize the Clock Service */
+	clock_init();
 
 	/* Initialize SD MMC stack */
 	sd_mmc_init();
@@ -147,24 +127,7 @@ int main(void)
 	/* Initialze the Audio Service */
 	audio_init();
 
-	/* Default RTC configuration, 24-hour mode */
-	rtc_set_hour_mode(RTC, 0);
-
-	/* Configure RTC interrupts */
-	NVIC_DisableIRQ(RTC_IRQn);
-	NVIC_ClearPendingIRQ(RTC_IRQn);
-	NVIC_SetPriority(RTC_IRQn, 0);
-	NVIC_EnableIRQ(RTC_IRQn);
-	rtc_enable_interrupt(RTC, RTC_IER_SECEN);
-
 	/* Initialization Complete: Start Work */
-
-	/* Test setting for the RTC */
-	rtc_set_time(RTC, 11, 15, 32);
-	rtc_set_date(RTC, 2012, 12, 6, 1);
-
-	/* Test output to the hx8347a display */
-	display_hx8347a_test();
 
 	/* Main Loop */
 	while(1) {

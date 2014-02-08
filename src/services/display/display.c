@@ -3,75 +3,40 @@
  *
  * \brief Nixie Clock Firmware
  *
- * Copyright (c) 2013 Joe Ciccone. All rights reserved.
+ * Copyright (c) 2013 - 2014 Joe Ciccone. All rights reserved.
  *
  */
 
 #include <asf.h>
 
-/**
- * Convert 24-bits color to 16-bits color
- */
-static hx8347a_color_t rgb24_to_rgb16(uint32_t ul_color)
-{
-	hx8347a_color_t result_color;
-	result_color = (((ul_color >> 8) & 0xF800) | ((ul_color >> 5) & 0x7E0) | ((ul_color >> 3) & 0x1F));
-	return result_color;
-}
-
-void display_hx8347a_show_rtc(void) {
-	uint32_t ul_hour, ul_minute, ul_second;
-	rtc_get_time(RTC, &ul_hour, &ul_minute, &ul_second);
-
-	char time[9];
-	snprintf(time, 9, "%02lu:%02lu:%02lu", ul_hour, ul_minute, ul_second);
-
-	hx8347a_set_foreground_color(rgb24_to_rgb16(COLOR_BLUE));
-	hx8347a_draw_filled_rectangle(0, 64, 96, 80);
-	hx8347a_set_foreground_color(rgb24_to_rgb16(COLOR_GREEN));
-	hx8347a_draw_string(0, 64, (uint8_t *)time);
-}
-
-void display_hx8347a_test(void) {
-	/* Write the version on the LCD */
-	hx8347a_set_foreground_color(rgb24_to_rgb16(COLOR_WHITE));
-	hx8347a_draw_string(0, 0, (uint8_t *)"Nixie Clock FW");
-	hx8347a_draw_string(10, 16, (uint8_t *)"v"VERSION);
-}
-
-/**
- *  Configure Display.
- */
-static void configure_hx8347a(void)
-{
-	/* Configure SMC interface for Lcd */
-	smc_set_setup_timing(SMC, CONF_BOARD_HX8347A_LCD_CS, SMC_SETUP_NWE_SETUP(1) | SMC_SETUP_NCS_WR_SETUP(1) | SMC_SETUP_NRD_SETUP(9) | SMC_SETUP_NCS_RD_SETUP(9));
-	smc_set_pulse_timing(SMC, CONF_BOARD_HX8347A_LCD_CS, SMC_PULSE_NWE_PULSE(4) | SMC_PULSE_NCS_WR_PULSE(4) | SMC_PULSE_NRD_PULSE(36) | SMC_PULSE_NCS_RD_PULSE(36));
-	smc_set_cycle_timing(SMC, CONF_BOARD_HX8347A_LCD_CS, SMC_CYCLE_NWE_CYCLE(10) | SMC_CYCLE_NRD_CYCLE(45));
-	smc_set_mode(SMC, CONF_BOARD_HX8347A_LCD_CS, SMC_MODE_READ_MODE | SMC_MODE_WRITE_MODE | SMC_MODE_DBW_BIT_16);
-
-	/* Initialize display parameter */
-	struct hx8347a_opt_t display_options = {
-		.ul_width = HX8347A_LCD_WIDTH,
-		.ul_height = HX8347A_LCD_HEIGHT,
-		.foreground_color = rgb24_to_rgb16(COLOR_WHITE),
-		.background_color = rgb24_to_rgb16(COLOR_BLACK)
+void display_show_rtc(void) {
+	// Draw the date in page 0
+	{
+		char date[11];
+		{
+			uint32_t ul_year, ul_month, ul_day;
+			rtc_get_date(RTC, &ul_year, &ul_month, &ul_day, NULL);
+			snprintf(date, 11, "%04lu/%02lu/%02lu", ul_year, ul_month, ul_day);
+		};
+		ssd1306_set_page_start_addr(0);
+		ssd1306_set_column_start_addr(0);
+		ssd1306_puts(date);
 	};
 
-	/* Switch off backlight */
-	aat31xx_disable_backlight();
+	// Draw the time in page 1
+	{
+		char time[9];
 
-	/* Configure the hx8347a display controller */
-	hx8347a_init(&display_options);
+		{
+			uint32_t ul_hour, ul_minute, ul_second;
+			rtc_get_time(RTC, &ul_hour, &ul_minute, &ul_second);
+			snprintf(time, 9, "%02lu:%02lu:%02lu", ul_hour, ul_minute, ul_second);
+		};
 
-	/* Set backlight level */
-	aat31xx_set_backlight(AAT31XX_AVG_BACKLIGHT_LEVEL);
-
-	/* Clear the screen */
-	hx8347a_fill(rgb24_to_rgb16(COLOR_BLACK));
-
-	/* Turn on LCD */
-	hx8347a_display_on();
+		ssd1306_set_page_start_addr(1);
+		ssd1306_set_column_start_addr(8);
+		ssd1306_puts(time);
+	};
 }
 
 /**
@@ -105,6 +70,5 @@ static void display_init_ssd1306(void) {
  * Init the Display Service
  */
 void display_init(void) {
-	configure_hx8347a();
 	display_init_ssd1306();
 }

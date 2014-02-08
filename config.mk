@@ -70,8 +70,6 @@ CSRCS = \
        common/utils/stdio/read.c                          \
        common/utils/stdio/write.c                         \
        sam/components/audio/codec/wm8731/wm8731.c         \
-       sam/components/display/aat31xx/aat31xx.c           \
-       sam/components/display/hx8347a/hx8347a.c           \
        sam/drivers/dmac/dmac.c                            \
        sam/drivers/ebi/smc/smc.c                          \
        sam/drivers/hsmci/hsmci.c                          \
@@ -99,6 +97,7 @@ CSRCS = \
        ../src/drivers/ssd1306/ssd1306.c                   \
        ../src/drivers/ssd1306/ssd1306_font8x8.c           \
        ../src/services/audio/audio.c                      \
+       ../src/services/clock/clock.c                      \
        ../src/services/display/display.c                  \
        ../src/main.c
 
@@ -123,8 +122,6 @@ INC_PATH = \
        common/utils                                       \
        common/utils/stdio/stdio_serial                    \
        sam/components/audio/codec/wm8731                  \
-       sam/components/display/aat31xx                     \
-       sam/components/display/hx8347a                     \
        sam/drivers/dmac                                   \
        sam/drivers/ebi/smc                                \
        sam/drivers/hsmci                                  \
@@ -152,6 +149,7 @@ INC_PATH = \
        ../src/drivers/hv5530                              \
        ../src/drivers/ssd1306                             \
        ../src/services/audio                              \
+       ../src/services/clock                              \
        ../src/services/display/                           \
        ../src
 

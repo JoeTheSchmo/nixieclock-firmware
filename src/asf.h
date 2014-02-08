@@ -55,6 +55,9 @@
 // Local Service: Audio
 #include <audio.h>
 
+// Local Service: Clock
+#include <clock.h>
+
 // From module: Common SAM compiler driver
 #include <compiler.h>
 #include <status_codes.h>
@@ -67,12 +70,6 @@
 
 // Local Service: Display
 #include <display.h>
-
-// From module: Display - AAT31XX Backlight Controller
-#include <aat31xx.h>
-
-// From module: Display - HX8347A LCD Controller
-#include <hx8347a.h>
 
 // From module: FatFS file system
 #include <diskio.h>
