@@ -11,7 +11,6 @@
 #define SSD1306_H
 
 #include "twi_master.h"
-#include "conf_ssd1306.h"
 
 /**
  * TWI Safety Definitions
@@ -19,19 +18,11 @@
 
 #if !defined(TWI_SSD1306)
 # warning The SSD1306 TWI instance has not been defined. Using default settings.
-# define TWI_SSD1306 0 /* TWI instance (TWI0) */
+# define TWI_SSD1306 TWI0 /* TWI instance (TWI0) */
 #endif
 #if !defined(SSD1306_SLAVE_ADDRESS)
 # warning The SSD1306 TWI address has not been defined. Using default settings.
 # define SSD1306_SLAVE_ADDRESS 0x3C /* TWI address (0x3C) */
-#endif
-#if !defined(SSD1306_LCDWIDTH)
-# warning The SSD1306 LCD Width has not been defined. Using default settings.
-# define SSD1306_LCDWIDTH 128 /* 32 Pixels Wide */
-#endif
-#if !defined(SSD1306_LCDHEIGHT)
-# warning The SSD1306 LCD Height has not been defined. Using default settings.
-# define SSD1306_LCDHEIGHT 32 /* 32 Pixels High */
 #endif
 
 /**

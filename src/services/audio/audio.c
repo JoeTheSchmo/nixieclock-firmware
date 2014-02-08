@@ -12,21 +12,6 @@
 #include "conf_wm8731.h"
 
 /**
- * Init TWI interface for WM8731 .
- */
-static void init_audio_twi_wm8731(void)
-{
-	/* Configure the options of TWI driver */
-	twi_options_t opt = {
-		.master_clk = sysclk_get_peripheral_hz(),
-		.speed = WM8731_TWI_CLK,
-		.chip = WM8731_SLAVE_ADDRESS
-	};
-
-	twi_master_setup(TWI_WM8731, &opt);
-}
-
-/**
  * \brief  Initial the WM8731 to play back the sample WAV file.
  */
 static void init_audio_dac(void)
@@ -38,8 +23,6 @@ static void init_audio_dac(void)
 	pmc_switch_pck_to_mainck(PMC_PCK_0, PMC_MCKR_PRES_CLK_1);
 	/* Finally, enable programmable clock */
 	pmc_enable_pck(PMC_PCK_0);
-	/* init control interface */
-	init_audio_twi_wm8731();
 	/* reset the WM8731 */
 	wm8731_reset();
 	/* Select the WM8731 DAC */

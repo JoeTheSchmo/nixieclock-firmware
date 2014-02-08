@@ -49,6 +49,7 @@
 #endif
 #include "gpio.h"
 #include "ioport.h"
+#include "twi_master.h"
 
 void board_init(void)
 {
@@ -76,6 +77,16 @@ void board_init(void)
 	gpio_configure_pin(TWI0_DATA_GPIO, TWI0_DATA_FLAGS);
 	gpio_configure_pin(TWI0_CLK_GPIO, TWI0_CLK_FLAGS);
 #endif
+
+#ifdef CONF_BOARD_TWI0_MASTER_CLK
+	/* Initialize TWI0 */
+	twi_options_t twi0_opt = {
+		.master_clk = sysclk_get_peripheral_hz(),
+		.speed = CONF_BOARD_TWI0_MASTER_CLK,
+	};
+	twi_master_setup(TWI0, &twi0_opt);
+#endif
+
 
 #ifdef CONF_BOARD_TWI1
 	gpio_configure_pin(TWI1_DATA_GPIO, TWI1_DATA_FLAGS);

@@ -19,7 +19,7 @@ void display_show_rtc(void) {
 			snprintf(date, 11, "%04lu/%02lu/%02lu", ul_year, ul_month, ul_day);
 		};
 		ssd1306_set_page_start_addr(0);
-		ssd1306_set_column_start_addr(0);
+		ssd1306_set_column_start_addr(24);
 		ssd1306_puts(date);
 	};
 
@@ -34,30 +34,16 @@ void display_show_rtc(void) {
 		};
 
 		ssd1306_set_page_start_addr(1);
-		ssd1306_set_column_start_addr(8);
+		ssd1306_set_column_start_addr(32);
 		ssd1306_puts(time);
 	};
-}
-
-/**
- * Init TWI interface for SSD1306 .
- */
-static void display_init_ssd1306_twi(void)
-{	/* Configure the options of TWI driver */
-	twi_options_t opt = {
-		.master_clk = sysclk_get_peripheral_hz(),
-		.speed = SSD1306_TWI_CLK,
-		.chip = SSD1306_SLAVE_ADDRESS
-	};
-
-	twi_master_setup(TWI_SSD1306, &opt);
 }
 
 /**
  * Configure the SSD1306 Display Controller .
  */
 static void display_init_ssd1306(void) {
-	display_init_ssd1306_twi();
+	// Setup the Controller from Reset
 	ssd1306_init();
 
 	// Set Horizontal Addressing Mode, Window = { Col 0 - 127, Page 0 - 3 }

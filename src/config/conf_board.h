@@ -75,6 +75,7 @@
 
 /** Configure TWI0 pins */
 #define CONF_BOARD_TWI0
+#define CONF_BOARD_TWI0_MASTER_CLK 400000
 
 /** Configure SSC pins */
 #define CONF_BOARD_SSC

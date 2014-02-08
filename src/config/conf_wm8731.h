@@ -45,9 +45,6 @@
 #ifndef CONF_WM8731_H_INCLUDED
 #define CONF_WM8731_H_INCLUDED
 
-/** TWI Bus Clock 400kHz */
-#define WM8731_TWI_CLK     400000
-
 /** DMA Channel used for playback */
 #define WM8731_DMA_CH      0
 
