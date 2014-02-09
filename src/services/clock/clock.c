@@ -21,7 +21,7 @@ void RTC_Handler(void) {
 		rtc_disable_interrupt(RTC, RTC_IDR_SECDIS);
 
 		// Display the Time on the Clock Display
-		//hv5530_set_from_rtc();
+		hv5530_set_from_rtc();
 
 		// Trigger an Event to the Display Service
 		display_show_rtc();

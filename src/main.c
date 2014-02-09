@@ -127,21 +127,11 @@ int main(void)
 	/* Initialze the Audio Service */
 	audio_init();
 
-	/* Initialization Complete: Start Work */
+	/* Initialization Complete */
 
-	/* Main Loop */
+	/* Do Nothing */
 	while(1) {
-		/* Do Something */
-		// delay_ms(1000);
-
-		/* Test output to the hv5530 shift registers */
-		int i;
-		for (i = 0; i < 64; i++) {
-			uint8_t hv5530_test[8] = {255,255,255,255,255,255,255,255};
-			hv5530_test[7 - (i / 8)] &= ~(1 << (i % 8));
-			hv5530_set_registers(hv5530_test);
-			delay_ms(250);
-		}
+		delay_ms(1000);
 	};
 
 	return 0;
