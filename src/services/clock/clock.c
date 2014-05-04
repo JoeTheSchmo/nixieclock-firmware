@@ -29,7 +29,7 @@ void RTC_Handler(void) {
 		// Clear Second Event from RTC Status Register
 		rtc_clear_status(RTC, RTC_SCCR_SECCLR);
 
-		// Enable RTC Interrupt
+		// Enable RTC interrupt
 		rtc_enable_interrupt(RTC, RTC_IER_SECEN);
 	}
 }
@@ -44,7 +44,7 @@ void clock_init(void) {
 	// Configure RTC Interrupts
 	NVIC_DisableIRQ(RTC_IRQn);
 	NVIC_ClearPendingIRQ(RTC_IRQn);
-	NVIC_SetPriority(RTC_IRQn, 0);
+	NVIC_SetPriority(RTC_IRQn, 0xF);
 	NVIC_EnableIRQ(RTC_IRQn);
 	rtc_enable_interrupt(RTC, RTC_IER_SECEN);
 }

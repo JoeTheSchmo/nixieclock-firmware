@@ -52,11 +52,6 @@
  * running the ASF driver selector tool. Any changes will be discarded.
  */
 
-// Local Service: Audio
-#include <audio.h>
-
-// Local Service: Clock
-#include <clock.h>
 
 // From module: Common SAM compiler driver
 #include <compiler.h>
@@ -67,9 +62,6 @@
 
 // From module: Delay routines
 #include <delay.h>
-
-// Local Service: Display
-#include <display.h>
 
 // From module: FatFS file system
 #include <diskio.h>
@@ -85,9 +77,6 @@
 
 // From module: High Speed Multimedia Card Interface
 #include <hsmci.h>
-
-// Local Driver: hv5530 shift register
-#include <hv5530.h>
 
 // From module: IOPORT - General purpose I/O service
 #include <ioport.h>
@@ -130,9 +119,6 @@
 // From module: SPI - Serial Peripheral Interface
 #include <spi.h>
 
-// Local Driver: ssd1306 - OLED Display Driver
-#include <ssd1306.h>
-
 // From module: SSC - Synchronous Serial Controller
 #include <ssc.h>
 
@@ -171,5 +157,23 @@
 
 // From module: pio_handler support enabled
 #include <pio_handler.h>
+
+// Local Driver: hv5530 shift register
+#include <hv5530.h>
+
+// Local Driver: ssd1306 - OLED Display Driver
+#include <ssd1306.h>
+
+// Local Service: Clock
+#include <clock.h>
+
+// Local Service: Audio
+#include <audio.h>
+
+// Local Service: Display
+#include <display.h>
+
+// Local Service: dma - DMA Service
+#include <dma.h>
 
 #endif // ASF_H

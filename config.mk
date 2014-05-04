@@ -99,6 +99,7 @@ CSRCS = \
        ../src/services/audio/audio.c                      \
        ../src/services/clock/clock.c                      \
        ../src/services/display/display.c                  \
+       ../src/services/dma/dma.c                          \
        ../src/main.c
 
 # List of assembler source files.
@@ -150,7 +151,8 @@ INC_PATH = \
        ../src/drivers/ssd1306                             \
        ../src/services/audio                              \
        ../src/services/clock                              \
-       ../src/services/display/                           \
+       ../src/services/display                            \
+       ../src/services/dma                                \
        ../src
 
 # Additional search paths for libraries.

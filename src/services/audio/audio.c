@@ -11,6 +11,10 @@
 
 #include "conf_wm8731.h"
 
+void audio_dma_interrupt(uint32_t status) {
+
+}
+
 /**
  * \brief  Initial the WM8731 to play back the sample WAV file.
  */
@@ -92,14 +96,8 @@ static void init_audio_dma(void)
 {
 	uint32_t cfg;
 
-	/* Enable DMA controller */
-	dmac_enable(DMAC);
-
-	/* Initialize and enable DMA controller */
-	pmc_enable_periph_clk(ID_DMAC);
-	dmac_init(DMAC);
-	dmac_set_priority_mode(DMAC, DMAC_PRIORITY_ROUND_ROBIN);
-	dmac_enable(DMAC);
+	// Global DMA Initialize
+	dma_init();
 
 	/* Disable the DMA channel for SSC */
 	dmac_channel_disable(DMAC, WM8731_DMA_CH);
@@ -113,8 +111,8 @@ static void init_audio_dma(void)
 
 	dmac_channel_set_configuration(DMAC, WM8731_DMA_CH, cfg);
 
-	/* Set interrupt */
-	NVIC_EnableIRQ(DMAC_IRQn);
+	// Register interupt handler with DMA Service for this Channel
+	dma_register_interrupt_handler(WM8731_DMA_CH, audio_dma_interrupt);
 	dmac_enable_interrupt(DMAC, (DMAC_EBCIER_CBTC0 << WM8731_DMA_CH));
 }
 
