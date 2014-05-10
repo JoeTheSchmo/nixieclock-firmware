@@ -145,7 +145,7 @@ static inline void board_init_twi0(void) {
 	// Initialize TWI0
 	twi_options_t twi0_opt = {
 		.master_clk = sysclk_get_peripheral_hz(),
-		.speed = CONF_BOARD_TWI0_MASTER_CLK,
+		.speed = CONF_BOARD_TWI0_MASTER_CLK
 	};
 	twi_master_setup(TWI0, &twi0_opt);
 #endif

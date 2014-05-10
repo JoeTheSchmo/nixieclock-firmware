@@ -308,7 +308,7 @@
 //! SSD1306 TWI Interface
 #define TWI_SSD1306                     TWI0
 //! SSD1306 Slave address
-#define SSD1306_SLAVE_ADDRESS           0x3c
+#define SSD1306_SLAVE_ADDRESS           0x3C
 
 //! TWI0 Board Definitions
 
