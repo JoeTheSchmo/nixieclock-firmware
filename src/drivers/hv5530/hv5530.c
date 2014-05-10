@@ -10,20 +10,28 @@
 #include <asf.h>
 #include <string.h>
 
+/** Reusable DMA descriptor initialized with the driver. */
 dma_transfer_descriptor_t hv5530_dmac_tx;
+
+/** Local copy of the registers to be sent through SPI via the DMA controller. */
 uint8_t hv5530_registers[8] = {
 	0xFF, 0xFF, 0xFF, 0xFF,
 	0xFF, 0xFF, 0xFF, 0xFF
 };
 
+/** Enumeration describing the state of the hv5530 driver */
 volatile enum {
-	hv5530_tx = 1
+	hv5530_state_init = 1,  ///< If flag is set, the driver has been initialized
+	hv5530_state_tx = 2,    ///< If flag is set, DMA is in progress
+	hv5530_state_glow = 3   ///< If flag is set, brightness is intensifying
 } hv5530_state = 0;
 
-struct spi_device SPI_DEVICE_HV5530 = {
-	.id = 0
-};
-
+/** \brief Interrupt Handler for DMA Operations
+ *
+ * This function handles DMA interrupts related to our channel.
+ *
+ * \param status Copy of the DMAC Status Register
+ */
 void hv5530_dma_interrupt(uint32_t status) {
 	// Wait for the transmission to complete
 	while (!spi_is_tx_empty(SPI));
@@ -37,7 +45,52 @@ void hv5530_dma_interrupt(uint32_t status) {
 	gpio_set_pin_high(PIO_PC1_IDX);
 
 	// Clear the tx flag in the state register
-	hv5530_state &= ~hv5530_tx;
+	hv5530_state &= ~hv5530_state_tx;
+}
+
+
+/** \brief Interrupt Handler for TC0
+ *
+ * This function handles interrupts from the TC0 Module. Currently it receives
+ * a counter overflow and match on counter C. When the overflow status is
+ * received, the blank line is driven low, turning on the display. The RC
+ * register is set determing the overall duty cycle for the display. Varying
+ * slightly at every overflow to form a glowing effect. When the match on
+ * coutner C in encountered, the blanking line is driven high turning the
+ * display off until the next overflow occurs.
+ */
+void TC0_Handler(void) {
+	static uint32_t status;
+	status = tc_get_status(TC0, 0);
+
+	if (status & TC_SR_COVFS) {
+		// clock overflow, turn on the display
+		gpio_set_pin_low(PIO_PC0_IDX);
+
+		// read the current rc register
+		static uint32_t rc;
+		rc = tc_read_rc(TC0, 0);
+
+		// determine if we need to change fading in / fading out
+		if (rc > 0xB000) {
+			hv5530_state &= ~hv5530_state_glow;
+		} else if (rc < 0x5000) {
+			hv5530_state |= hv5530_state_glow;
+		}
+
+		// calculate the new duty cycle
+		if (hv5530_state & hv5530_state_glow) {
+			rc += 0x200;
+		} else {
+			rc -= 0x200;
+		}
+
+		// write the rc register
+		tc_write_rc(TC0, 0, rc);
+	} else if (status & TC_SR_CPCS) {
+		// rc match, turn off the display
+		gpio_set_pin_high(PIO_PC0_IDX);
+	}
 }
 
 /** \brief Write and Latch the Shift Registers
@@ -47,7 +100,7 @@ void hv5530_dma_interrupt(uint32_t status) {
  */
 void hv5530_write_registers() {
 	// Set the tx flag in the state register
-	hv5530_state |= hv5530_tx;
+	hv5530_state |= hv5530_state_tx;
 
 	// Start a new DMA transfer
 	dmac_channel_disable(DMAC, HV5530_DMA_CH);
@@ -165,14 +218,12 @@ void hv5530_set_from_rtc(void) {
 	hv5530_set_digits(ul_hour, ul_minute, ul_second);
 }
 
-/** \brief Initialize the Nixie Clock Display
+/** \brief Initialize the DMA Channel for the SPI Controller
  *
- * This function sets up the SPI Controller and a DMA channel that it will
- * use to asyncronously load the shift registers. The display will be
- * initialized to a blank state and then the High-Voltage Power Supply will
- * be turned on.
+ * This function sets up the DMA channel that it will be used to asyncronously
+ * load the shift registers via the SPI controller
  */
-void hv5530_init(void) {
+static void hv5530_init_dma(void) {
 	// Global DMA Initialize
 	dma_init();
 
@@ -204,22 +255,81 @@ void hv5530_init(void) {
 
 	hv5530_dmac_tx.ul_descriptor_addr = 0;
 
-	// Initialize the SPI controller
-	spi_disable(SPI);
-	spi_master_init(SPI);
-	spi_master_setup_device(SPI, &SPI_DEVICE_HV5530, SPI_MODE_3, 800000, 0);
-	spi_enable(SPI);
-
 	// Register interupt handler with DMA Service for this Channel
 	dma_register_interrupt_handler(HV5530_DMA_CH, hv5530_dma_interrupt);
 	dmac_enable_interrupt(DMAC, (DMAC_EBCIER_CBTC0 << HV5530_DMA_CH));
+}
+
+/** \brief Initialize the SPI Controller
+ *
+ * This function sets up the SPI controller with the proper mode for driving
+ * the hv5530 shift registers.
+ */
+static void hv5530_init_spi(void) {
+	struct spi_device device = {
+		.id = 0
+	};
+
+	// Initialize the SPI controller
+	spi_disable(SPI);
+	spi_master_init(SPI);
+	spi_master_setup_device(SPI, &device, SPI_MODE_3, 800000, 0);
+	spi_enable(SPI);
+}
+
+/** \brief Initialize the TC Module
+ *
+ * This function sets up the TC module for fading.
+ */
+static void hv5530_init_tc(void) {
+	// Configure PMC
+	pmc_enable_periph_clk(ID_TC0);
+
+	// Configure TC for MCK/8
+	tc_init(TC0, 0, TC_CMR_TCCLKS_TIMER_CLOCK3 | TC_CMR_WAVE);
+
+	// start with a duty cycle of ~5%
+	tc_write_rc(TC0, 0, 0x100);
+
+	// Configure and enable interrupt on overflow and RC compare
+	NVIC_DisableIRQ(TC0_IRQn);
+	NVIC_ClearPendingIRQ(TC0_IRQn);
+	NVIC_SetPriority(TC0_IRQn, 0x1);
+	NVIC_EnableIRQ(TC0_IRQn);
+
+	tc_enable_interrupt(TC0, 0, TC_IER_COVFS | TC_IER_CPCS);
+}
+
+/** \brief Initialize the Nixie Clock Display
+ *
+ * This function initializes all of the components required to drive the hv5530
+ * shift registers as well as properly drive the Nixie Tubes. Once the DMA
+ * Channel, SPI Controller, and Timer Counter Module are all setup. The display
+ * will be initialized to a blank state and then the High-Voltage Power Supply
+ * will be turned on.
+ */
+void hv5530_init(void) {
+	// Initialize the DMA channel
+	hv5530_init_dma();
+
+	// Initialize the SPI controller
+	hv5530_init_spi();
 
 	// Write the default state
 	hv5530_write_registers();
 
+	// Initialize the Timer Counter
+	hv5530_init_tc();
+
 	// Wait for the data to be latched
-	while (hv5530_state & hv5530_tx);
+	while (hv5530_state & hv5530_state_tx);
+
+	// Start the glow sequence
+	tc_start(TC0, 0);
 
 	// Enable the HV PSU
 	gpio_set_pin_high(PIO_PB0_IDX);
+
+	// set the initialized flag
+	hv5530_state |= hv5530_state_init;
 }
