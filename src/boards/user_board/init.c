@@ -63,10 +63,10 @@ void board_init(void)
 
 #ifdef CONF_BOARD_HV5530
 	/* Configure the HV Power Supply */
-	gpio_configure_pin(PIO_PB0_IDX, PIO_TYPE_PIO_OUTPUT_1 | PIO_DEFAULT); // HV Enable (Active Low)
+	gpio_configure_pin(PIO_PB0_IDX, PIO_TYPE_PIO_OUTPUT_0 | PIO_DEFAULT); // HV Enable (Active High)
 
 	/* Configure Misc GPIO for the HV5530 */
-	gpio_configure_pin(PIO_PC0_IDX, PIO_TYPE_PIO_OUTPUT_1 | PIO_DEFAULT); // Blank (Blank Low)
+	gpio_configure_pin(PIO_PC0_IDX, PIO_TYPE_PIO_OUTPUT_0 | PIO_DEFAULT); // Blank (Blank Low)
 	gpio_configure_pin(PIO_PC1_IDX, PIO_TYPE_PIO_OUTPUT_1 | PIO_DEFAULT); // Latch (Latch Low)
 #endif
 

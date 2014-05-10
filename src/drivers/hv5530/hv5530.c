@@ -207,7 +207,7 @@ void hv5530_init(void) {
 	// Initialize the SPI controller
 	spi_disable(SPI);
 	spi_master_init(SPI);
-	spi_master_setup_device(SPI, &SPI_DEVICE_HV5530, SPI_MODE_0, 800000, 0);
+	spi_master_setup_device(SPI, &SPI_DEVICE_HV5530, SPI_MODE_3, 800000, 0);
 	spi_enable(SPI);
 
 	// Register interupt handler with DMA Service for this Channel
@@ -221,5 +221,5 @@ void hv5530_init(void) {
 	while (hv5530_state & hv5530_tx);
 
 	// Enable the HV PSU
-	gpio_set_pin_low(PIO_PB0_IDX);
+	gpio_set_pin_high(PIO_PB0_IDX);
 }
