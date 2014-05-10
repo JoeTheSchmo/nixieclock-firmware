@@ -98,6 +98,27 @@
 #define CONSOLE_UART                    UART
 #define CONSOLE_UART_ID                 ID_UART
 
+//! BMP085 Board Definitions
+
+//! BMP085 TWI Interface
+#define TWI_BMP085                      TWI0
+//! BMP085 Slave address
+#define BMP085_SLAVE_ADDRESS            0xEE
+
+//! DS3231 Board Definitions
+
+//! DS3231 TWI Interface
+#define TWI_DS3231                      TWI0
+//! DS3231 Slave address
+#define DS3231_SLAVE_ADDRESS            0xD0
+
+//! HIH3160 Board Definitions
+
+//! HIH3160 TWI Interface
+#define TWI_HIH6130                     TWI0
+//! HIH3160 Slave address
+#define HIH6130_SLAVE_ADDRESS           0x42
+
 //! HSMCI Board Definitions
 
 //! Number of slot connected on HSMCI interface

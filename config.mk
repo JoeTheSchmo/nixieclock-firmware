@@ -93,9 +93,12 @@ CSRCS = \
        thirdparty/fatfs/fatfs-r0.09/src/ff.c              \
        thirdparty/fatfs/fatfs-r0.09/src/option/ccsbcs.c   \
        ../src/boards/user_board/init.c                    \
-       ../src/drivers/hv5530/hv5530.c                     \
-       ../src/drivers/ssd1306/ssd1306.c                   \
-       ../src/drivers/ssd1306/ssd1306_font8x8.c           \
+       ../src/components/display/hv5530/hv5530.c          \
+       ../src/components/display/ssd1306/ssd1306.c        \
+       ../src/components/display/ssd1306/ssd1306_font8x8.c \
+       ../src/components/environment/bmp085/bmp085.c      \
+       ../src/components/environment/hih6130/hih6130.c    \
+       ../src/components/rtc/ds3231/ds3231.c              \
        ../src/services/audio/audio.c                      \
        ../src/services/clock/clock.c                      \
        ../src/services/display/display.c                  \
@@ -145,9 +148,15 @@ INC_PATH = \
        ../src/boards                                      \
        ../src/boards/user_board                           \
        ../src/config                                      \
-       ../src/drivers                                     \
-       ../src/drivers/hv5530                              \
-       ../src/drivers/ssd1306                             \
+       ../src/components                                  \
+       ../src/components/display                          \
+       ../src/components/display/hv5530                   \
+       ../src/components/display/ssd1306                  \
+       ../src/components/environment                      \
+       ../src/components/environment/bmp085               \
+       ../src/components/environment/hih6130              \
+       ../src/components/rtc                              \
+       ../src/components/rtc/ds3231                       \
        ../src/services/audio                              \
        ../src/services/clock                              \
        ../src/services/display                            \

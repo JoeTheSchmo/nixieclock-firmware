@@ -155,6 +155,15 @@
 // From module: pio_handler support enabled
 #include <pio_handler.h>
 
+// Local Driver: bmp085 Sensor
+#include <bmp085.h>
+
+// Local Driver: ds3231 RTC
+#include <ds3231.h>
+
+// Local Driver: hih6130 Sensor
+#include <hih6130.h>
+
 // Local Driver: hv5530 shift register
 #include <hv5530.h>
 
