@@ -44,7 +44,7 @@
 #include "compiler.h"
 #include "board.h"
 #include "conf_board.h"
-#include "gpio.h"
+#include "pio.h"
 #include "ioport.h"
 #include "twi_master.h"
 
@@ -63,25 +63,25 @@ void board_init(void)
 
 #ifdef CONF_BOARD_HV5530
 	/* Configure the HV Power Supply */
-	gpio_configure_pin(PIO_PB0_IDX, PIO_TYPE_PIO_OUTPUT_0 | PIO_DEFAULT); // HV Enable (Active High)
+	pio_configure_pin(PIO_PB0_IDX, PIO_TYPE_PIO_OUTPUT_0 | PIO_DEFAULT); // HV Enable (Active High)
 
 	/* Configure Misc GPIO for the HV5530 */
-	gpio_configure_pin(PIO_PC0_IDX, PIO_TYPE_PIO_OUTPUT_1 | PIO_DEFAULT); // Blank (Blank High)
-	gpio_configure_pin(PIO_PC1_IDX, PIO_TYPE_PIO_OUTPUT_1 | PIO_DEFAULT); // Latch (Latch Low)
+	pio_configure_pin(PIO_PC0_IDX, PIO_TYPE_PIO_OUTPUT_1 | PIO_DEFAULT); // Blank (Blank High)
+	pio_configure_pin(PIO_PC1_IDX, PIO_TYPE_PIO_OUTPUT_1 | PIO_DEFAULT); // Latch (Latch Low)
 #endif
 
 	/* Configure Push Button pins */
-	gpio_configure_pin(GPIO_PUSH_BUTTON_1, GPIO_PUSH_BUTTON_1_FLAGS);
-	gpio_configure_pin(GPIO_PUSH_BUTTON_2, GPIO_PUSH_BUTTON_2_FLAGS);
+	pio_configure_pin(GPIO_PUSH_BUTTON_1, GPIO_PUSH_BUTTON_1_FLAGS);
+	pio_configure_pin(GPIO_PUSH_BUTTON_2, GPIO_PUSH_BUTTON_2_FLAGS);
 
 #ifdef CONF_BOARD_UART_CONSOLE
 	/* Configure UART pins */
-	gpio_configure_group(PINS_UART_PIO, PINS_UART, PINS_UART_FLAGS);
+	pio_configure_pin_group(PINS_UART_PIO, PINS_UART, PINS_UART_FLAGS);
 #endif
 
 #ifdef CONF_BOARD_TWI0
-	gpio_configure_pin(TWI0_DATA_GPIO, TWI0_DATA_FLAGS);
-	gpio_configure_pin(TWI0_CLK_GPIO, TWI0_CLK_FLAGS);
+	pio_configure_pin(TWI0_DATA_GPIO, TWI0_DATA_FLAGS);
+	pio_configure_pin(TWI0_CLK_GPIO, TWI0_CLK_FLAGS);
 #endif
 
 #ifdef CONF_BOARD_TWI0_MASTER_CLK
@@ -95,15 +95,15 @@ void board_init(void)
 
 
 #ifdef CONF_BOARD_TWI1
-	gpio_configure_pin(TWI1_DATA_GPIO, TWI1_DATA_FLAGS);
-	gpio_configure_pin(TWI1_CLK_GPIO, TWI1_CLK_FLAGS);
+	pio_configure_pin(TWI1_DATA_GPIO, TWI1_DATA_FLAGS);
+	pio_configure_pin(TWI1_CLK_GPIO, TWI1_CLK_FLAGS);
 #endif
 
 	/* Configure SPI pins */
 #ifdef CONF_BOARD_SPI
-	gpio_configure_pin(SPI_MISO_GPIO, SPI_MISO_FLAGS);
-	gpio_configure_pin(SPI_MOSI_GPIO, SPI_MOSI_FLAGS);
-	gpio_configure_pin(SPI_SPCK_GPIO, SPI_SPCK_FLAGS);
+	pio_configure_pin(SPI_MISO_GPIO, SPI_MISO_FLAGS);
+	pio_configure_pin(SPI_MOSI_GPIO, SPI_MOSI_FLAGS);
+	pio_configure_pin(SPI_SPCK_GPIO, SPI_SPCK_FLAGS);
 
 	/**
 	 * For NPCS 1, 2, and 3, different PINs can be used to access the same NPCS line.
@@ -113,122 +113,122 @@ void board_init(void)
 	 */
 
 #  ifdef CONF_BOARD_SPI_NPCS0
-	gpio_configure_pin(SPI_NPCS0_GPIO, SPI_NPCS0_FLAGS);
+	pio_configure_pin(SPI_NPCS0_GPIO, SPI_NPCS0_FLAGS);
 #  endif
 
 #  ifdef CONF_BOARD_SPI_NPCS1
 #    if defined(CONF_BOARD_SPI_NPCS1_GPIO) && defined(CONF_BOARD_SPI_NPCS1_FLAGS)
-	gpio_configure_pin(CONF_BOARD_SPI_NPCS1_GPIO, CONF_BOARD_SPI_NPCS1_FLAGS);
+	pio_configure_pin(CONF_BOARD_SPI_NPCS1_GPIO, CONF_BOARD_SPI_NPCS1_FLAGS);
 #    else
-	gpio_configure_pin(SPI_NPCS1_PA0_GPIO, SPI_NPCS1_PA0_FLAGS);
+	pio_configure_pin(SPI_NPCS1_PA0_GPIO, SPI_NPCS1_PA0_FLAGS);
 #    endif
 #  endif
 
 #  ifdef CONF_BOARD_SPI_NPCS2
 #    if defined(CONF_BOARD_SPI_NPCS2_GPIO) && defined(CONF_BOARD_SPI_NPCS2_FLAGS)
-	gpio_configure_pin(CONF_BOARD_SPI_NPCS2_GPIO, CONF_BOARD_SPI_NPCS2_FLAGS);
+	pio_configure_pin(CONF_BOARD_SPI_NPCS2_GPIO, CONF_BOARD_SPI_NPCS2_FLAGS);
 #    else
-	gpio_configure_pin(SPI_NPCS2_PA1_GPIO, SPI_NPCS2_PA1_FLAGS);
+	pio_configure_pin(SPI_NPCS2_PA1_GPIO, SPI_NPCS2_PA1_FLAGS);
 #    endif
 #  endif
 
 #  ifdef CONF_BOARD_SPI_NPCS3
 #    if defined(CONF_BOARD_SPI_NPCS3_GPIO) && defined(CONF_BOARD_SPI_NPCS3_FLAGS)
-	gpio_configure_pin(CONF_BOARD_SPI_NPCS3_GPIO, CONF_BOARD_SPI_NPCS3_FLAGS);
+	pio_configure_pin(CONF_BOARD_SPI_NPCS3_GPIO, CONF_BOARD_SPI_NPCS3_FLAGS);
 #    else
-	gpio_configure_pin(SPI_NPCS3_PA19_GPIO, SPI_NPCS3_PA19_FLAGS);
+	pio_configure_pin(SPI_NPCS3_PA19_GPIO, SPI_NPCS3_PA19_FLAGS);
 #    endif
 #  endif
 #endif /* CONF_BOARD_SPI */
 
 #ifdef CONF_BOARD_USART_RXD
 	/* Configure USART RXD pin */
-	gpio_configure_pin(PIN_USART1_RXD_IDX, PIN_USART1_RXD_FLAGS);
+	pio_configure_pin(PIN_USART1_RXD_IDX, PIN_USART1_RXD_FLAGS);
 #endif
 
 #ifdef CONF_BOARD_USART_TXD
 	/* Configure USART TXD pin */
-	gpio_configure_pin(PIN_USART1_TXD_IDX, PIN_USART1_TXD_FLAGS);
+	pio_configure_pin(PIN_USART1_TXD_IDX, PIN_USART1_TXD_FLAGS);
 #endif
 
 #ifdef CONF_BOARD_USART_CTS
 	/* Configure USART CTS pin */
-	gpio_configure_pin(PIN_USART1_CTS_IDX, PIN_USART1_CTS_FLAGS);
+	pio_configure_pin(PIN_USART1_CTS_IDX, PIN_USART1_CTS_FLAGS);
 #endif
 
 #ifdef CONF_BOARD_USART_RTS
 	/* Configure USART RTS pin */
-	gpio_configure_pin(PIN_USART1_RTS_IDX, PIN_USART1_RTS_FLAGS);
+	pio_configure_pin(PIN_USART1_RTS_IDX, PIN_USART1_RTS_FLAGS);
 #endif
 
 #ifdef CONF_BOARD_USART_SCK
 	/* Configure USART synchronous communication SCK pin */
-	gpio_configure_pin(PIN_USART1_SCK_IDX, PIN_USART1_SCK_FLAGS);
+	pio_configure_pin(PIN_USART1_SCK_IDX, PIN_USART1_SCK_FLAGS);
 #endif
 
 #ifdef CONF_BOARD_NAND
-	gpio_configure_pin(PIN_EBI_NANDOE, PIN_EBI_NANDOE_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDWE, PIN_EBI_NANDWE_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDCLE, PIN_EBI_NANDCLE_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDALE, PIN_EBI_NANDALE_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_0, PIN_EBI_NANDIO_0_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_1, PIN_EBI_NANDIO_1_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_2, PIN_EBI_NANDIO_2_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_3, PIN_EBI_NANDIO_3_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_4, PIN_EBI_NANDIO_4_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_5, PIN_EBI_NANDIO_5_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_6, PIN_EBI_NANDIO_6_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_7, PIN_EBI_NANDIO_7_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_8, PIN_EBI_NANDIO_8_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_9, PIN_EBI_NANDIO_9_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_10, PIN_EBI_NANDIO_10_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_11, PIN_EBI_NANDIO_11_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_12, PIN_EBI_NANDIO_12_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_13, PIN_EBI_NANDIO_13_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_14, PIN_EBI_NANDIO_14_FLAGS);
-	gpio_configure_pin(PIN_EBI_NANDIO_15, PIN_EBI_NANDIO_15_FLAGS);
-	gpio_configure_pin(PIN_NF_CE_IDX, PIN_NF_CE_FLAGS);
-	gpio_configure_pin(PIN_NF_RB_IDX, PIN_NF_RB_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDOE, PIN_EBI_NANDOE_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDWE, PIN_EBI_NANDWE_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDCLE, PIN_EBI_NANDCLE_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDALE, PIN_EBI_NANDALE_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_0, PIN_EBI_NANDIO_0_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_1, PIN_EBI_NANDIO_1_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_2, PIN_EBI_NANDIO_2_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_3, PIN_EBI_NANDIO_3_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_4, PIN_EBI_NANDIO_4_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_5, PIN_EBI_NANDIO_5_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_6, PIN_EBI_NANDIO_6_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_7, PIN_EBI_NANDIO_7_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_8, PIN_EBI_NANDIO_8_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_9, PIN_EBI_NANDIO_9_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_10, PIN_EBI_NANDIO_10_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_11, PIN_EBI_NANDIO_11_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_12, PIN_EBI_NANDIO_12_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_13, PIN_EBI_NANDIO_13_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_14, PIN_EBI_NANDIO_14_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_15, PIN_EBI_NANDIO_15_FLAGS);
+	pio_configure_pin(PIN_NF_CE_IDX, PIN_NF_CE_FLAGS);
+	pio_configure_pin(PIN_NF_RB_IDX, PIN_NF_RB_FLAGS);
 #endif
 
 #ifdef CONF_BOARD_TWI0
-	gpio_configure_pin(TWI0_DATA_GPIO, TWI0_DATA_FLAGS);
-	gpio_configure_pin(TWI0_CLK_GPIO, TWI0_CLK_FLAGS);
+	pio_configure_pin(TWI0_DATA_GPIO, TWI0_DATA_FLAGS);
+	pio_configure_pin(TWI0_CLK_GPIO, TWI0_CLK_FLAGS);
 #endif
 
 #ifdef CONF_BOARD_SSC
-	gpio_configure_pin(PIN_SSC_TD, PIN_SSC_TD_FLAGS);
-	gpio_configure_pin(PIN_SSC_TK, PIN_SSC_TK_FLAGS);
-	gpio_configure_pin(PIN_SSC_TF, PIN_SSC_TF_FLAGS);
-	gpio_configure_pin(PIN_SSC_RD, PIN_SSC_RD_FLAGS);
-	gpio_configure_pin(PIN_SSC_RK, PIN_SSC_RK_FLAGS);
-	gpio_configure_pin(PIN_SSC_RF, PIN_SSC_RF_FLAGS);
+	pio_configure_pin(PIN_SSC_TD, PIN_SSC_TD_FLAGS);
+	pio_configure_pin(PIN_SSC_TK, PIN_SSC_TK_FLAGS);
+	pio_configure_pin(PIN_SSC_TF, PIN_SSC_TF_FLAGS);
+	pio_configure_pin(PIN_SSC_RD, PIN_SSC_RD_FLAGS);
+	pio_configure_pin(PIN_SSC_RK, PIN_SSC_RK_FLAGS);
+	pio_configure_pin(PIN_SSC_RF, PIN_SSC_RF_FLAGS);
 #endif
 
 #ifdef CONF_BOARD_PCK0
-	gpio_configure_pin(PIN_PCK0, PIN_PCK0_FLAGS);
+	pio_configure_pin(PIN_PCK0, PIN_PCK0_FLAGS);
 #endif
 
 #ifdef CONF_BOARD_SD_MMC_HSMCI
 	/* Configure HSMCI pins */
-	gpio_configure_pin(PIN_HSMCI_MCCDA_GPIO, PIN_HSMCI_MCCDA_FLAGS);
-	gpio_configure_pin(PIN_HSMCI_MCCK_GPIO, PIN_HSMCI_MCCK_FLAGS);
-	gpio_configure_pin(PIN_HSMCI_MCDA0_GPIO, PIN_HSMCI_MCDA0_FLAGS);
-	gpio_configure_pin(PIN_HSMCI_MCDA1_GPIO, PIN_HSMCI_MCDA1_FLAGS);
-	gpio_configure_pin(PIN_HSMCI_MCDA2_GPIO, PIN_HSMCI_MCDA2_FLAGS);
-	gpio_configure_pin(PIN_HSMCI_MCDA3_GPIO, PIN_HSMCI_MCDA3_FLAGS);
-	gpio_configure_pin(PIN_HSMCI_MCDA4_GPIO, PIN_HSMCI_MCDA4_FLAGS);
-	gpio_configure_pin(PIN_HSMCI_MCDA5_GPIO, PIN_HSMCI_MCDA5_FLAGS);
-	gpio_configure_pin(PIN_HSMCI_MCDA6_GPIO, PIN_HSMCI_MCDA6_FLAGS);
-	gpio_configure_pin(PIN_HSMCI_MCDA7_GPIO, PIN_HSMCI_MCDA7_FLAGS);
+	pio_configure_pin(PIN_HSMCI_MCCDA_GPIO, PIN_HSMCI_MCCDA_FLAGS);
+	pio_configure_pin(PIN_HSMCI_MCCK_GPIO, PIN_HSMCI_MCCK_FLAGS);
+	pio_configure_pin(PIN_HSMCI_MCDA0_GPIO, PIN_HSMCI_MCDA0_FLAGS);
+	pio_configure_pin(PIN_HSMCI_MCDA1_GPIO, PIN_HSMCI_MCDA1_FLAGS);
+	pio_configure_pin(PIN_HSMCI_MCDA2_GPIO, PIN_HSMCI_MCDA2_FLAGS);
+	pio_configure_pin(PIN_HSMCI_MCDA3_GPIO, PIN_HSMCI_MCDA3_FLAGS);
+	pio_configure_pin(PIN_HSMCI_MCDA4_GPIO, PIN_HSMCI_MCDA4_FLAGS);
+	pio_configure_pin(PIN_HSMCI_MCDA5_GPIO, PIN_HSMCI_MCDA5_FLAGS);
+	pio_configure_pin(PIN_HSMCI_MCDA6_GPIO, PIN_HSMCI_MCDA6_FLAGS);
+	pio_configure_pin(PIN_HSMCI_MCDA7_GPIO, PIN_HSMCI_MCDA7_FLAGS);
 
 	/* Configure SD/MMC card detect pin */
-	gpio_configure_pin(SD_MMC_0_CD_GPIO, SD_MMC_0_CD_FLAGS);
+	pio_configure_pin(SD_MMC_0_CD_GPIO, SD_MMC_0_CD_FLAGS);
 #endif
 
 #if defined(CONF_BOARD_USB_PORT)
 #  if defined(CONF_BOARD_USB_VBUS_DETECT)
-	gpio_configure_pin(USB_VBUS_PIN, USB_VBUS_FLAGS);
+	pio_configure_pin(USB_VBUS_PIN, USB_VBUS_FLAGS);
 #  endif
 #endif
 }

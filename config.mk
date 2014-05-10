@@ -111,7 +111,6 @@ INC_PATH = \
        common/components/memory/sd_mmc                    \
        common/services/clock                              \
        common/services/delay                              \
-       common/services/gpio                               \
        common/services/ioport                             \
        common/services/serial                             \
        common/services/serial/sam_uart                    \

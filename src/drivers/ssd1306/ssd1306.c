@@ -532,30 +532,12 @@ uint32_t ssd1306_puts(char *s) {
 	return TWI_SUCCESS;
 }
 
-/** \brief Reset to the SSD1306 Controller.
- *
- * This function initializes the GPIO and provides the SSD1306 controller with
- * a RESET signal.
- */
-static void ssd1306_init_reset(void) {
-	// Initialize Reset GPIO
-	gpio_configure_pin(PIO_PC2_IDX, PIO_TYPE_PIO_OUTPUT_0 | PIO_DEFAULT);
-
-	// Issue a Reset to the controller
-	gpio_set_pin_low(PIO_PC2_IDX);
-	delay_ms(10);
-	gpio_set_pin_high(PIO_PC2_IDX);
-	delay_ms(10);
-}
-
 /** \brief Initialize the SSD1306 Driver and Controller
  * 
  * This function initializes the SSD1306 controller after a reset and enables
  * the display output
  */
 void ssd1306_init(void) {
-	ssd1306_init_reset();
-
 	// Initialize the Display Controller
 	ssd1306_set_display_on(0x0);
 	ssd1306_set_multiplex_ratio(0x1F);
