@@ -45,45 +45,32 @@
 #ifndef CONF_BOARD_H_INCLUDED
 #define CONF_BOARD_H_INCLUDED
 
-/* Configure HV5530 pins */
+//! Configure HV5530 pins
 #define CONF_BOARD_HV5530
 
-/* Configure UART pins */
+//! Configure UART pins
 #define CONF_BOARD_UART_CONSOLE
 
-/*
- * USART pins are configured as basic serial port by default.
- * You can enable other pins according application.
- */
-/* Configure USART RXD pin */
-//#define CONF_BOARD_USART_RXD
+//! Configure USART0 pins
+#define CONF_BOARD_USART0
 
-/* Configure USART TXD pin */
-//#define CONF_BOARD_USART_TXD
-
-/* Configure USART CTS pin */
-//#define CONF_BOARD_USART_CTS
-
-/* Configure USART RTS pin */
-//#define CONF_BOARD_USART_RTS
-
-/* Configure USART synchronous communication SCK pin */
-//#define CONF_BOARD_USART_SCK
-
-/** SPI MACRO definition */
+//! SPI MACRO definition
 #define CONF_BOARD_SPI
 
-/** Configure PCK0 pin */
+//! Configure PCK0 pin
 #define CONF_BOARD_PCK0
 
-/** Configure TWI0 pins */
+//! Configure TWI0 pins
 #define CONF_BOARD_TWI0
 #define CONF_BOARD_TWI0_MASTER_CLK 400000
 
-/** Configure SSC pins */
+//! Configure SSC pins
 #define CONF_BOARD_SSC
 
-/** Enable SD MMC interface pins through HSMCI */
+//! Enable SD MMC interface pins through HSMCI
 #define CONF_BOARD_SD_MMC_HSMCI
+
+//! Configure XBee Pins
+#define CONF_BOARD_XBEE
 
 #endif /* CONF_BOARD_H_INCLUDED */

@@ -40,9 +40,9 @@ void hv5530_dma_interrupt(uint32_t status) {
 	delay_us(1);
 
 	// Latch the output
-	pio_set_pin_low(PIO_PC1_IDX);
+	pio_set_pin_low(PIN_HV5530_LATCH_GPIO);
 	delay_us(1);
-	pio_set_pin_high(PIO_PC1_IDX);
+	pio_set_pin_high(PIN_HV5530_LATCH_GPIO);
 
 	// Clear the tx flag in the state register
 	hv5530_state &= ~hv5530_state_tx;
@@ -65,7 +65,7 @@ void TC0_Handler(void) {
 
 	if (status & TC_SR_COVFS) {
 		// clock overflow, turn on the display
-		pio_set_pin_low(PIO_PC0_IDX);
+		pio_set_pin_low(PIN_HV5530_BLANK_GPIO);
 
 		// read the current rc register
 		static uint32_t rc;
@@ -89,7 +89,7 @@ void TC0_Handler(void) {
 		tc_write_rc(TC0, 0, rc);
 	} else if (status & TC_SR_CPCS) {
 		// rc match, turn off the display
-		pio_set_pin_high(PIO_PC0_IDX);
+		pio_set_pin_high(PIN_HV5530_BLANK_GPIO);
 	}
 }
 
@@ -328,7 +328,7 @@ void hv5530_init(void) {
 	tc_start(TC0, 0);
 
 	// Enable the HV PSU
-	pio_set_pin_high(PIO_PB0_IDX);
+	pio_set_pin_high(PIN_HV5530_HVEN_GPIO);
 
 	// set the initialized flag
 	hv5530_state |= hv5530_state_init;

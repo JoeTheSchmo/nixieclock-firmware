@@ -48,169 +48,9 @@
 #include "ioport.h"
 #include "twi_master.h"
 
-void board_init(void)
-{
-#ifndef CONF_BOARD_KEEP_WATCHDOG_AT_INIT
-	/* Disable the watchdog */
-	WDT->WDT_MR = WDT_MR_WDDIS;
-#endif
-
-	/* GPIO has been deprecated, the old code just keeps it for compatibility.
-	 * In new designs IOPORT is used instead.
-	 * Here IOPORT must be initialized for others to use before setting up IO.
-	 */
-	ioport_init();
-
-#ifdef CONF_BOARD_HV5530
-	/* Configure the HV Power Supply */
-	pio_configure_pin(PIO_PB0_IDX, PIO_TYPE_PIO_OUTPUT_0 | PIO_DEFAULT); // HV Enable (Active High)
-
-	/* Configure Misc GPIO for the HV5530 */
-	pio_configure_pin(PIO_PC0_IDX, PIO_TYPE_PIO_OUTPUT_1 | PIO_DEFAULT); // Blank (Blank High)
-	pio_configure_pin(PIO_PC1_IDX, PIO_TYPE_PIO_OUTPUT_1 | PIO_DEFAULT); // Latch (Latch Low)
-#endif
-
-	/* Configure Push Button pins */
-	pio_configure_pin(GPIO_PUSH_BUTTON_1, GPIO_PUSH_BUTTON_1_FLAGS);
-	pio_configure_pin(GPIO_PUSH_BUTTON_2, GPIO_PUSH_BUTTON_2_FLAGS);
-
-#ifdef CONF_BOARD_UART_CONSOLE
-	/* Configure UART pins */
-	pio_configure_pin_group(PINS_UART_PIO, PINS_UART, PINS_UART_FLAGS);
-#endif
-
-#ifdef CONF_BOARD_TWI0
-	pio_configure_pin(TWI0_DATA_GPIO, TWI0_DATA_FLAGS);
-	pio_configure_pin(TWI0_CLK_GPIO, TWI0_CLK_FLAGS);
-#endif
-
-#ifdef CONF_BOARD_TWI0_MASTER_CLK
-	/* Initialize TWI0 */
-	twi_options_t twi0_opt = {
-		.master_clk = sysclk_get_peripheral_hz(),
-		.speed = CONF_BOARD_TWI0_MASTER_CLK,
-	};
-	twi_master_setup(TWI0, &twi0_opt);
-#endif
-
-
-#ifdef CONF_BOARD_TWI1
-	pio_configure_pin(TWI1_DATA_GPIO, TWI1_DATA_FLAGS);
-	pio_configure_pin(TWI1_CLK_GPIO, TWI1_CLK_FLAGS);
-#endif
-
-	/* Configure SPI pins */
-#ifdef CONF_BOARD_SPI
-	pio_configure_pin(SPI_MISO_GPIO, SPI_MISO_FLAGS);
-	pio_configure_pin(SPI_MOSI_GPIO, SPI_MOSI_FLAGS);
-	pio_configure_pin(SPI_SPCK_GPIO, SPI_SPCK_FLAGS);
-
-	/**
-	 * For NPCS 1, 2, and 3, different PINs can be used to access the same NPCS line.
-	 * Depending on the application requirements, the default PIN may not be available.
-	 * Hence a different PIN should be selected using the CONF_BOARD_SPI_NPCS_GPIO and
-	 * CONF_BOARD_SPI_NPCS_FLAGS macros.
-	 */
-
-#  ifdef CONF_BOARD_SPI_NPCS0
-	pio_configure_pin(SPI_NPCS0_GPIO, SPI_NPCS0_FLAGS);
-#  endif
-
-#  ifdef CONF_BOARD_SPI_NPCS1
-#    if defined(CONF_BOARD_SPI_NPCS1_GPIO) && defined(CONF_BOARD_SPI_NPCS1_FLAGS)
-	pio_configure_pin(CONF_BOARD_SPI_NPCS1_GPIO, CONF_BOARD_SPI_NPCS1_FLAGS);
-#    else
-	pio_configure_pin(SPI_NPCS1_PA0_GPIO, SPI_NPCS1_PA0_FLAGS);
-#    endif
-#  endif
-
-#  ifdef CONF_BOARD_SPI_NPCS2
-#    if defined(CONF_BOARD_SPI_NPCS2_GPIO) && defined(CONF_BOARD_SPI_NPCS2_FLAGS)
-	pio_configure_pin(CONF_BOARD_SPI_NPCS2_GPIO, CONF_BOARD_SPI_NPCS2_FLAGS);
-#    else
-	pio_configure_pin(SPI_NPCS2_PA1_GPIO, SPI_NPCS2_PA1_FLAGS);
-#    endif
-#  endif
-
-#  ifdef CONF_BOARD_SPI_NPCS3
-#    if defined(CONF_BOARD_SPI_NPCS3_GPIO) && defined(CONF_BOARD_SPI_NPCS3_FLAGS)
-	pio_configure_pin(CONF_BOARD_SPI_NPCS3_GPIO, CONF_BOARD_SPI_NPCS3_FLAGS);
-#    else
-	pio_configure_pin(SPI_NPCS3_PA19_GPIO, SPI_NPCS3_PA19_FLAGS);
-#    endif
-#  endif
-#endif /* CONF_BOARD_SPI */
-
-#ifdef CONF_BOARD_USART_RXD
-	/* Configure USART RXD pin */
-	pio_configure_pin(PIN_USART1_RXD_IDX, PIN_USART1_RXD_FLAGS);
-#endif
-
-#ifdef CONF_BOARD_USART_TXD
-	/* Configure USART TXD pin */
-	pio_configure_pin(PIN_USART1_TXD_IDX, PIN_USART1_TXD_FLAGS);
-#endif
-
-#ifdef CONF_BOARD_USART_CTS
-	/* Configure USART CTS pin */
-	pio_configure_pin(PIN_USART1_CTS_IDX, PIN_USART1_CTS_FLAGS);
-#endif
-
-#ifdef CONF_BOARD_USART_RTS
-	/* Configure USART RTS pin */
-	pio_configure_pin(PIN_USART1_RTS_IDX, PIN_USART1_RTS_FLAGS);
-#endif
-
-#ifdef CONF_BOARD_USART_SCK
-	/* Configure USART synchronous communication SCK pin */
-	pio_configure_pin(PIN_USART1_SCK_IDX, PIN_USART1_SCK_FLAGS);
-#endif
-
-#ifdef CONF_BOARD_NAND
-	pio_configure_pin(PIN_EBI_NANDOE, PIN_EBI_NANDOE_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDWE, PIN_EBI_NANDWE_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDCLE, PIN_EBI_NANDCLE_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDALE, PIN_EBI_NANDALE_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_0, PIN_EBI_NANDIO_0_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_1, PIN_EBI_NANDIO_1_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_2, PIN_EBI_NANDIO_2_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_3, PIN_EBI_NANDIO_3_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_4, PIN_EBI_NANDIO_4_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_5, PIN_EBI_NANDIO_5_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_6, PIN_EBI_NANDIO_6_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_7, PIN_EBI_NANDIO_7_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_8, PIN_EBI_NANDIO_8_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_9, PIN_EBI_NANDIO_9_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_10, PIN_EBI_NANDIO_10_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_11, PIN_EBI_NANDIO_11_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_12, PIN_EBI_NANDIO_12_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_13, PIN_EBI_NANDIO_13_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_14, PIN_EBI_NANDIO_14_FLAGS);
-	pio_configure_pin(PIN_EBI_NANDIO_15, PIN_EBI_NANDIO_15_FLAGS);
-	pio_configure_pin(PIN_NF_CE_IDX, PIN_NF_CE_FLAGS);
-	pio_configure_pin(PIN_NF_RB_IDX, PIN_NF_RB_FLAGS);
-#endif
-
-#ifdef CONF_BOARD_TWI0
-	pio_configure_pin(TWI0_DATA_GPIO, TWI0_DATA_FLAGS);
-	pio_configure_pin(TWI0_CLK_GPIO, TWI0_CLK_FLAGS);
-#endif
-
-#ifdef CONF_BOARD_SSC
-	pio_configure_pin(PIN_SSC_TD, PIN_SSC_TD_FLAGS);
-	pio_configure_pin(PIN_SSC_TK, PIN_SSC_TK_FLAGS);
-	pio_configure_pin(PIN_SSC_TF, PIN_SSC_TF_FLAGS);
-	pio_configure_pin(PIN_SSC_RD, PIN_SSC_RD_FLAGS);
-	pio_configure_pin(PIN_SSC_RK, PIN_SSC_RK_FLAGS);
-	pio_configure_pin(PIN_SSC_RF, PIN_SSC_RF_FLAGS);
-#endif
-
-#ifdef CONF_BOARD_PCK0
-	pio_configure_pin(PIN_PCK0, PIN_PCK0_FLAGS);
-#endif
-
+static inline void board_init_hsmci(void) {
 #ifdef CONF_BOARD_SD_MMC_HSMCI
-	/* Configure HSMCI pins */
+	// Configure HSMCI pins
 	pio_configure_pin(PIN_HSMCI_MCCDA_GPIO, PIN_HSMCI_MCCDA_FLAGS);
 	pio_configure_pin(PIN_HSMCI_MCCK_GPIO, PIN_HSMCI_MCCK_FLAGS);
 	pio_configure_pin(PIN_HSMCI_MCDA0_GPIO, PIN_HSMCI_MCDA0_FLAGS);
@@ -222,13 +62,142 @@ void board_init(void)
 	pio_configure_pin(PIN_HSMCI_MCDA6_GPIO, PIN_HSMCI_MCDA6_FLAGS);
 	pio_configure_pin(PIN_HSMCI_MCDA7_GPIO, PIN_HSMCI_MCDA7_FLAGS);
 
-	/* Configure SD/MMC card detect pin */
+	// Configure SD/MMC card detect pin
 	pio_configure_pin(SD_MMC_0_CD_GPIO, SD_MMC_0_CD_FLAGS);
 #endif
+}
 
-#if defined(CONF_BOARD_USB_PORT)
-#  if defined(CONF_BOARD_USB_VBUS_DETECT)
-	pio_configure_pin(USB_VBUS_PIN, USB_VBUS_FLAGS);
-#  endif
+static inline void board_init_hv5530(void) {
+#ifdef CONF_BOARD_HV5530
+	// Configure the HV Power Supply
+	pio_configure_pin(PIN_HV5530_HVEN_GPIO, PIN_HV5530_HVEN_FLAGS);
+
+	// Configure Misc GPIO for the HV5530
+	pio_configure_pin(PIN_HV5530_BLANK_GPIO, PIN_HV5530_BLANK_FLAGS);
+	pio_configure_pin(PIN_HV5530_LATCH_GPIO, PIN_HV5530_LATCH_FLAGS);
 #endif
+}
+
+static inline void board_init_nand(void) {
+#ifdef CONF_BOARD_NAND
+	// Configure NAND Pins
+	pio_configure_pin(PIN_EBI_NANDOE_GPIO, PIN_EBI_NANDOE_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDWE_GPIO, PIN_EBI_NANDWE_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDCLE_GPIO, PIN_EBI_NANDCLE_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDALE_GPIO, PIN_EBI_NANDALE_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_0_GPIO, PIN_EBI_NANDIO_0_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_1_GPIO, PIN_EBI_NANDIO_1_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_2_GPIO, PIN_EBI_NANDIO_2_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_3_GPIO, PIN_EBI_NANDIO_3_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_4_GPIO, PIN_EBI_NANDIO_4_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_5_GPIO, PIN_EBI_NANDIO_5_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_6_GPIO, PIN_EBI_NANDIO_6_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_7_GPIO, PIN_EBI_NANDIO_7_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_8_GPIO, PIN_EBI_NANDIO_8_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_9_GPIO, PIN_EBI_NANDIO_9_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_10_GPIO, PIN_EBI_NANDIO_10_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_11_GPIO, PIN_EBI_NANDIO_11_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_12_GPIO, PIN_EBI_NANDIO_12_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_13_GPIO, PIN_EBI_NANDIO_13_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_14_GPIO, PIN_EBI_NANDIO_14_FLAGS);
+	pio_configure_pin(PIN_EBI_NANDIO_15_GPIO, PIN_EBI_NANDIO_15_FLAGS);
+	pio_configure_pin(PIN_NF_CE_GPIO, PIN_NF_CE_FLAGS);
+	pio_configure_pin(PIN_NF_RB_GPIO, PIN_NF_RB_FLAGS);
+#endif
+}
+
+static inline void board_init_pck0(void) {
+#ifdef CONF_BOARD_PCK0
+	// Configure PCK0 Pin
+	pio_configure_pin(PIN_PCK0_GPIO, PIN_PCK0_FLAGS);
+#endif
+}
+
+static inline void board_init_spi(void) {
+#ifdef CONF_BOARD_SPI
+	// Configure SPI Pins
+	pio_configure_pin(PIN_SPI_MISO_GPIO, PIN_SPI_MISO_FLAGS);
+	pio_configure_pin(PIN_SPI_MOSI_GPIO, PIN_SPI_MOSI_FLAGS);
+	pio_configure_pin(PIN_SPI_SPCK_GPIO, PIN_SPI_SPCK_FLAGS);
+#endif
+}
+
+static inline void board_init_ssc(void) {
+#ifdef CONF_BOARD_SSC
+	// Configure SSC Pins
+	pio_configure_pin(PIN_SSC_TD_GPIO, PIN_SSC_TD_FLAGS);
+	pio_configure_pin(PIN_SSC_TK_GPIO, PIN_SSC_TK_FLAGS);
+	pio_configure_pin(PIN_SSC_TF_GPIO, PIN_SSC_TF_FLAGS);
+	pio_configure_pin(PIN_SSC_RD_GPIO, PIN_SSC_RD_FLAGS);
+	pio_configure_pin(PIN_SSC_RK_GPIO, PIN_SSC_RK_FLAGS);
+	pio_configure_pin(PIN_SSC_RF_GPIO, PIN_SSC_RF_FLAGS);
+#endif
+}
+
+static inline void board_init_twi0(void) {
+#ifdef CONF_BOARD_TWI0
+	// Configure TWI0 Pins
+	pio_configure_pin(PIN_TWI0_SDA_GPIO, PIN_TWI0_SDA_FLAGS);
+	pio_configure_pin(PIN_TWI0_SCL_GPIO, PIN_TWI0_SCL_FLAGS);
+#endif
+
+#ifdef CONF_BOARD_TWI0_MASTER_CLK
+	// Initialize TWI0
+	twi_options_t twi0_opt = {
+		.master_clk = sysclk_get_peripheral_hz(),
+		.speed = CONF_BOARD_TWI0_MASTER_CLK,
+	};
+	twi_master_setup(TWI0, &twi0_opt);
+#endif
+}
+
+static inline void board_init_uart(void) {
+#ifdef CONF_BOARD_UART_CONSOLE
+	// Configure UART Pins
+	pio_configure_pin(PIN_UART_URXD_GPIO, PIN_UART_URXD_FLAGS);
+	pio_configure_pin(PIN_UART_UTXD_GPIO, PIN_UART_UTXD_FLAGS);
+#endif
+}
+
+static inline void board_init_usart0(void) {
+#ifdef CONF_BOARD_USART0
+	// Configure UART Pins
+	pio_configure_pin(PIN_USART0_RXD_GPIO, PIN_USART0_RXD_FLAGS);
+	pio_configure_pin(PIN_USART0_TXD_GPIO, PIN_USART0_TXD_FLAGS);
+	pio_configure_pin(PIN_USART0_CTS_GPIO, PIN_USART0_CTS_FLAGS);
+	pio_configure_pin(PIN_USART0_RTS_GPIO, PIN_USART0_RTS_FLAGS);
+#endif
+}
+
+static inline void board_init_xbee(void) {
+#ifndef CONF_BOARD_XBEE
+	// Configure XBee Pins
+	pio_configure_pin(PIN_XBEE_SHDN_GPIO, PIN_XBEE_SHDN_FLAGS);
+	pio_configure_pin(PIN_XBEE_DTR_GPIO, PIN_XBEE_DTR_FLAGS);
+#endif
+}
+
+void board_init(void) {
+#ifndef CONF_BOARD_KEEP_WATCHDOG_AT_INIT
+	/* Disable the watchdog */
+	WDT->WDT_MR = WDT_MR_WDDIS;
+#endif
+
+	/* GPIO has been deprecated, the old code just keeps it for compatibility.
+	 * In new designs IOPORT is used instead.
+	 * Here IOPORT must be initialized for others to use before setting up IO.
+	 */
+	ioport_init();
+
+	// Initialize I/O and Peripherals
+	board_init_hsmci();
+	board_init_hv5530();
+	board_init_nand();
+	board_init_pck0();
+	board_init_spi();
+	board_init_ssc();
+	board_init_twi0();
+	board_init_uart();
+	board_init_usart0();
+	board_init_xbee();
 }
