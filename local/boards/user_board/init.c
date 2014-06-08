@@ -78,6 +78,15 @@ static inline void board_init_hv5530(void) {
 #endif
 }
 
+static inline void board_init_leds(void) {
+#ifdef CONF_BOARD_LEDS
+	pio_configure_pin(PIN_LED_0_GPIO, PIN_LED_0_FLAGS);
+	pio_configure_pin(PIN_LED_1_GPIO, PIN_LED_1_FLAGS);
+	pio_configure_pin(PIN_LED_2_GPIO, PIN_LED_2_FLAGS);
+	pio_configure_pin(PIN_LED_3_GPIO, PIN_LED_3_FLAGS);
+#endif
+}
+
 static inline void board_init_nand(void) {
 #ifdef CONF_BOARD_NAND
 	// Configure NAND Pins
@@ -192,6 +201,7 @@ void board_init(void) {
 	// Initialize I/O and Peripherals
 	board_init_hsmci();
 	board_init_hv5530();
+	board_init_leds();
 	board_init_nand();
 	board_init_pck0();
 	board_init_spi();

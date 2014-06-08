@@ -59,6 +59,18 @@ TARGET_SRAM = nixie1-$(VERSION)_sram.elf
 
 # List of C source files.
 CSRCS = \
+       ../local/boards/user_board/init.c \
+       ../local/applications/clock/main.c \
+       ../local/components/display/hv5530/hv5530.c \
+       ../local/components/display/ssd1306/ssd1306.c \
+       ../local/components/display/ssd1306/ssd1306_font8x8.c \
+       ../local/components/environment/bmp085/bmp085.c \
+       ../local/components/environment/hih6130/hih6130.c \
+       ../local/components/rtc/ds3231/ds3231.c \
+       ../local/services/audio/audio.c \
+       ../local/services/clock/clock.c \
+       ../local/services/display/display.c \
+       ../local/services/dma/dma.c \
        common/components/memory/sd_mmc/sd_mmc.c \
        common/components/memory/sd_mmc/sd_mmc_mem.c \
        common/services/clock/sam3u/sysclk.c \
@@ -91,25 +103,25 @@ CSRCS = \
        thirdparty/fatfs/fatfs-port-r0.09/diskio.c \
        thirdparty/fatfs/fatfs-port-r0.09/sam/fattime_rtc.c \
        thirdparty/fatfs/fatfs-r0.09/src/ff.c \
-       thirdparty/fatfs/fatfs-r0.09/src/option/ccsbcs.c \
-       ../local/boards/user_board/init.c \
-       ../local/applications/clock/main.c \
-       ../local/components/display/hv5530/hv5530.c \
-       ../local/components/display/ssd1306/ssd1306.c \
-       ../local/components/display/ssd1306/ssd1306_font8x8.c \
-       ../local/components/environment/bmp085/bmp085.c \
-       ../local/components/environment/hih6130/hih6130.c \
-       ../local/components/rtc/ds3231/ds3231.c \
-       ../local/services/audio/audio.c \
-       ../local/services/clock/clock.c \
-       ../local/services/display/display.c \
-       ../local/services/dma/dma.c
+       thirdparty/fatfs/fatfs-r0.09/src/option/ccsbcs.c
 
 # List of assembler source files.
 ASSRCS = 
 
 # List of include paths.
 INC_PATH = \
+       ../local/applications/clock \
+       ../local/applications/clock/config \
+       ../local/boards/user_board \
+       ../local/components/display/hv5530 \
+       ../local/components/display/ssd1306 \
+       ../local/components/environment/bmp085 \
+       ../local/components/environment/hih6130 \
+       ../local/components/rtc/ds3231 \
+       ../local/services/audio \
+       ../local/services/clock \
+       ../local/services/display \
+       ../local/services/dma \
        common/boards \
        common/components/memory/sd_mmc \
        common/services/clock \
@@ -144,19 +156,7 @@ INC_PATH = \
        sam/utils/preprocessor \
        thirdparty/CMSIS/Include \
        thirdparty/fatfs/fatfs-port-r0.09/sam \
-       thirdparty/fatfs/fatfs-r0.09/src \
-       ../local/applications/clock \
-       ../local/applications/clock/config \
-       ../local/boards/user_board \
-       ../local/components/display/hv5530 \
-       ../local/components/display/ssd1306 \
-       ../local/components/environment/bmp085 \
-       ../local/components/environment/hih6130 \
-       ../local/components/rtc/ds3231 \
-       ../local/services/audio \
-       ../local/services/clock \
-       ../local/services/display \
-       ../local/services/dma
+       thirdparty/fatfs/fatfs-r0.09/src
 
 # Additional search paths for libraries.
 LIB_PATH = \
@@ -172,8 +172,8 @@ LINKER_SCRIPT_FLASH = sam/utils/linker_scripts/sam3u/sam3u4/gcc/flash.ld
 LINKER_SCRIPT_SRAM  = sam/utils/linker_scripts/sam3u/sam3u4/gcc/sram.ld
 
 # Path relative to top level directory pointing to a linker script.
-DEBUG_SCRIPT_FLASH = ../src/boards/user_board/debug_scripts/gcc/sam3u_ek_flash.gdb
-DEBUG_SCRIPT_SRAM  = ../src/boards/user_board/debug_scripts/gcc/sam3u_ek_sram.gdb
+DEBUG_SCRIPT_FLASH = ../local/boards/user_board/debug_scripts/gcc/sam3u_ek_flash.gdb
+DEBUG_SCRIPT_SRAM  = ../local/boards/user_board/debug_scripts/gcc/sam3u_ek_sram.gdb
 
 # Project type parameter: all, sram or flash
 PROJECT_TYPE        = flash

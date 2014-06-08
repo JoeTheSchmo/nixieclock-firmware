@@ -73,6 +73,46 @@
 #include "conf_board.h"
 #include "conf_clock.h"
 
+void NMI_Handler(void) {
+	while(1) {};
+}
+void HardFault_Handler(void) {
+	SCB_Type *scb = (void*)(0xE000ED00);
+	if (scb->HFSR & SCB_HFSR_VECTTBL_Msk) {
+		pio_set_pin_high(PIN_LED_0_GPIO);
+	} else if (scb->HFSR & SCB_HFSR_FORCED_Msk) {
+		pio_set_pin_high(PIN_LED_1_GPIO);
+	} else if (scb->HFSR & SCB_HFSR_VECTTBL_Msk) {
+		pio_set_pin_high(PIN_LED_2_GPIO);
+	}
+	while(1) {};
+}
+void MemManage_Handler(void) {
+	pio_set_pin_high(PIN_LED_1_GPIO);
+	while(1) {};
+}
+void BusFault_Handler(void) {
+	pio_set_pin_high(PIN_LED_2_GPIO);
+	while(1) {};
+}
+void UsageFault_Handler(void) {
+	pio_set_pin_high(PIN_LED_3_GPIO);
+	while(1) {};
+}
+void SVC_Handler(void) {
+	while(1) {};
+}
+void DebugMon_Handler(void) {
+	while(1) {};
+}
+void PendSV_Handler(void) {
+	while(1) {};
+}
+void SysTick_Handler(void) {
+	while(1) {};
+}
+
+
 /**
  *  Configure UART console.
  */
@@ -80,7 +120,9 @@ static void configure_console(void)
 {
 	const usart_serial_options_t uart_serial_options = {
 		.baudrate = CONF_UART_BAUDRATE,
-		.paritytype = CONF_UART_PARITY
+		.charlength = US_MR_CHRL_8_BIT,
+		.paritytype = CONF_UART_PARITY,
+		.stopbits = US_MR_NBSTOP_1_BIT
 	};
 
 	/* Configure console UART. */
@@ -124,7 +166,7 @@ int main(void)
 	/* Initialize SD MMC stack */
 	sd_mmc_init();
 
-	/* Initialze the Audio Service */
+	/* Initialize the Audio Service */
 	audio_init();
 
 	/* Initialization Complete */

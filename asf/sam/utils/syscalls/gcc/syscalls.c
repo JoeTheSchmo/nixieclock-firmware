@@ -73,16 +73,11 @@ extern caddr_t _sbrk(int incr)
 {
 	static unsigned char *heap = NULL;
 	unsigned char *prev_heap;
-	int ramend = (int)&__ram_end__;
 
 	if (heap == NULL) {
 		heap = (unsigned char *)&_end;
 	}
 	prev_heap = heap;
-
-	if (((int)prev_heap + incr) > ramend) {
-		return (caddr_t) -1;	
-	}
 
 	heap += incr;
 

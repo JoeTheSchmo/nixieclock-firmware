@@ -174,6 +174,21 @@
 #define PIN_HV5530_LATCH_GPIO           (PIO_PC1_IDX)
 #define PIN_HV5530_LATCH_FLAGS          (PIO_TYPE_PIO_OUTPUT_1 | PIO_PULLUP)
 
+//! LEDS Board Definitions
+
+//! LED Indicator 0 Pin Definition
+#define PIN_LED_0_GPIO                  (PIO_PC15_IDX)
+#define PIN_LED_0_FLAGS                 (PIO_TYPE_PIO_OUTPUT_0 | PIO_DEFAULT)
+//! LED Indicator 1 Pin Definition
+#define PIN_LED_1_GPIO                  (PIO_PC16_IDX)
+#define PIN_LED_1_FLAGS                 (PIO_TYPE_PIO_OUTPUT_0 | PIO_DEFAULT)
+//! LED Indicator 2 Pin Definition
+#define PIN_LED_2_GPIO                  (PIO_PC17_IDX)
+#define PIN_LED_2_FLAGS                 (PIO_TYPE_PIO_OUTPUT_0 | PIO_DEFAULT)
+//! LED Indicator 3 Pin Definition
+#define PIN_LED_3_GPIO                  (PIO_PC18_IDX)
+#define PIN_LED_3_FLAGS                 (PIO_TYPE_PIO_OUTPUT_0 | PIO_DEFAULT)
+
 //! NAND Board Definitions
 
 //! NAND Pins Definition: OE
