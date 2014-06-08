@@ -49,7 +49,7 @@
 
 # Include the common Makefile, which will also include the project specific
 # config.mk file.
-MAKEFILE_PATH = ASF/sam/utils/make/Makefile.sam.in
+MAKEFILE_PATH = asf/sam/utils/make/Makefile.sam.in
 include $(MAKEFILE_PATH)
 
 docdir          := doxygen/html
