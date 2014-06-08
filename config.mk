@@ -93,6 +93,7 @@ CSRCS = \
        thirdparty/fatfs/fatfs-r0.09/src/ff.c \
        thirdparty/fatfs/fatfs-r0.09/src/option/ccsbcs.c \
        ../local/boards/user_board/init.c \
+       ../local/applications/clock/main.c \
        ../local/components/display/hv5530/hv5530.c \
        ../local/components/display/ssd1306/ssd1306.c \
        ../local/components/display/ssd1306/ssd1306_font8x8.c \
@@ -102,8 +103,7 @@ CSRCS = \
        ../local/services/audio/audio.c \
        ../local/services/clock/clock.c \
        ../local/services/display/display.c \
-       ../local/services/dma/dma.c \
-       ../local/main.c
+       ../local/services/dma/dma.c
 
 # List of assembler source files.
 ASSRCS = 
@@ -145,18 +145,13 @@ INC_PATH = \
        thirdparty/CMSIS/Include \
        thirdparty/fatfs/fatfs-port-r0.09/sam \
        thirdparty/fatfs/fatfs-r0.09/src \
-       ../local \
-       ../local/boards \
+       ../local/applications/clock \
+       ../local/applications/clock/config \
        ../local/boards/user_board \
-       ../local/config \
-       ../local/components \
-       ../local/components/display \
        ../local/components/display/hv5530 \
        ../local/components/display/ssd1306 \
-       ../local/components/environment \
        ../local/components/environment/bmp085 \
        ../local/components/environment/hih6130 \
-       ../local/components/rtc \
        ../local/components/rtc/ds3231 \
        ../local/services/audio \
        ../local/services/clock \
