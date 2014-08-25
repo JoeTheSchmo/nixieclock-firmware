@@ -1,12 +1,4 @@
-/.cproject
-/.project
-/.settings
-*.bin
+/docs/html
+*.o
 *.d
 *.elf
-*.hex
-*.lss
-*.map
-*.o
-*.swp
-*.sym
