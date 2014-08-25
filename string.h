@@ -13,7 +13,9 @@
 #include "types.h"
 
 extern char *strcat(char *d, const char *s);
-extern char *strncat(char *d, const char *s, size_t n);
+extern int32_t strcmp(const char *s1, const char *s2);
 extern size_t strlen(const char *s);
+extern char *strncat(char *d, const char *s, size_t n);
+extern int32_t strncmp(const char *s1, const char *s2, size_t n);
 
 #endif // _STRING_H_

@@ -59,20 +59,7 @@ void kmain(void) {
 	PIO_SODR(PIN_LED_0_PIO) = (1 << PIN_LED_0_IDX);
 
 	// Basic Serial Console
-	char c;
 	while(1) {
-		// Echo back the serial console
-		if (0 == kgetc(&c)) {
-			kputc(c);
-			if (c == '\r') {
-				kputc('\n');
-			}
-
-			// Reset the Processor and Peripherals
-			if (c == 'r') {
-				RSTC_CR = RSTC_CR_PROCRST | RSTC_CR_PERRST | RSTC_CR_KEY;
-			}
-
-		}
+		console_shell();
 	}
 }

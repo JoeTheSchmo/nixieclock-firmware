@@ -12,6 +12,7 @@
 
 #include "types.h"
 
+extern int32_t isprint(const char c);
 extern int32_t isspace(const char c);
 extern char toupper(const char c);
 extern char tolower(const char c);

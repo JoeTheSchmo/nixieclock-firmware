@@ -92,9 +92,6 @@ void rtc_handler() {
 
 		// Notify the Display Service of this Event
 		display_rtc_update();
-
-		// For Debugging Print the Time to the Console
-		kprintf("\rTOD = %02u:%02u:%02u", clock_time_hour, clock_time_minute, clock_time_second);
 	}
 }
 
@@ -128,7 +125,7 @@ int32_t clock_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
 		hour -= 12;
 	}
 	// Stage Time of Day
-	timr |= RTC_TIMR_HOUR(((hour / 10) << 4) + (hour % 10));
+	timr |= RTC_TIMR_HOUR(hour);
 	timr |= RTC_TIMR_MIN(((minute / 10) << 4) + (minute % 10));
 	timr |= RTC_TIMR_SEC(((second / 10) << 4) + (second % 10));
 	// Write the Value to the Register

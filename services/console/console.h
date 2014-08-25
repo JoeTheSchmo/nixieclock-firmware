@@ -11,5 +11,6 @@
 #define _COSNOLE_H_
 
 extern void console_init(void);
+extern void console_shell(void);
 
 #endif // _CONSOLE_H_
