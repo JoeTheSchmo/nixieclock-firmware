@@ -29,6 +29,7 @@ OBJS            += components/hv5530/hv5530.o
 OBJS            += components/ssd1306/ssd1306.o
 OBJS            += components/ssd1306/ssd1306_font8x8.o
 OBJS            += cpu/vectors.o
+OBJS            += drivers/twi/twi_master.o
 OBJS            += lib/ctype/isprint.o
 OBJS            += lib/ctype/isspace.o
 OBJS            += lib/ctype/toupper.o

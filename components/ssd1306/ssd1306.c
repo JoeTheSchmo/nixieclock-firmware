@@ -9,9 +9,9 @@
 
 #include "types.h"
 #include "ssd1306.h"
-#include "cpu/peripherals/twi.h"
+#include "drivers/twi/twi_master.h"
 
-//! Address of the Slave Device in the TWI Bus
+//! Address of the Slave Device on the TWI Bus
 #define SSD1306_SLAVE_ADDRESS 0x3C
 
 /** \brief Write to the SSD1306 Controller via the TWI Bus
@@ -20,37 +20,10 @@
  * \param[in] len The length of the command or data to be sent
  * \param[in] ptr A pointer to the command or data to be sent
  *
- * \return 0 if all bytes were written, error code otherwise.
+ * \return 0 if all bytes were written, -1 if an error occurred.
  */
-uint32_t ssd1306_write_register(uint8_t addr, uint8_t len, uint8_t *ptr) {
-	// Set the Master Mode Register
-	TWI_MMR(TWI0) = TWI_MMR_IADRSZ(TWI_MMR_IADRSZ_1_BYTE) | TWI_MMR_DADR(SSD1306_SLAVE_ADDRESS);
-	// Set the Slave Device Internal Address
-	TWI_IADR(TWI0) = TWI_IADR_IADR(addr);
-
-	// Send the data
-	while (len > 0) {
-		// Wait until TXRDY is set
-		uint32_t status = TWI_SR(TWI0);
-		if (!(status & TWI_SR_TXRDY)) {
-			continue;
-		}
-
-		// Shift the data into the register and decrement the remaining count
-		TWI_THR(TWI0) = TWI_THR_TXDATA(*ptr++);
-		len--;
-
-		// Check for a NACK
-		if (status & TWI_SR_NACK) {
-			return -1;
-		}
-	}
-
-	// Write a STOP Command
-	TWI_CR(TWI0) = TWI_CR_STOP;
-	while (!(TWI_SR(TWI0) & TWI_SR_TXCOMP));
-
-	return 0;
+inline int32_t ssd1306_write_register(uint8_t addr, uint8_t len, uint8_t *ptr) {
+	return twi_master_write(SSD1306_SLAVE_ADDRESS, addr, len, ptr);
 }
 
 /** \brief Set Contrast Control
@@ -63,7 +36,7 @@ uint32_t ssd1306_write_register(uint8_t addr, uint8_t len, uint8_t *ptr) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_contrast(uint8_t uc_contrast) {
+int32_t ssd1306_set_contrast(uint8_t uc_contrast) {
 	uint8_t data[2] = {
 		0x81,
 		uc_contrast
@@ -84,7 +57,7 @@ uint32_t ssd1306_set_contrast(uint8_t uc_contrast) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_entire_display_on(uint8_t uc_display_on) {
+int32_t ssd1306_set_entire_display_on(uint8_t uc_display_on) {
 	uint8_t data[1] = {
 		(0xA4 + (uc_display_on & 0x01))
 	};
@@ -105,7 +78,7 @@ uint32_t ssd1306_set_entire_display_on(uint8_t uc_display_on) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_display_invert(uint8_t uc_display_invert) {
+int32_t ssd1306_set_display_invert(uint8_t uc_display_invert) {
 	uint8_t data[1] = {
 		(0xA6 + (uc_display_invert & 0x01))
 	};
@@ -128,7 +101,7 @@ uint32_t ssd1306_set_display_invert(uint8_t uc_display_invert) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_display_on(uint8_t uc_display_on) {
+int32_t ssd1306_set_display_on(uint8_t uc_display_on) {
 	uint8_t data[1] = {
 		(0xAE + (uc_display_on & 0x01))
 	};
@@ -146,7 +119,7 @@ uint32_t ssd1306_set_display_on(uint8_t uc_display_on) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_column_start_addr_low(uint8_t uc_low_nib) {
+int32_t ssd1306_set_column_start_addr_low(uint8_t uc_low_nib) {
 	uint8_t data[1] = {
 		(0x00 + (uc_low_nib & 0x0F))
 	};
@@ -164,7 +137,7 @@ uint32_t ssd1306_set_column_start_addr_low(uint8_t uc_low_nib) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_column_start_addr_high(uint8_t uc_high_nib) {
+int32_t ssd1306_set_column_start_addr_high(uint8_t uc_high_nib) {
 	uint8_t data[1] = {
 		(0x10 + (uc_high_nib & 0x0F))
 	};
@@ -182,7 +155,7 @@ uint32_t ssd1306_set_column_start_addr_high(uint8_t uc_high_nib) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_column_start_addr(uint8_t uc_addr) {
+int32_t ssd1306_set_column_start_addr(uint8_t uc_addr) {
 	uint8_t data[2] = {
 		(0x10 + ((uc_addr >> 4) & 0x0F)),
 		(0x00 + (uc_addr & 0x0F)),
@@ -227,7 +200,7 @@ uint32_t ssd1306_set_column_start_addr(uint8_t uc_addr) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_mem_addr_mode(uint8_t uc_mode) {
+int32_t ssd1306_set_mem_addr_mode(uint8_t uc_mode) {
 	uint8_t data[2] = {
 		0x20,
 		(0x00 + (uc_mode & 0x03))
@@ -252,7 +225,7 @@ uint32_t ssd1306_set_mem_addr_mode(uint8_t uc_mode) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_column_addr(uint8_t uc_start, uint8_t uc_end) {
+int32_t ssd1306_set_column_addr(uint8_t uc_start, uint8_t uc_end) {
 	uint8_t data[3] = {
 		0x21,
 		(uc_start & 0x7F),
@@ -278,7 +251,7 @@ uint32_t ssd1306_set_column_addr(uint8_t uc_start, uint8_t uc_end) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_page_addr(uint8_t uc_start, uint8_t uc_end) {
+int32_t ssd1306_set_page_addr(uint8_t uc_start, uint8_t uc_end) {
 	uint8_t data[3] = {
 		0x22,
 		(uc_start & 0x07),
@@ -297,7 +270,7 @@ uint32_t ssd1306_set_page_addr(uint8_t uc_start, uint8_t uc_end) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_page_start_addr(uint8_t uc_addr) {
+int32_t ssd1306_set_page_start_addr(uint8_t uc_addr) {
 	uint8_t data[1] = {
 		(0xB0 | (uc_addr & 0x07))
 	};
@@ -316,7 +289,7 @@ uint32_t ssd1306_set_page_start_addr(uint8_t uc_addr) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_display_start_line(uint8_t uc_register) {
+int32_t ssd1306_set_display_start_line(uint8_t uc_register) {
 	uint8_t data[1] = {
 		(0x40 + (uc_register * 0x3F))
 	};
@@ -339,7 +312,7 @@ uint32_t ssd1306_set_display_start_line(uint8_t uc_register) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_segment_remap(uint8_t uc_map) {
+int32_t ssd1306_set_segment_remap(uint8_t uc_map) {
 	uint8_t data[1] = {
 		(0xA0 + (uc_map * 0x01))
 	};
@@ -360,7 +333,7 @@ uint32_t ssd1306_set_segment_remap(uint8_t uc_map) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_multiplex_ratio(uint8_t uc_ratio) {
+int32_t ssd1306_set_multiplex_ratio(uint8_t uc_ratio) {
 	uint8_t data[2] = {
 		0xA8,
 		(uc_ratio & 0x3F)
@@ -385,7 +358,7 @@ uint32_t ssd1306_set_multiplex_ratio(uint8_t uc_ratio) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_com_scan_dir(uint8_t uc_direction) {
+int32_t ssd1306_set_com_scan_dir(uint8_t uc_direction) {
 	uint8_t data[1] = {
 		(0xC0 + ((uc_direction & 0x01) << 3))
 	};
@@ -408,7 +381,7 @@ uint32_t ssd1306_set_com_scan_dir(uint8_t uc_direction) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_display_offset(uint8_t uc_offset) {
+int32_t ssd1306_set_display_offset(uint8_t uc_offset) {
 	uint8_t data[2] = {
 		0xD3,
 		(uc_offset & 0x3F)
@@ -427,7 +400,7 @@ uint32_t ssd1306_set_display_offset(uint8_t uc_offset) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_com_pins(uint8_t uc_remap, uint8_t uc_alt) {
+int32_t ssd1306_set_com_pins(uint8_t uc_remap, uint8_t uc_alt) {
 	uint8_t data[2] = {
 		0xDA,
 		(0x02 | ((uc_remap & 0x01) << 5) | ((uc_alt & 0x01) << 4))
@@ -453,7 +426,7 @@ uint32_t ssd1306_set_com_pins(uint8_t uc_remap, uint8_t uc_alt) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_clock_ratio(uint8_t uc_osc, uint8_t uc_ratio) {
+int32_t ssd1306_set_clock_ratio(uint8_t uc_osc, uint8_t uc_ratio) {
 	uint8_t data[2] = {
 		0xD5,
 		(((uc_osc & 0x0F) << 4) | (uc_ratio & 0x0F))
@@ -472,7 +445,7 @@ uint32_t ssd1306_set_clock_ratio(uint8_t uc_osc, uint8_t uc_ratio) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_precharge_period(uint8_t uc_phase2, uint8_t uc_phase1) {
+int32_t ssd1306_set_precharge_period(uint8_t uc_phase2, uint8_t uc_phase1) {
 	uint8_t data[2] = {
 		0xD9,
 		(((uc_phase2 & 0x0F) << 4) | (uc_phase1 & 0x0F))
@@ -493,7 +466,7 @@ uint32_t ssd1306_set_precharge_period(uint8_t uc_phase2, uint8_t uc_phase1) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_vcomh(uint8_t uc_deselect) {
+int32_t ssd1306_set_vcomh(uint8_t uc_deselect) {
 	uint8_t data[2] = {
 		0xDB,
 		((uc_deselect & 0x07) << 4)
@@ -513,7 +486,7 @@ uint32_t ssd1306_set_vcomh(uint8_t uc_deselect) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_set_charge_pump_enable(uint8_t uc_enable) {
+int32_t ssd1306_set_charge_pump_enable(uint8_t uc_enable) {
 	uint8_t data[2] = {
 		0x8D,
 		(0x10 + ((uc_enable & 0x01) << 2))
@@ -531,7 +504,7 @@ uint32_t ssd1306_set_charge_pump_enable(uint8_t uc_enable) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_putc(const char c) {
+int32_t ssd1306_putc(const char c) {
 	return ssd1306_write_register(0x40, 8, ssd1306_font8x8[c & 0x7F]);
 }
 
@@ -544,7 +517,7 @@ uint32_t ssd1306_putc(const char c) {
  *
  * \return 0 if all bytes were written, error code otherwise.
  */
-uint32_t ssd1306_puts(const char *s) {
+int32_t ssd1306_puts(const char *s) {
 	uint32_t ret;
 	while (*s) {
 		ret = ssd1306_putc(*s++);
