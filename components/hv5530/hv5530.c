@@ -27,7 +27,7 @@ volatile uint8_t hv5530_tx_pos = 8;
 volatile enum {
         hv5530_state_init = 1,  //!< If flag is set, the driver has been initialized
         hv5530_state_tx = 2,    //!< If flag is set, TX is in progress
-        hv5530_state_glow = 3   //!< If flag is set, brightness is intensifying
+        hv5530_state_glow = 4   //!< If flag is set, brightness is intensifying
 } hv5530_state = 0;
 
 /** \brief Interrupt Handler for TC0
