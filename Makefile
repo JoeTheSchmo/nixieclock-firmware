@@ -25,6 +25,7 @@ LDFLAGS         += --gc-sections
 
 OBJS            := kmain.o
 OBJS            += board/init.o
+OBJS            += components/ds3231/ds3231.o
 OBJS            += components/hv5530/hv5530.o
 OBJS            += components/ssd1306/ssd1306.o
 OBJS            += components/ssd1306/ssd1306_font8x8.o
@@ -41,6 +42,7 @@ OBJS            += lib/stdio/kputs.o
 OBJS            += lib/stdlib/ltostr.o
 OBJS            += lib/stdlib/strtoul.o
 OBJS            += lib/stdlib/ultostr.o
+OBJS            += lib/string/memset.o
 OBJS            += lib/string/strlen.o
 OBJS            += lib/string/strcat.o
 OBJS            += lib/string/strcmp.o

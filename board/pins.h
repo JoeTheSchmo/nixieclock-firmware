@@ -10,6 +10,12 @@
 #ifndef _BOARD_PINS_H_
 #define _BOARD_PINS_H_
 
+//! DS3231 Board Definitions
+
+//! DS3231 Interrupt Pin
+#define PIN_DS3231_INT_PIO PIOC
+#define PIN_DS3231_INT_IDX 2
+
 //! HV5530 Board Definitions
 
 //! HV5530 High Voltage Enable Pin Definition

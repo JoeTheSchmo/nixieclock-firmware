@@ -16,6 +16,13 @@
 #include "cpu/peripherals/wdt.h"
 #include "types.h"
 
+static inline void board_init_ds3231(void) {
+	// Configure PIN_DS3231_INT
+	PIO_PER(PIN_DS3231_INT_PIO)  = (1 << PIN_DS3231_INT_IDX);    // Enable PIO on Pin
+	PIO_ODR(PIN_DS3231_INT_PIO)  = (1 << PIN_DS3231_INT_IDX);    // Disable Output
+	PIO_PUDR(PIN_DS3231_INT_PIO) = (1 << PIN_DS3231_INT_IDX);    // Disable Pull-Up
+}
+
 static inline void board_init_hv5530(void) {
 	// Configure PIN_HV5530_HVEN
 	PIO_PER(PIN_HV5530_HVEN_PIO)  = (1 << PIN_HV5530_HVEN_IDX);    // Enable PIO on Pin
@@ -120,6 +127,7 @@ void board_init(void) {
 	RSTC_MR |= RSTC_MR_ERSTL(11) | RSTC_MR_KEY;
 
 	// Setup the Peripherals
+	board_init_ds3231();
 	board_init_hv5530();
 	board_init_leds();
 	board_init_pck0();
