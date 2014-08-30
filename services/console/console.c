@@ -7,8 +7,11 @@
  *
  */
 
+
+#include "board/pins.h"
 #include "console.h"
 #include "ctype.h"
+#include "cpu/peripherals/pio.h"
 #include "cpu/peripherals/rstc.h"
 #include "cpu/peripherals/uart.h"
 #include "services/clock/clock.h"
@@ -74,9 +77,17 @@ void console_shell(void) {
 					// Acknowledge the carriage return
 					kputs("\r\n");
 
-					// Print the command back to the console
-					if (strcmp(buffer, "reset") == 0) {
+					// Process the command
+					if (*buffer == '\0') {
+						// Do nothing, empty line
+					} else if (strcmp(buffer, "reset") == 0) {
 						RSTC_CR = RSTC_CR_PROCRST | RSTC_CR_PERRST | RSTC_CR_KEY;
+					} else if (strcmp(buffer, "hvoff") == 0) {
+						// Turn off the high voltage power supply
+						PIO_CODR(PIN_HV5530_HVEN_PIO) = (1 << PIN_HV5530_HVEN_IDX);
+					} else if (strcmp(buffer, "hvon") == 0) {
+						// Turn on the high voltage power supply
+						PIO_SODR(PIN_HV5530_HVEN_PIO) = (1 << PIN_HV5530_HVEN_IDX);
 					} else if (strncmp(buffer, "clock set ", 10) == 0) {
 						const char *p = buffer + 10;
 
@@ -112,16 +123,22 @@ void console_shell(void) {
 						uint32_t second = strtoul(p, &p, 10);
 
 						// Pass the data to the clock service
-						clock_set_date(year / 100, year % 100, month, day, date);
-						clock_set_time(hour, minute, second);
+						if (clock_set_date(year / 100, year % 100, month, day, date) < 0) {
+							kputs("Invalid date provided, please try again.\r\n");
+						}
+						if (clock_set_time(hour, minute, second) < 0) {
+							kputs("Invalid time specified, please try again.\r\n");
+						}
 					} else {
 						kputs("Invalid Command\r\n");
 					}
+					break;
+				}
 
+				if (c == '\r') {
 					// Clear the Buffer
 					cmd_len = 0;
 					buffer[0] = '\0';
-					break;
 				}
 			}
 		}

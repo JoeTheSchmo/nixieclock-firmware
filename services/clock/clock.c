@@ -68,7 +68,7 @@ void clock_refresh_globals(void) {
 	clock_cal_month = (10 * ((month & 0xF0) >> 4)) + (month & 0xF);
 	clock_cal_day = day;
 	clock_cal_date = (10 * ((date & 0xF0) >> 4)) + (date & 0xF);
-	clock_time_hour = hour;
+	clock_time_hour = (10 * ((hour & 0xF0) >> 4)) + (hour & 0xF);
 	clock_time_minute = (10 * ((minute & 0xF0) >> 4)) + (minute & 0xF);
 	clock_time_second = (10 * ((second & 0xF0) >> 4)) + (second & 0xF);
 }
@@ -125,7 +125,7 @@ int32_t clock_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
 		hour -= 12;
 	}
 	// Stage Time of Day
-	timr |= RTC_TIMR_HOUR(hour);
+	timr |= RTC_TIMR_HOUR(((hour / 10) << 4) + (hour % 10));
 	timr |= RTC_TIMR_MIN(((minute / 10) << 4) + (minute % 10));
 	timr |= RTC_TIMR_SEC(((second / 10) << 4) + (second % 10));
 	// Write the Value to the Register
