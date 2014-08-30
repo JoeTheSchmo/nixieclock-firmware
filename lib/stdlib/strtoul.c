@@ -37,6 +37,7 @@ uint32_t strtoul(const char *nptr, const char **endptr, int8_t base) {
 	if ((base == 0)||(base == 16)) {
 		if (*nptr == '0') {
 			if (*++nptr == 'x') {
+				nptr++;
 				base = 16;
 			} else {
 				nptr--;
@@ -70,7 +71,7 @@ uint32_t strtoul(const char *nptr, const char **endptr, int8_t base) {
 		if ((c >= '0')&&(c <= '9')) {
 			value = (value * base) + (c - '0');
 		} else {
-			value = (value * base) + (c - 'a');
+			value = (value * base) + (c - 'a') + 10;
 		}
 
 		nptr++;
