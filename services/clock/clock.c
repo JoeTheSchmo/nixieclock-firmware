@@ -7,29 +7,24 @@
  *
  */
 
+#include "components/ds3231/ds3231.h"
 #include "components/hv5530/hv5530.h"
 #include "cpu/cortex-m3/nvic.h"
 #include "cpu/peripherals/rtc.h"
+#include "services/clock/clock.h"
 #include "services/display/display.h"
 #include "stdio.h"
+#include "string.h"
 
-//! Global Cache for the Calendar Date
-volatile uint8_t clock_cal_cent = 0;
-//! Global Cache for the Calendar Date
-volatile uint8_t clock_cal_year = 0;
-//! Global Cache for the Calendar Date
-volatile uint8_t clock_cal_month = 0;
-//! Global Cache for the Calendar Date
-volatile uint8_t clock_cal_day = 0;
-//! Global Cache for the Calendar Date
-volatile uint8_t clock_cal_date = 0;
+//! Global Cache for the Date and Time since the last second event
+volatile timespec_t clock;
 
-//! Global Cache for the Time of Day
-volatile uint8_t clock_time_hour = 0;
-//! Global Cache for the Time of Day
-volatile uint8_t clock_time_minute = 0;
-//! Global Cache for the Time of Day
-volatile uint8_t clock_time_second = 0;
+//! Clock State Flags
+volatile enum {
+	clock_state_init = 1,  //!< If flag is set, the driver has been initialized
+	clock_state_sync = 2,  //!< If flag is set, the drivers time has been set from the ds3231 chip
+} clock_state = 0;
+
 
 /** \brief Update the Global Date and Time Cache from RTC
  *
@@ -63,132 +58,138 @@ void clock_refresh_globals(void) {
 	uint32_t second = (timr & RTC_TIMR_SEC_Msk) >> RTC_TIMR_SEC_Pos;
 
 	// Convert from BCD to Integer and Store
-	clock_cal_cent = (10 * ((cent & 0xF0) >> 4)) + (cent & 0xF);
-	clock_cal_year = (10 * ((year & 0xF0) >> 4)) + (year & 0xF);
-	clock_cal_month = (10 * ((month & 0xF0) >> 4)) + (month & 0xF);
-	clock_cal_day = day;
-	clock_cal_date = (10 * ((date & 0xF0) >> 4)) + (date & 0xF);
-	clock_time_hour = (10 * ((hour & 0xF0) >> 4)) + (hour & 0xF);
-	clock_time_minute = (10 * ((minute & 0xF0) >> 4)) + (minute & 0xF);
-	clock_time_second = (10 * ((second & 0xF0) >> 4)) + (second & 0xF);
+	clock.cent = (10 * ((cent & 0xF0) >> 4)) + (cent & 0xF);
+	clock.year = (10 * ((year & 0xF0) >> 4)) + (year & 0xF);
+	clock.month = (10 * ((month & 0xF0) >> 4)) + (month & 0xF);
+	clock.day = day;
+	clock.date = (10 * ((date & 0xF0) >> 4)) + (date & 0xF);
+	clock.hour = (10 * ((hour & 0xF0) >> 4)) + (hour & 0xF);
+	clock.minute = (10 * ((minute & 0xF0) >> 4)) + (minute & 0xF);
+	clock.second = (10 * ((second & 0xF0) >> 4)) + (second & 0xF);
+}
+
+/** \brief Set DS3231 External RTC
+ *
+ * This function sets the time in the DS3231 External RTC and clears the
+ * sync flag in the clock state so that it will be read into the internal
+ * state at the next second event.
+ */
+int32_t clock_set(timespec_t *time) {
+	// Working Register Set
+	uint8_t ds3231_regs[7];
+	memset(ds3231_regs, 0, 7);
+
+	// Convert the Time to the BCD Encoded Register Mapping (24hr mode)
+	ds3231_regs[0] = 0x7F & ((((time->second / 10) << 4) | (time->second % 10)));
+	ds3231_regs[1] = 0x7F & (((time->minute / 10) << 4) | (time->minute % 10));
+	ds3231_regs[2] = 0x3F & (((time->hour / 10) << 4) | (time->hour % 10));
+
+	// Convert the Date to the BCD Encoded Register Mapping (24hr mode)
+	ds3231_regs[3] = 0x07 & (time->day);
+	ds3231_regs[4] = 0x3F & (((time->date / 10) << 4) | (time->date % 10));
+	ds3231_regs[5] = 0x1F & (((time->month / 10) << 4) | (time->month % 10));
+	if (time->cent == 20) {
+		ds3231_regs[5] |= 0x80;
+	}
+	ds3231_regs[6] = 0xFF & (((time->year / 10) << 4) | (time->year % 10));
+
+	// Write the Registers to the DS3231 RTC
+	if (ds3231_write_register(0x00, 7, ds3231_regs) < 0) {
+		return -1;
+	}
+
+	// Force the Internal RTC to re-sync
+	clock_state &= ~(clock_state_sync);
+
+	// Successfully Updated the RTC
+	return 0;
+}
+
+/** \brief Set Internal RTC from DS3231 External RTC
+ *
+ * This function reads the current date and time from the DS3231 External RTC
+ * and applies that time to the Internal RTC.
+ */
+int32_t clock_set_rtc_from_ds3231(void) {
+	// Stop the RTC and Request a Calendar and Time Update
+	RTC_CR |= RTC_CR_UPDTIM | RTC_CR_UPDCAL;
+	// Wait for the RTC to Acknowledge our Request
+	while (!(RTC_SR & RTC_SR_ACKUPD));
+	// Clear the Acknowledge Flag
+	RTC_SCCR = RTC_SCCR_ACKCLR;
+
+	// Read the time and date from the external ds3231
+	uint8_t ds3231[7];
+	if (ds3231_read_register(0x00, 7, ds3231) < 0) {
+		return -1;
+	}
+
+	// Stage a new time register
+	uint32_t timr = 0;
+	timr |= RTC_TIMR_SEC(ds3231[0] & 0x7F);
+	timr |= RTC_TIMR_MIN(ds3231[1] & 0x7F);
+	if (ds3231[2] & 0x40) {
+		// 12 hour mode
+		RTC_MR |= RTC_MR_HRMOD;
+		timr |= RTC_TIMR_HOUR(ds3231[2] & 0x1F);
+	} else {
+		// 24 hour mode
+		RTC_MR &= ~(RTC_MR_HRMOD);
+		timr |= RTC_TIMR_HOUR(ds3231[2] & 0x3F);
+	}
+
+	// Stage a new calendar register
+	uint32_t calr = 0;
+	calr |= RTC_CALR_DAY(ds3231[3] & 0x07);
+	calr |= RTC_CALR_DATE(ds3231[4] & 0x3F);
+	calr |= RTC_CALR_MONTH(ds3231[5] & 0x1F);
+	calr |= RTC_CALR_CENT(((ds3231[5] & 0x80) >> 7) + 19);
+	calr |= RTC_CALR_YEAR(ds3231[6]);
+
+	// Write the Values to the RTC
+	RTC_TIMR = timr;
+	RTC_CALR = calr;
+
+	// Clear the Request for a Time Update in the Control Register
+	RTC_CR &= ~(RTC_CR_UPDTIM | RTC_CR_UPDCAL);
+
+	// Return an Error if the Time Register has Invalid Data
+	if (RTC_VER & (RTC_VER_NVTIM | RTC_VER_NVCAL)) {
+		return -1;
+	}
+
+	return 0;
 }
 
 /** \brief RTC Interrupt Handler
  *
  * Every second update the global variables, set the clock face, and send
  * the time of day to the display service.
+ *
+ * The clock sync flag will also be checked, if it is not set, the Internal
+ * RTC will be refreshed.
  */
 void rtc_handler() {
 	// Update the Clock Face every Second
 	if (RTC_SR & RTC_SR_SEC) {
-		// Clear the flag in the status register
-		RTC_SCCR = RTC_SCCR_SECCLR;
+		// Check if we need to re-sync with the external time source
+		if (!(clock_state & clock_state_sync)) {
+			clock_set_rtc_from_ds3231();
+			clock_state |= clock_state_sync;
+		}
 
 		// Update the Global Date and Time Variables from the RTC
 		clock_refresh_globals();
 
 		// Update the Clock Face
-		hv5530_set_digits(clock_time_hour, clock_time_minute, clock_time_second);
+		hv5530_set_digits(clock.hour, clock.minute, clock.second);
 
 		// Notify the Display Service of this Event
 		display_rtc_update();
+
+		// Clear the flag in the status register
+		RTC_SCCR = RTC_SCCR_SECCLR;
 	}
-}
-
-/** \brief Set the Time in the RTC
- *
- * This function sets the Time of Day in the RTC.
- */
-int32_t clock_set_time(uint8_t hour, uint8_t minute, uint8_t second) {
-	// Store the Status of the Enabled Interrupts
-	uint32_t imr = RTC_IMR;
-	// Disable all Enabled Interrupts
-	RTC_IDR = imr;
-
-	// Wait for a Second Event in the Status Register
-	while (!(RTC_SR & RTC_SR_SEC));
-	// Clear the Second Event Flag
-	RTC_SCCR = RTC_SCCR_SECCLR;
-
-	// Stop the RTC and Request a Time Update
-	RTC_CR |= RTC_CR_UPDTIM;
-	// Wait for the RTC to Acknowledge our Request
-	while (!(RTC_SR & RTC_SR_ACKUPD));
-	// Clear the Acknowledge Flag
-	RTC_SCCR = RTC_SCCR_ACKCLR;
-
-	// Stage the new Register Value
-	uint32_t timr = 0;
-	// Truncate if 12 Hour Mode Active
-	if ((hour > 12)&&(RTC_MR & RTC_MR_HRMOD)) {
-		timr |= RTC_TIMR_AMPM;
-		hour -= 12;
-	}
-	// Stage Time of Day
-	timr |= RTC_TIMR_HOUR(((hour / 10) << 4) + (hour % 10));
-	timr |= RTC_TIMR_MIN(((minute / 10) << 4) + (minute % 10));
-	timr |= RTC_TIMR_SEC(((second / 10) << 4) + (second % 10));
-	// Write the Value to the Register
-	RTC_TIMR = timr;
-
-	// Clear the Request for a Time Update in the Control Register
-	RTC_CR &= ~(RTC_CR_UPDTIM);
-
-	// Re-Enable the Interrupts Disabled Earlier
-	RTC_IER = imr;
-
-	// Return an Error if the Time Register has Invalid Data
-	if (RTC_VER & RTC_VER_NVTIM) {
-		return -1;
-	}
-
-	return 0;
-}
-
-/** \brief Set the Date in the RTC
- *
- * This function sets the Date and Year in the RTC.
- */
-int32_t clock_set_date(uint8_t cent, uint8_t year, uint8_t month, uint8_t day, uint8_t date) {
-	// Store the Status of the Enabled Interrupts
-	uint32_t imr = RTC_IMR;
-	// Disable all Enabled Interrupts
-	RTC_IDR = imr;
-
-	// Wait for a Second Event in the Status Register
-	while (!(RTC_SR & RTC_SR_SEC));
-	// Clear the Second Event Flag
-	RTC_SCCR = RTC_SCCR_SECCLR;
-
-	// Stop the RTC and Request a Calendar Update
-	RTC_CR |= RTC_CR_UPDCAL;
-	// Wait for the RTC to Acknowledge our Request
-	while (!(RTC_SR & RTC_SR_ACKUPD));
-	// Clear the Acknowledge Flag
-	RTC_SCCR = RTC_SCCR_ACKCLR;
-
-	// Stage the new Register Value
-	uint32_t calr = 0;
-	calr |= RTC_CALR_CENT(((cent / 10) << 4) + (cent % 10));
-	calr |= RTC_CALR_YEAR(((year / 10) << 4) + (year % 10));
-	calr |= RTC_CALR_MONTH(((month / 10) << 4) + (month % 10));
-	calr |= RTC_CALR_DAY(((day / 10) << 4) + (day % 10));
-	calr |= RTC_CALR_DATE(((date / 10) << 4) + (date % 10));
-	// Write the Value to the Register
-	RTC_CALR = calr;
-
-	// Clear the Request for a Calendar Update in the Control Register
-	RTC_CR &= ~(RTC_CR_UPDCAL);
-
-	// Re-Enable the Interrupts Disabled Earlier
-	RTC_IER = imr;
-
-	// Return an Error if the Calendar Register has Invalid Data
-	if (RTC_VER & RTC_VER_NVCAL) {
-		return -1;
-	}
-
-	return 0;
 }
 
 /** Clock Service Initialization
@@ -207,4 +208,7 @@ void clock_init(void) {
 	ISER0 = (1 << PMC_ID_RTC); // Enable Interrupt
 	// Enable Interrupts for RTC
 	RTC_IER = RTC_IER_SECEN;
+
+	// Set the initialized flag
+	clock_state |= clock_state_init;
 }

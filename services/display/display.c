@@ -19,50 +19,50 @@
 void display_rtc_update() {
 	// Convert the Date to a String
 	char date[11];
-	ultostr(clock_cal_cent, date, 10);
-	if (clock_cal_year < 10) {
+	ultostr(clock.cent, date, 10);
+	if (clock.year < 10) {
 		date[2] = '0';
-		ultostr(clock_cal_year, date+3, 10);
+		ultostr(clock.year, date+3, 10);
 	} else {
-		ultostr(clock_cal_year, date+2, 10);
+		ultostr(clock.year, date+2, 10);
 	}
 	date[4] = '/';
-	if (clock_cal_month < 10) {
+	if (clock.month < 10) {
 		date[5] = '0';
-		ultostr(clock_cal_month, date+6, 10);
+		ultostr(clock.month, date+6, 10);
 	} else {
-		ultostr(clock_cal_month, date+5, 10);
+		ultostr(clock.month, date+5, 10);
 	}
 	date[7] = '/';
-	if (clock_cal_date < 10) {
+	if (clock.date < 10) {
 		date[8] = '0';
-		ultostr(clock_cal_date, date+9, 10);
+		ultostr(clock.date, date+9, 10);
 	} else {
-		ultostr(clock_cal_date, date+8, 10);
+		ultostr(clock.date, date+8, 10);
 	}
 	date[10] = '\0';
 
 	// Convert the Time to a String
 	char time[9];
-	if (clock_time_hour < 10) {
+	if (clock.hour < 10) {
 		time[0] = '0';
-		ultostr(clock_time_hour, time+1, 10);
+		ultostr(clock.hour, time+1, 10);
 	} else {
-		ultostr(clock_time_hour, time, 10);
+		ultostr(clock.hour, time, 10);
 	}
 	time[2] = ':';
-	if (clock_time_minute < 10) {
+	if (clock.minute < 10) {
 		time[3] = '0';
-		ultostr(clock_time_minute, time+4, 10);
+		ultostr(clock.minute, time+4, 10);
 	} else {
-		ultostr(clock_time_minute, time+3, 10);
+		ultostr(clock.minute, time+3, 10);
 	}
 	time[5] = ':';
-	if (clock_time_second < 10) {
+	if (clock.second < 10) {
 		time[6] = '0';
-		ultostr(clock_time_second, time+7, 10);
+		ultostr(clock.second, time+7, 10);
 	} else {
-		ultostr(clock_time_second, time+6, 10);
+		ultostr(clock.second, time+6, 10);
 	}
 	time[8] = '\0';
 

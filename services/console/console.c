@@ -7,7 +7,6 @@
  *
  */
 
-
 #include "board/pins.h"
 #include "console.h"
 #include "ctype.h"
@@ -88,46 +87,50 @@ void console_shell(void) {
 					} else if (strcmp(buffer, "hvon") == 0) {
 						// Turn on the high voltage power supply
 						PIO_SODR(PIN_HV5530_HVEN_PIO) = (1 << PIN_HV5530_HVEN_IDX);
+					} else if (strncmp(buffer, "peek ", 5) == 0) {
+						// peek at a memory address
+						uint32_t *addr = (uint32_t *)strtoul(buffer + 5, 0, 0);
+						kprintf("(*(uint32_t*)(0x%08lX)) = 0x%08lX\r\n", (uint32_t)addr, *addr);
 					} else if (strncmp(buffer, "clock set ", 10) == 0) {
 						const char *p = buffer + 10;
+						timespec_t t;
 
 						// Parse the date from the CLI
 						uint32_t year = strtoul(p, &p, 10);
+						t.cent = year / 100;
+						t.year = year % 100;
 						if (*p++ != '/') {
 							break;
 						}
-						uint32_t month = strtoul(p, &p, 10);
+						t.month = strtoul(p, &p, 10);
 						if (*p++ != '/') {
 							break;
 						}
-						uint32_t date = strtoul(p, &p, 10);
+						t.date = strtoul(p, &p, 10);
 						if (*p++ != ' ') {
 							break;
 						}
 
 						// Parse the day of week
-						uint32_t day = strtoul(p, &p, 10);
+						t.day = strtoul(p, &p, 10);
 						if (*p++ != ' ') {
 							break;
 						};
 
 						// Parse the time from the CLI
-						uint32_t hour = strtoul(p, &p, 10);
+						t.hour = strtoul(p, &p, 10);
 						if (*p++ != ':') {
 							break;
 						}
-						uint32_t minute = strtoul(p, &p, 10);
+						t.minute = strtoul(p, &p, 10);
 						if (*p++ != ':') {
 							break;
 						}
-						uint32_t second = strtoul(p, &p, 10);
+						t.second = strtoul(p, &p, 10);
 
-						// Pass the data to the clock service
-						if (clock_set_date(year / 100, year % 100, month, day, date) < 0) {
-							kputs("Invalid date provided, please try again.\r\n");
-						}
-						if (clock_set_time(hour, minute, second) < 0) {
-							kputs("Invalid time specified, please try again.\r\n");
+						// Tell the Clock Service the new Date and Time
+						if (clock_set(&t) < 0) {
+							kputs("Failed to set the new time.\r\n");
 						}
 					} else {
 						kputs("Invalid Command\r\n");
