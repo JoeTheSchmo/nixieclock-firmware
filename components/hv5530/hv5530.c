@@ -54,15 +54,15 @@ void tc0_handler() {
 		// Determine if we need to change fading in / fading out
 		if (rc > 0xB000) {
 			hv5530_state &= ~hv5530_state_glow;
-		} else if (rc < 0x5000) {
+		} else if (rc < 0x8000) {
 			hv5530_state |= hv5530_state_glow;
 		}
 
 		// Calculate the new duty cycle
 		if (hv5530_state & hv5530_state_glow) {
-			rc += 0x200;
+			rc += 0x40;
 		} else {
-			rc -= 0x200;
+			rc -= 0x40;
 		}
 
 		// Write the RC register
@@ -256,7 +256,7 @@ void hv5530_init(void) {
 	// Disable TC0 Clock
 	TC_CCR(TC0) = TC_CCR_CLKDIS;
 	// Configure TC0 for MCK/8 and Waveform Mode
-	TC_CMR(TC0) = TC_CMR_WM_TCCLKS_TIMER_CLOCK3 | TC_CMR_WM_WAVE;
+	TC_CMR(TC0) = TC_CMR_WM_TCCLKS_TIMER_CLOCK2 | TC_CMR_WM_WAVE;
 	// Start with a Duty Cycle of ~5%
 	TC_RC(TC0) = 0x100;
 	// Enable the TC0 Interrupt in the NVIC
