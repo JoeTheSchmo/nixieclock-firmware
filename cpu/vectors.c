@@ -132,8 +132,8 @@ extern uint32_t _bss_end;
  */
 void reset_handler(void) {
 	// Load the Data section into RAM
-	uint32_t *src = &_flash_data;
-	uint32_t *dst = &_data_start;
+	uint32_t *src = &_flash_data; // TODO Stack Leak
+	uint32_t *dst = &_data_start; // TODO Stack Leak
 	while (dst < &_data_end) {
 		*dst++ = *src++;
 	}

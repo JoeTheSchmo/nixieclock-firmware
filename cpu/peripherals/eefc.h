@@ -78,6 +78,20 @@
 #define EEFC_FCR_FCMD_Pos (0)                   //!< FCMD Position
 #define EEFC_FCR_FCMD_Len (8)                   //!< FCMD Field Length
 #define EEFC_FCR_FCMD_Msk (0xFF << 0)           //!< FCMD Mask
+#define EEFC_FCR_FCMD_GETD (0x00)               //!< Get Flash Descriptor
+#define EEFC_FCR_FCMD_WP   (0x01)               //!< Write Page
+#define EEFC_FCR_FCMD_WPL  (0x02)               //!< Write Page and Lock
+#define EEFC_FCR_FCMD_EWP  (0x03)               //!< Erase Page and Write Page
+#define EEFC_FCR_FCMD_EWPL (0x04)               //!< Erase Page and Write Page and Lock
+#define EEFC_FCR_FCMD_EA   (0x05)               //!< Erase all
+#define EEFC_FCR_FCMD_SLB  (0x08)               //!< Set Lock Bit
+#define EEFC_FCR_FCMD_CLB  (0x09)               //!< Clear Lock Bit
+#define EEFC_FCR_FCMD_GLB  (0x0A)               //!< Get Lock Bit
+#define EEFC_FCR_FCMD_SGPB (0x0B)               //!< Set GPNVM Bit
+#define EEFC_FCR_FCMD_CGPB (0x0C)               //!< Clear GPNVM Bit
+#define EEFC_FCR_FCMD_GGPB (0x0D)               //!< Get GPNVM Bit
+#define EEFC_FCR_FCMD_STUI (0x0E)               //!< Start Read Unique Identifier
+#define EEFC_FCR_FCMD_SPUI (0x0F)               //!< Stop Read Unique Identifier
 /* \} */
 /** \defgroup EFC_FCR_FARG FARG: Flash Command Argument
  * \ingroup EEFC_FCR

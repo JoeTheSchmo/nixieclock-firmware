@@ -34,19 +34,19 @@ void kmain(void) {
 	console_init();
 
 	// Console Header
-	kputs("\r\n\r\n----------\r\n\r\n");
-	kputs("Nixie Clock Firmware\r\n");
+	kputs("\r\n\r\n----------\r\n");
+	kputs("Nixie Clock\r\n");
 
 	// Inform the User how the CPU Reset
-	uint32_t rst_typ = ((RSTC_SR & RSTC_SR_RSTTYP_Msk) >> RSTC_SR_RSTTYP_Pos);
-	kputs("CPU Reset with Type: ");
+	uint32_t rst_typ = ((RSTC_SR & RSTC_SR_RSTTYP_Msk) >> RSTC_SR_RSTTYP_Pos); // TOTO Stack Leak
+	kputs("cpu reset: ");
 	switch (rst_typ) {
-	case RSTC_SR_RSTTYP_GENERAL: kputs("General\r\n"); break;
-	case RSTC_SR_RSTTYP_BACKUP: kputs("Backup\r\n"); break;
-	case RSTC_SR_RSTTYP_WATCHDOG: kputs("Watchdog\r\n"); break;
-	case RSTC_SR_RSTTYP_SOFTWARE: kputs("Software\r\n"); break;
-	case RSTC_SR_RSTTYP_USER: kputs("User\r\n"); break;
-	default: kprintf("Unknown (%lu)\r\n", rst_typ);
+	case RSTC_SR_RSTTYP_GENERAL: kputs("general\r\n"); break;
+	case RSTC_SR_RSTTYP_BACKUP: kputs("backup\r\n"); break;
+	case RSTC_SR_RSTTYP_WATCHDOG: kputs("watchdog\r\n"); break;
+	case RSTC_SR_RSTTYP_SOFTWARE: kputs("software\r\n"); break;
+	case RSTC_SR_RSTTYP_USER: kputs("user\r\n"); break;
+	default: kprintf("unknown (%lu)\r\n", rst_typ);
 	}
 
 	// Initialize the Clock Face

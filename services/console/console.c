@@ -10,6 +10,7 @@
 #include "board/pins.h"
 #include "console.h"
 #include "ctype.h"
+#include "cpu/peripherals/eefc.h"
 #include "cpu/peripherals/pio.h"
 #include "cpu/peripherals/rstc.h"
 #include "cpu/peripherals/uart.h"
@@ -38,7 +39,7 @@ void console_init(void) {
  * This function blocks providing an interactive shell for the user.
  */
 void console_shell(void) {
-	kputs("Shell Started\r\n");
+	kputs("starting shell...\r\n");
 
 	char buffer[64];
 	int32_t cmd_len = 0;
@@ -80,7 +81,27 @@ void console_shell(void) {
 					if (*buffer == '\0') {
 						// Do nothing, empty line
 					} else if (strcmp(buffer, "reset") == 0) {
+						// Reset the CPU
 						RSTC_CR = RSTC_CR_PROCRST | RSTC_CR_PERRST | RSTC_CR_KEY;
+					} else if (strcmp(buffer, "reset samba") == 0) {
+						// Disable Interrupts, We're about to change vector tables
+						asm volatile("cpsid f");
+						asm volatile("dmb");
+
+						// Wait for EEFC0 to be ready for a command
+						while (!(EEFC_FSR(EEFC0) & EEFC_FSR_FRDY));
+						// Clear the GPNVM boot mode bit
+						EEFC_FCR(EEFC0) = EEFC_FCR_FKEY | EEFC_FCR_FCMD(EEFC_FCR_FCMD_CGPB) | EEFC_FCR_FARG(1);
+						asm volatile("dsb");
+						while (!(EEFC_FSR(EEFC0) & EEFC_FSR_FRDY));
+
+						// Check for an error
+						if (EEFC_FSR(EEFC0) & EEFC_FSR_FCMDE) {
+							kputs("flash command error, unable to clear boot mode bit\r\n");
+						}
+
+						// Reset the CPU into SAM-BA
+						RSTC_CR = RSTC_CR_EXTRST | RSTC_CR_KEY;
 					} else if (strcmp(buffer, "hvoff") == 0) {
 						// Turn off the high voltage power supply
 						PIO_CODR(PIN_HV5530_HVEN_PIO) = (1 << PIN_HV5530_HVEN_IDX);
@@ -90,7 +111,17 @@ void console_shell(void) {
 					} else if (strncmp(buffer, "peek ", 5) == 0) {
 						// peek at a memory address
 						uint32_t *addr = (uint32_t *)strtoul(buffer + 5, 0, 0);
-						kprintf("(*(uint32_t*)(0x%08lX)) = 0x%08lX\r\n", (uint32_t)addr, *addr);
+						kprintf("(*(uint32_t*)(0x%08lX)) == 0x%08lX\r\n", (uint32_t)addr, *addr);
+					} else if (strncmp(buffer, "poke ", 5) == 0) {
+						// poke into a memory address
+						const char *p = buffer + 5;
+						uint32_t *addr = (uint32_t *)strtoul(p, &p, 0);
+						if (*p++ != ' ') {
+							break;
+						}
+						uint32_t value = strtoul(p, &p, 0);
+						kprintf("(*(uint32_t*)(0x%08lX)) = 0x%08lX\r\n", (uint32_t)addr, value);
+						*addr = value;
 					} else if (strncmp(buffer, "clock set ", 10) == 0) {
 						const char *p = buffer + 10;
 						timespec_t t;
