@@ -4,6 +4,7 @@ CROSS_COMPILE   := arm-none-eabi-
 CC              := $(CROSS_COMPILE)gcc
 LD              := $(CROSS_COMPILE)ld
 GDB             := $(CROSS_COMPILE)gdb
+OBJCOPY         := $(CROSS_COMPILE)objcopy
 OBJDUMP         := $(CROSS_COMPILE)objdump
 
 RM              := rm
@@ -52,10 +53,11 @@ OBJS            += services/clock/clock.o
 OBJS            += services/console/console.o
 OBJS            += services/display/display.o
 
+BIN             := nixie1.bin
 ELF             := nixie1.elf
 
 .PHONY: all
-all: $(ELF)
+all: $(ELF) $(BIN)
 
 -include $(OBJS:%.o=%.d)
 %.o: %.c Makefile
@@ -63,6 +65,9 @@ all: $(ELF)
 
 $(ELF): $(OBJS) $(LINK_SCRIPT)
 	$(LD) $(LDFLAGS) $(OBJS) -o $@
+
+$(BIN): $(ELF)
+	$(OBJCOPY) -O binary $(ELF) $(BIN)
 
 .PHONY: debug
 debug: $(ELF)
