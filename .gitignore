@@ -1,4 +1,5 @@
 /docs/html
 *.o
 *.d
+*.bin
 *.elf
