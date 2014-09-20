@@ -198,6 +198,9 @@ void rtc_handler() {
  * in the RTC.
  */
 void clock_init(void) {
+	// Prepare the RTC and OSC
+	ds3231_init();
+
 	// Prepare the Clock Face
 	hv5530_init();
 
