@@ -243,8 +243,8 @@ void hv5530_init(void) {
 	SPI_CR = SPI_CR_SWRST;
 	// Set master mode and disable mode fault detection
 	SPI_MR |= SPI_MR_MSTR | SPI_MR_MODFDIS;
-	// Set SPI Mode 3 with clock divisor of 64
-	SPI_CSR0 = SPI_CSR_CPOL | SPI_CSR_SCBR(64);
+	// Set SPI Mode 3 with clock divisor of 32 (96MHz/32 = 3MHz)
+	SPI_CSR0 = SPI_CSR_CPOL | SPI_CSR_SCBR(32);
 	// Enable the SPI controller
 	SPI_CR = SPI_CR_SPIEN;
 	// Enable the SPI Interrupt in the NVIC
