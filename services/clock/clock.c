@@ -111,18 +111,19 @@ int32_t clock_set(timespec_t *time) {
  * and applies that time to the Internal RTC.
  */
 int32_t clock_set_rtc_from_ds3231(void) {
+	// Read the time and date from the external ds3231
+	uint8_t ds3231[7];
+	if (ds3231_read_register(0x00, 7, ds3231) < 0) {
+		kprintf("failed to read date and time registers from ds3231\r\n");
+		return -1;
+	}
+
 	// Stop the RTC and Request a Calendar and Time Update
 	RTC_CR |= RTC_CR_UPDTIM | RTC_CR_UPDCAL;
 	// Wait for the RTC to Acknowledge our Request
 	while (!(RTC_SR & RTC_SR_ACKUPD));
 	// Clear the Acknowledge Flag
 	RTC_SCCR = RTC_SCCR_ACKCLR;
-
-	// Read the time and date from the external ds3231
-	uint8_t ds3231[7];
-	if (ds3231_read_register(0x00, 7, ds3231) < 0) {
-		return -1;
-	}
 
 	// Stage a new time register
 	uint32_t timr = 0;
