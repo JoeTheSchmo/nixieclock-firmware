@@ -167,8 +167,9 @@ void hv5530_set_digits(uint32_t ul_hour, uint32_t ul_minute, uint32_t ul_second)
 	case 1: hv5530_registers[2] &= 0b11101111; break; // 45: SEC_TEN_1
 	}
 
-	hv5530_registers[2] &= 0b11110111; // 44: RCOL_TOP
-	hv5530_registers[2] &= 0b11111011; // 43: RCOL_BOT
+	// Do not light the colons
+	//hv5530_registers[2] &= 0b11110111; // 44: RCOL_TOP
+	//hv5530_registers[2] &= 0b11111011; // 43: RCOL_BOT
 
 	switch(ul_minute % 10) {
 	case 0: hv5530_registers[2] &= 0b11111101; break; // 42: MIN_ONE_0
@@ -209,8 +210,10 @@ void hv5530_set_digits(uint32_t ul_hour, uint32_t ul_minute, uint32_t ul_second)
 	case 1: hv5530_registers[6] &= 0b11101111; break; // 13: HOUR_ONE_1
 	}
 
-	hv5530_registers[6] &= 0b11110111; // 12: LCOL_TOP
-	hv5530_registers[6] &= 0b11111011; // 11: LCOL_BOT
+	// Do not light the colons
+	//hv5530_registers[6] &= 0b11110111; // 12: LCOL_TOP
+	//hv5530_registers[6] &= 0b11111011; // 11: LCOL_BOT
+
 
 	switch(ul_hour / 10) {
 	case 0: hv5530_registers[6] &= 0b11111101; break; // 10: HOUR_TEN_0
