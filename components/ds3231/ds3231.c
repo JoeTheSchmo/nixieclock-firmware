@@ -8,6 +8,7 @@
  */
 
 #include "types.h"
+#include "cpu/peripherals/supc.h"
 #include "drivers/twi/twi_master.h"
 #include "ds3231.h"
 #include "stdio.h"
@@ -51,19 +52,18 @@ void ds3231_init(void) {
 	uint8_t flags[2] = {0x00, 0x08};
 	if (ds3231_write_register(0x0E, 2, flags) < 0) {
 		kputs("failed to write ds3231 control registers\r\n");
-		kputs("not changing slow clock to external 32kHz reference.\r\n");
 		return;
 	}
 
 	// Read and inform the user of the register status
 	if (ds3231_read_register(0x0E, 2, flags) < 0) {
 		kputs("failed to read ds3231 control registers\r\n");
-		kputs("not changing slow clock to external 32kHz reference.\r\n");
 		return;
 	} else {
 		kprintf("ds3231[0x0E:0x0F] == {0x%02X,0x%02X}\r\n", flags[0], flags[1]);
 	}
 
 	//kputs("changing slow clock to external 32kHz reference.\r\n");
-	//! \TODO Set XTALSEL in Supply Controller
+	//SUPC_MR |= SUPC_MR_KEY | SUPC_MR_OSCBYPASS;
+	//SUPC_CR = SUPC_CR_KEY | SUPC_CR_XTALSEL;
 }

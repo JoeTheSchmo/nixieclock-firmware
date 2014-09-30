@@ -13,6 +13,7 @@
 #include "cpu/peripherals/eefc.h"
 #include "cpu/peripherals/pio.h"
 #include "cpu/peripherals/rstc.h"
+#include "cpu/peripherals/supc.h"
 #include "cpu/peripherals/uart.h"
 #include "services/clock/clock.h"
 #include "stdio.h"
@@ -102,6 +103,11 @@ void console_shell(void) {
 
 						// Reset the CPU into SAM-BA
 						RSTC_CR = RSTC_CR_EXTRST | RSTC_CR_KEY;
+					} else if (strcmp(buffer, "clk32") == 0) {
+						// Switch to the external 32kHz clock
+						kputs("changing slow clock to external 32kHz reference.\r\n");
+						SUPC_MR |= SUPC_MR_KEY | SUPC_MR_OSCBYPASS;
+						SUPC_CR = SUPC_CR_KEY | SUPC_CR_XTALSEL;
 					} else if (strcmp(buffer, "hvoff") == 0) {
 						// Turn off the high voltage power supply
 						PIO_CODR(PIN_HV5530_HVEN_PIO) = (1 << PIN_HV5530_HVEN_IDX);
