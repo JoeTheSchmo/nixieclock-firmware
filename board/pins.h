@@ -3,7 +3,7 @@
  *
  * \brief Nixie Clock Firmware
  *
- * Copyright (c) 2013 - 2014 Joe Ciccone. All rights reserved.
+ * Copyright (c) 2013 - 2015 Joe Ciccone. All rights reserved.
  *
  */
 
@@ -60,6 +60,27 @@
 //! SPI SPCK Pin Definition
 #define PIN_SPI_SPCK_PIO PIOA
 #define PIN_SPI_SPCK_IDX 15
+
+//! SSC Board Definitions
+
+//! SSC TD Pin Definition
+#define PIN_SSC_TD_PIO PIOA
+#define PIN_SSC_TD_IDX 26
+//! SSC RD Pin Definition
+#define PIN_SSC_RD_PIO PIOA
+#define PIN_SSC_RD_IDX 27
+//! SSC TK Pin Definition
+#define PIN_SSC_TK_PIO PIOA
+#define PIN_SSC_TK_IDX 28
+//! SSC RK Pin Definition
+#define PIN_SSC_RK_PIO PIOA
+#define PIN_SSC_RK_IDX 29
+//! SSC TF Pin Definition
+#define PIN_SSC_TF_PIO PIOA
+#define PIN_SSC_TF_IDX 30
+//! SSC RF Pin Definition
+#define PIN_SSC_RF_PIO PIOA
+#define PIN_SSC_RF_IDX 31
 
 //! TWI0 Board Definitions
 

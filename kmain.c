@@ -3,7 +3,7 @@
  *
  * \brief Nixie Clock Firmware
  *
- * Copyright (c) 2013 - 2014 Joe Ciccone. All rights reserved.
+ * Copyright (c) 2013 - 2015 Joe Ciccone. All rights reserved.
  *
  */
 
@@ -12,6 +12,7 @@
 #include "components/ssd1306/ssd1306.h"
 #include "cpu/peripherals/pio.h"
 #include "cpu/peripherals/rstc.h"
+#include "services/audio/audio.h"
 #include "services/clock/clock.h"
 #include "services/console/console.h"
 #include "services/display/display.h"
@@ -54,6 +55,9 @@ void kmain(void) {
 
 	// Initialize the Display
 	display_init();
+
+	// Initialize the Audio Service
+	audio_init();
 
 	// Turn On LED 0
 	PIO_SODR(PIN_LED_0_PIO) = (1 << PIN_LED_0_IDX);

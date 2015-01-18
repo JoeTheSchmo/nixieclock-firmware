@@ -3,7 +3,7 @@
  *
  * \brief Nixie Clock Firmware
  *
- * Copyright (c) 2013 - 2014 Joe Ciccone. All rights reserved.
+ * Copyright (c) 2013 - 2015 Joe Ciccone. All rights reserved.
  *
  */
 
@@ -88,6 +88,32 @@ static inline void board_init_spi(void) {
 	PIO_PUDR(PIN_SPI_SPCK_PIO)  =  (1 << PIN_SPI_SPCK_IDX); // Enable Pull-Up
 }
 
+static inline void board_init_ssc(void) {
+	// Configure PIN_SSC_TD (PA26 / Peripheral A)
+	PIO_PDR(PIN_SSC_TD_PIO)   =  (1 << PIN_SSC_TD_IDX); // Disable PIO to Enable Peripheral on Pin
+	PIO_ABSR(PIN_SSC_TD_PIO) &= ~(1 << PIN_SSC_TD_IDX); // Select Peripheral A
+
+	// Configure PIN_SSC_RD (PA27 / Peripheral A)
+	PIO_PDR(PIN_SSC_RD_PIO)   =  (1 << PIN_SSC_RD_IDX); // Disable PIO to Enable Peripheral on Pin
+	PIO_ABSR(PIN_SSC_RD_PIO) &= ~(1 << PIN_SSC_RD_IDX); // Select Peripheral A
+
+	// Configure PIN_SSC_TK (PA28 / Peripheral A)
+	PIO_PDR(PIN_SSC_TK_PIO)   =  (1 << PIN_SSC_TK_IDX); // Disable PIO to Enable Peripheral on Pin
+	PIO_ABSR(PIN_SSC_TK_PIO) &= ~(1 << PIN_SSC_TK_IDX); // Select Peripheral A
+
+	// Configure PIN_SSC_RK (PA29 / Peripheral A)
+	PIO_PDR(PIN_SSC_RK_PIO)   =  (1 << PIN_SSC_RK_IDX); // Disable PIO to Enable Peripheral on Pin
+	PIO_ABSR(PIN_SSC_RK_PIO) &= ~(1 << PIN_SSC_RK_IDX); // Select Peripheral A
+
+	// Configure PIN_SSC_TF (PA30 / Peripheral A)
+	PIO_PDR(PIN_SSC_TF_PIO)   =  (1 << PIN_SSC_TF_IDX); // Disable PIO to Enable Peripheral on Pin
+	PIO_ABSR(PIN_SSC_TF_PIO) &= ~(1 << PIN_SSC_TF_IDX); // Select Peripheral A
+
+	// Configure PIN_SSC_RF (PA31 / Peripheral A)
+	PIO_PDR(PIN_SSC_RF_PIO)   =  (1 << PIN_SSC_RF_IDX); // Disable PIO to Enable Peripheral on Pin
+	PIO_ABSR(PIN_SSC_RF_PIO) &= ~(1 << PIN_SSC_RF_IDX); // Select Peripheral A
+}
+
 static inline void board_init_twi0(void) {
 	// Configure PIN_TWI0_SDA (PA9 / Peripheral A)
 	PIO_PDR(PIN_TWI0_SDA_PIO)   =  (1 << PIN_TWI0_SDA_IDX); // Disable PIO to Enable Peripheral on Pin
@@ -132,6 +158,7 @@ void board_init(void) {
 	board_init_leds();
 	board_init_pck0();
 	board_init_spi();
+	board_init_ssc();
 	board_init_twi0();
 	board_init_uart();
 }
@@ -176,11 +203,11 @@ void sysclock_init(void) {
 	// Wait for the master clock to be ready
 	while (!(PMC_SR & PMC_SR_MCKRDY));
 
-	// Configure Programmable Clock Controller (PCK0)
+	// Configure Programmable Clock Controller (PCK0 = MCK / 8 = 12MHz)
 	// Enable PCK0
 	PMC_SCER = PMC_SCER_PCK0;
 	// Configure PCK0
-	PMC_PCK0 = PMC_PCK_CSS(PMC_PCK_CSS_MCK) | PMC_PCK_PRES(PMC_PCK_PRES_CLK_64);
+	PMC_PCK0 = PMC_PCK_CSS(PMC_PCK_CSS_MCK) | PMC_PCK_PRES(PMC_PCK_PRES_CLK_8);
 	// Wait for PCK0 to become ready
 	while (!(PMC_SR & PMC_SR_PCKRDY0));
 
@@ -190,6 +217,7 @@ void sysclock_init(void) {
 	PMC_PCER = (1 << PMC_ID_PIOB);
 	PMC_PCER = (1 << PMC_ID_PIOC);
 	PMC_PCER = (1 << PMC_ID_SPI);
+	PMC_PCER = (1 << PMC_ID_SSC);
 	PMC_PCER = (1 << PMC_ID_TC0);
 	PMC_PCER = (1 << PMC_ID_TWI0);
 }
