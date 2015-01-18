@@ -3,7 +3,7 @@
  *
  * \brief Supply Control (SUPC) User Interface
  *
- * Copyright (c) 2013 - 2014 Joe Ciccone. All rights reserved.
+ * Copyright (c) 2013 - 2015 Joe Ciccone. All rights reserved.
  *
  */
 

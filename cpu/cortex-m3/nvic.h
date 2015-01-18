@@ -3,7 +3,7 @@
  *
  * \brief Nixie Clock Firmware
  *
- * Copyright (c) 2013 - 2014 Joe Ciccone. All rights reserved.
+ * Copyright (c) 2013 - 2015 Joe Ciccone. All rights reserved.
  *
  */
 
@@ -460,6 +460,5 @@
 #define STIR_INTID_Len (9)                  //!< INTID Field Length
 #define STIR_INTID_Msk (0x1FF << 9)         //!< INTID Mask
 /* \} */
-
 
 #endif // _CPU_CORTEX_M3_NVIC_H_
