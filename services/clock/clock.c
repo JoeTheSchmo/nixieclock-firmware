@@ -3,7 +3,7 @@
  *
  * \brief Nixie Clock Firmware
  *
- * Copyright (c) 2013 - 2014 Joe Ciccone. All rights reserved.
+ * Copyright (c) 2013 - 2015 Joe Ciccone. All rights reserved.
  *
  */
 
@@ -95,6 +95,7 @@ int32_t clock_set(timespec_t *time) {
 
 	// Write the Registers to the DS3231 RTC
 	if (ds3231_write_register(0x00, 7, ds3231_regs) < 0) {
+		kputs("ds3231: failed to write date and time registers\r\n");
 		return -1;
 	}
 
@@ -111,12 +112,7 @@ int32_t clock_set(timespec_t *time) {
  * and applies that time to the Internal RTC.
  */
 int32_t clock_set_rtc_from_ds3231(void) {
-	// Read the time and date from the external ds3231
-	uint8_t ds3231[7];
-	if (ds3231_read_register(0x00, 7, ds3231) < 0) {
-		kprintf("failed to read date and time registers from ds3231\r\n");
-		return -1;
-	}
+	int32_t ret = 0;
 
 	// Stop the RTC and Request a Calendar and Time Update
 	RTC_CR |= RTC_CR_UPDTIM | RTC_CR_UPDCAL;
@@ -125,31 +121,38 @@ int32_t clock_set_rtc_from_ds3231(void) {
 	// Clear the Acknowledge Flag
 	RTC_SCCR = RTC_SCCR_ACKCLR;
 
-	// Stage a new time register
-	uint32_t timr = 0;
-	timr |= RTC_TIMR_SEC(ds3231[0] & 0x7F);
-	timr |= RTC_TIMR_MIN(ds3231[1] & 0x7F);
-	if (ds3231[2] & 0x40) {
-		// 12 hour mode
-		RTC_MR |= RTC_MR_HRMOD;
-		timr |= RTC_TIMR_HOUR(ds3231[2] & 0x1F);
+	// Read the time and date from the external ds3231
+	uint8_t ds3231[7];
+	if (ds3231_read_register(0x00, 7, ds3231) < 0) {
+		kputs("ds3231: failed to read date and time registers\r\n");
+		ret = -1;
 	} else {
-		// 24 hour mode
-		RTC_MR &= ~(RTC_MR_HRMOD);
-		timr |= RTC_TIMR_HOUR(ds3231[2] & 0x3F);
+		// Stage a new time register
+		uint32_t timr = 0;
+		timr |= RTC_TIMR_SEC(ds3231[0] & 0x7F);
+		timr |= RTC_TIMR_MIN(ds3231[1] & 0x7F);
+		if (ds3231[2] & 0x40) {
+			// 12 hour mode
+			RTC_MR |= RTC_MR_HRMOD;
+			timr |= RTC_TIMR_HOUR(ds3231[2] & 0x1F);
+		} else {
+			// 24 hour mode
+			RTC_MR &= ~(RTC_MR_HRMOD);
+			timr |= RTC_TIMR_HOUR(ds3231[2] & 0x3F);
+		}
+
+		// Stage a new calendar register
+		uint32_t calr = 0;
+		calr |= RTC_CALR_DAY(ds3231[3] & 0x07);
+		calr |= RTC_CALR_DATE(ds3231[4] & 0x3F);
+		calr |= RTC_CALR_MONTH(ds3231[5] & 0x1F);
+		calr |= RTC_CALR_CENT(((ds3231[5] & 0x80) >> 7) + 19);
+		calr |= RTC_CALR_YEAR(ds3231[6]);
+
+		// Write the Values to the RTC
+		RTC_TIMR = timr;
+		RTC_CALR = calr;
 	}
-
-	// Stage a new calendar register
-	uint32_t calr = 0;
-	calr |= RTC_CALR_DAY(ds3231[3] & 0x07);
-	calr |= RTC_CALR_DATE(ds3231[4] & 0x3F);
-	calr |= RTC_CALR_MONTH(ds3231[5] & 0x1F);
-	calr |= RTC_CALR_CENT(((ds3231[5] & 0x80) >> 7) + 19);
-	calr |= RTC_CALR_YEAR(ds3231[6]);
-
-	// Write the Values to the RTC
-	RTC_TIMR = timr;
-	RTC_CALR = calr;
 
 	// Clear the Request for a Time Update in the Control Register
 	RTC_CR &= ~(RTC_CR_UPDTIM | RTC_CR_UPDCAL);
@@ -159,7 +162,7 @@ int32_t clock_set_rtc_from_ds3231(void) {
 		return -1;
 	}
 
-	return 0;
+	return ret;
 }
 
 /** \brief RTC Interrupt Handler
