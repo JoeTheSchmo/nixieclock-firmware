@@ -41,7 +41,7 @@
 #define PIN_LED_2_IDX 17
 //! LED 3 Pin Definition
 #define PIN_LED_3_PIO PIOC
-#define PIN_LED_3_IDX 17
+#define PIN_LED_3_IDX 18
 
 //! PCK0 Board Definitions
 
