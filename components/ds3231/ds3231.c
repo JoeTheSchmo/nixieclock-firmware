@@ -3,7 +3,7 @@
  *
  * \brief Nixie Clock Firmware
  *
- * Copyright (c) 2013 - 2014 Joe Ciccone. All rights reserved.
+ * Copyright (c) 2013 - 2015 Joe Ciccone. All rights reserved.
  *
  */
 
@@ -51,19 +51,19 @@ void ds3231_init(void) {
 	// Clear status bits in 0x0F and enable 32Khz output
 	uint8_t flags[2] = {0x00, 0x08};
 	if (ds3231_write_register(0x0E, 2, flags) < 0) {
-		kputs("failed to write ds3231 control registers\r\n");
+		kputs("ds3231: failed to write control registers\r\n");
 		return;
 	}
 
 	// Read and inform the user of the register status
 	if (ds3231_read_register(0x0E, 2, flags) < 0) {
-		kputs("failed to read ds3231 control registers\r\n");
+		kputs("ds3231: failed to read control registers\r\n");
 		return;
 	} else {
-		kprintf("ds3231[0x0E:0x0F] == {0x%02X,0x%02X}\r\n", flags[0], flags[1]);
+		kprintf("ds3231: reg[0x0E:0x0F] == {0x%02X,0x%02X}\r\n", flags[0], flags[1]);
 	}
 
-	//kputs("changing slow clock to external 32kHz reference.\r\n");
-	//SUPC_MR |= SUPC_MR_KEY | SUPC_MR_OSCBYPASS;
-	//SUPC_CR = SUPC_CR_KEY | SUPC_CR_XTALSEL;
+	kputs("ds3231: changing slow clock to external 32kHz reference.\r\n");
+	SUPC_MR |= SUPC_MR_KEY | SUPC_MR_OSCBYPASS;
+	SUPC_CR = SUPC_CR_KEY | SUPC_CR_XTALSEL;
 }
