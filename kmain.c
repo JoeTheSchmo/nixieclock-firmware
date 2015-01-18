@@ -18,6 +18,25 @@
 #include "services/display/display.h"
 #include "stdio.h"
 
+/** Print Reset Reason
+ *
+ *
+ * This function read the reset controller status register and informs the
+ * user how the cpu was reset.
+ */
+void print_reset_type(void) {
+	uint32_t rst_typ = ((RSTC_SR & RSTC_SR_RSTTYP_Msk) >> RSTC_SR_RSTTYP_Pos);
+	kputs("cpu: reset type; ");
+	switch (rst_typ) {
+	case RSTC_SR_RSTTYP_GENERAL: kputs("general\r\n"); break;
+	case RSTC_SR_RSTTYP_BACKUP: kputs("backup\r\n"); break;
+	case RSTC_SR_RSTTYP_WATCHDOG: kputs("watchdog\r\n"); break;
+	case RSTC_SR_RSTTYP_SOFTWARE: kputs("software\r\n"); break;
+	case RSTC_SR_RSTTYP_USER: kputs("user\r\n"); break;
+	default: kprintf("unknown (%lu)\r\n", rst_typ);
+	}
+}
+
 /** Firmware Entry Point
  *
  * After \ref reset_handler finishes the core initialization, this function
@@ -39,16 +58,7 @@ void kmain(void) {
 	kputs("Nixie Clock\r\n");
 
 	// Inform the User how the CPU Reset
-	uint32_t rst_typ = ((RSTC_SR & RSTC_SR_RSTTYP_Msk) >> RSTC_SR_RSTTYP_Pos); // TOTO Stack Leak
-	kputs("cpu reset: ");
-	switch (rst_typ) {
-	case RSTC_SR_RSTTYP_GENERAL: kputs("general\r\n"); break;
-	case RSTC_SR_RSTTYP_BACKUP: kputs("backup\r\n"); break;
-	case RSTC_SR_RSTTYP_WATCHDOG: kputs("watchdog\r\n"); break;
-	case RSTC_SR_RSTTYP_SOFTWARE: kputs("software\r\n"); break;
-	case RSTC_SR_RSTTYP_USER: kputs("user\r\n"); break;
-	default: kprintf("unknown (%lu)\r\n", rst_typ);
-	}
+	print_reset_type();
 
 	// Initialize the Clock Face
 	clock_init();

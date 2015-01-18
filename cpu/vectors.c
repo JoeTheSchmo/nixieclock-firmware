@@ -3,7 +3,7 @@
  *
  * \brief Nixie Clock Firmware
  *
- * Copyright (c) 2013 - 2014 Joe Ciccone. All rights reserved.
+ * Copyright (c) 2013 - 2015 Joe Ciccone. All rights reserved.
  *
  */
 
@@ -131,17 +131,20 @@ extern uint32_t _bss_end;
  * speak. Memory is initialized and zeroed.
  */
 void reset_handler(void) {
-	// Load the Data section into RAM
-	uint32_t *src = &_flash_data; // TODO Stack Leak
-	uint32_t *dst = &_data_start; // TODO Stack Leak
-	while (dst < &_data_end) {
-		*dst++ = *src++;
-	}
+	// Make sure these locals are not on the stack when we call kmain()
+	{
+		// Load the Data section into RAM
+		uint32_t *src = &_flash_data; // TODO Stack Leak
+		uint32_t *dst = &_data_start; // TODO Stack Leak
+		while (dst < &_data_end) {
+			*dst++ = *src++;
+		}
 
-	// Zero the BSS Section
-	dst = &_bss_start;
-	while (dst < &_bss_end) {
-		*dst++ = '\0';
+		// Zero the BSS Section
+		dst = &_bss_start;
+		while (dst < &_bss_end) {
+			*dst++ = '\0';
+		}
 	}
 
 	// Start the program
