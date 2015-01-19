@@ -10,6 +10,15 @@
 #ifndef _BOARD_PINS_H_
 #define _BOARD_PINS_H_
 
+//! 5V PSU Board Definitions
+
+//! 5V PSU Enable Pin
+#define PIN_5VPSU_EN_PIO PIOC
+#define PIN_5VPSU_EN_IDX 13
+//! 5V PSU Power Good Pin
+#define PIN_5VPSU_PG_PIO PIOA
+#define PIN_5VPSU_PG_IDX 20
+
 //! DS3231 Board Definitions
 
 //! DS3231 Interrupt Pin

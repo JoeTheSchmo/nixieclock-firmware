@@ -24,6 +24,7 @@ typedef struct _timespec_t {
 extern volatile timespec_t clock;
 
 extern int32_t clock_set(timespec_t *time);
+extern void clock_force_resync(void);
 extern void clock_init(void);
 
 #endif // _CLOCK_H_

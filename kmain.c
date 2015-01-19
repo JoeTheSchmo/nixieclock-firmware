@@ -72,8 +72,8 @@ void kmain(void) {
 	// Turn On LED 0
 	PIO_SODR(PIN_LED_0_PIO) = (1 << PIN_LED_0_IDX);
 
-	// Basic Serial Console
-	while(1) {
-		console_shell();
+	// Idle until the next instruction comes along.
+	while (1) {
+		asm volatile ("wfi");
 	}
 }

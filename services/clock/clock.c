@@ -196,6 +196,15 @@ void rtc_handler() {
 	}
 }
 
+/** Clock Service Force ReSync
+ *
+ * Un-sets the clock sync flag which causes the service to reset the RTC time
+ * from the external ds3231 RTC the next time the handler is invoked.
+ */
+void clock_force_resync(void) {
+	clock_state &= ~clock_state_sync;
+}
+
 /** Clock Service Initialization
  *
  * Initialize the hv5530 component and enable the second event interrupt

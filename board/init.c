@@ -16,6 +16,19 @@
 #include "cpu/peripherals/wdt.h"
 #include "types.h"
 
+static inline void board_init_5vpsu(void) {
+	// Configure PIN_5VPSU_EN
+	PIO_PER(PIN_5VPSU_EN_PIO)  = (1 << PIN_5VPSU_EN_IDX);    // Enable PIO on Pin
+	PIO_OER(PIN_5VPSU_EN_PIO)  = (1 << PIN_5VPSU_EN_IDX);    // Enable Output
+	PIO_PUER(PIN_5VPSU_EN_PIO) = (1 << PIN_5VPSU_EN_IDX);    // Enable Pull-Up
+	PIO_CODR(PIN_5VPSU_EN_PIO) = (1 << PIN_5VPSU_EN_IDX);    // Clear Output Data Register
+
+	// Configure PIN_5VPSU_PG
+	PIO_PER(PIN_5VPSU_PG_PIO)  = (1 << PIN_5VPSU_PG_IDX);    // Enable PIO on Pin
+	PIO_ODR(PIN_5VPSU_PG_IDX)  = (1 << PIN_5VPSU_PG_IDX);    // Disable Output
+	PIO_PUER(PIN_5VPSU_PG_IDX) = (1 << PIN_5VPSU_PG_IDX);    // Enable Pull-Up
+}
+
 static inline void board_init_ds3231(void) {
 	// Configure PIN_DS3231_INT
 	PIO_PER(PIN_DS3231_INT_PIO)  = (1 << PIN_DS3231_INT_IDX);    // Enable PIO on Pin
@@ -152,7 +165,8 @@ void board_init(void) {
 	// Assert NRST for 2^(11+1) Slow Clock Cycles (32 kHz * 4096 = 128ms)
 	RSTC_MR |= RSTC_MR_ERSTL(11) | RSTC_MR_KEY;
 
-	// Setup the Peripherals
+	// Setup Verious I/O
+	board_init_5vpsu();
 	board_init_ds3231();
 	board_init_hv5530();
 	board_init_leds();
