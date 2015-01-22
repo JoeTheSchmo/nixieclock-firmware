@@ -10,6 +10,7 @@
 #include "board/init.h"
 #include "board/pins.h"
 #include "components/ssd1306/ssd1306.h"
+#include "cpu/cortex-m3/scb.h"
 #include "cpu/peripherals/pio.h"
 #include "cpu/peripherals/rstc.h"
 #include "services/audio/audio.h"
@@ -45,6 +46,13 @@ void print_reset_type(void) {
 void kmain(void) {
 	sysclock_init();
 	board_init();
+
+	// Divide the interrupts into 4 groups of 4; 0-3, 4-7, 8-11, 12-15.
+	// Interrupts within the same group will not pre-empt each other but an
+	// interrupt from a group with a lower priority will. When two interrupts
+	// within the same group are received at the same time, the one with the
+	// lower priority will be serviced first.
+	AIRCR = AIRCR_VECTKEY | AIRCR_PRIGROUP(0x5);
 
 	// Enable interrupts and fault handlers
 	asm volatile("cpsie i");

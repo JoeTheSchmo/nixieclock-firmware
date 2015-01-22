@@ -61,6 +61,76 @@
  * \ingroup SCB
  */
 
+/** \defgroup AIRCR_VECTKEYSTAT VECTKEYSTAT: Confirmation value on read
+ * \ingroup AIRCR
+ * \{
+ */
+#define AIRCR_VECTKEYSTAT     (0xFA050000) //!< VECTKEYSTAT Value
+#define AIRCR_VECTKEYSTAT_Pos (16)         //!< VECTKEYSTAT Position
+#define AIRCR_VECTKEYSTAT_Len (16)         //!< VECTKEYSTAT Field Length
+#define AIRCR_VECTKEYSTAT_Msk (0xFFFF0000) //!< VECTKEYSTAT Mask
+/* \} */
+
+/** \defgroup AIRCR_VECTKEY VECTKEY: Password must be present on write
+ * \ingroup AIRCR
+ * \{
+ */
+#define AIRCR_VECTKEY     (0x05FA0000) //!< VECTKEY Value
+#define AIRCR_VECTKEY_Pos (16)         //!< VECTKEY Position
+#define AIRCR_VECTKEY_Len (16)         //!< VECTKEY Field Length
+#define AIRCR_VECTKEY_Msk (0xFFFF0000) //!< VECTKEY Mask
+/* \} */
+
+/** \defgroup AIRCR_ENDIANESS ENDIANESS: Data endianness bit
+ * \ingroup AIRCR
+ * \{
+ */
+#define AIRCR_ENDIANESS     (1 << 15) //!< ENDIANESS Value
+#define AIRCR_ENDIANESS_Pos (15)      //!< ENDIANESS Position
+#define AIRCR_ENDIANESS_Len (1)       //!< ENDIANESS Field Length
+#define AIRCR_ENDIANESS_Msk (1 << 15) //!< ENDIANESS Mask
+/* \} */
+
+/** \defgroup AIRCR_PRIGROUP PRIGROUP: Interrupt priority grouping field
+ * \ingroup AIRCR
+ * \{
+ */
+#define AIRCR_PRIGROUP(v)  (((v) & 0x7) << 8) //!< PRIGROUP Value
+#define AIRCR_PRIGROUP_Pos (8)                //!< PRIGROUP Position
+#define AIRCR_PRIGROUP_Len (3)                //!< PRIGROUP Field Length
+#define AIRCR_PRIGROUP_Msk (0x7 << 8)         //!< PRIGROUP Mask
+/* \} */
+
+/** \defgroup AIRCR_SYSRESETREQ SYSRESETREQ: System reset request
+ * \ingroup AIRCR
+ * \{
+ */
+#define AIRCR_SYSRESETREQ     (1 << 2) //!< SYSRESETREQ Value
+#define AIRCR_SYSRESETREQ_Pos (2)      //!< SYSRESETREQ Position
+#define AIRCR_SYSRESETREQ_Len (1)      //!< SYSRESETREQ Field Length
+#define AIRCR_SYSRESETREQ_Msk (1 << 2) //!< SYSRESETREQ Mask
+/* \} */
+
+/** \defgroup AIRCR_VECTCLRACTIVE VECTCLRACTIVE: Reserved for Debug use
+ * \ingroup AIRCR
+ * \{
+ */
+#define AIRCR_VECTCLRACTIVE     (1 << 1) //!< VECTCLRACTIVE Value
+#define AIRCR_VECTCLRACTIVE_Pos (1)      //!< VECTCLRACTIVE Position
+#define AIRCR_VECTCLRACTIVE_Len (1)      //!< VECTCLRACTIVE Field Length
+#define AIRCR_VECTCLRACTIVE_Msk (1 << 1) //!< VECTCLRACTIVE Mask
+/* \} */
+
+/** \defgroup AIRCR_VECTRESET VECTRESET: Reserved for Debug use
+ * \ingroup AIRCR
+ * \{
+ */
+#define AIRCR_VECTRESET     (1 << 0) //!< VECTRESET Value
+#define AIRCR_VECTRESET_Pos (0)      //!< VECTRESET Position
+#define AIRCR_VECTRESET_Len (1)      //!< VECTRESET Field Length
+#define AIRCR_VECTRESET_Msk (1 << 0) //!< VECTRESET Mask
+/* \} */
+
 /** \defgroup SCR System Control Register Bit Definitions
  * \ingroup SCB
  */

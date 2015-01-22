@@ -253,7 +253,7 @@ void hv5530_init(void) {
 	// Enable the SPI Interrupt in the NVIC
 	ICER0 = (1 << PMC_ID_SPI); // Disable Interrupt
 	ICPR0 = (1 << PMC_ID_SPI); // Clear Pending
-	IPR5  = (IPR5 & 0xFFFFFF00) | (0x00 << 0); // Set the Priority to 0
+	IPR(PMC_ID_SPI) = (IPR(PMC_ID_SPI) & ~(IPR_IP_Msk(PMC_ID_SPI))) | IPR_IP(PMC_ID_SPI, 0x0); // Set the Priority to 0
 	ISER0 = (1 << PMC_ID_SPI); // Enable Interrupt
 
 	// Disable TC0 Clock
@@ -265,7 +265,7 @@ void hv5530_init(void) {
 	// Enable the TC0 Interrupt in the NVIC
 	ICER0 = (1 << PMC_ID_TC0); // Disable Interrupt
 	ICPR0 = (1 << PMC_ID_TC0); // Clear Pending
-	IPR5  = (IPR5 & 0xFF00FFFF) | (0x10 << 16); // Set the Priority to 1
+	IPR(PMC_ID_TC0) = (IPR(PMC_ID_TC0) & ~(IPR_IP_Msk(PMC_ID_TC0))) | IPR_IP(PMC_ID_TC0, 0x1); // Set the Priority to 1
 	ISER0 = (1 << PMC_ID_TC0); // Enable Interrupt
 	// Enable Interrupts for TC0
 	TC_IER(TC0) = TC_IER_COVFS | TC_IER_CPCS;

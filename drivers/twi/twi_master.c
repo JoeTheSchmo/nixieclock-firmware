@@ -11,6 +11,40 @@
 #include "cpu/peripherals/twi.h"
 #include "drivers/twi/twi_master.h"
 
+typedef struct _twi_transfer_t {
+	
+} twi_transfer_t;
+
+twi_transfer_t *twi_active_transfer = 0;
+
+/** \brief TWI Interrupt Handler
+ *
+ * Maintains the transfer state and finishes transfers that were started
+ * asynchronously by the \ref twi_master_write and \ref twi_master_read
+ * functions. The two communication functions will block until the transfer
+ * is completed.
+ */
+void twi0_handler(void) {
+
+}
+
+/** \brief Acquires exclusive access to the TWI bus
+ *
+ * This functional acquires a lock that guarantees that the calling thread or
+ * interrupt has exclusive access to the peripheral and the bus. This is
+ * done by setting a transfer state pointer that the interrupt will clear once
+ * the transfer is complete. Then the next thread will be allowed to
+ * communicate. This requires that the TWI interrupt priority is always higher
+ * than any other service that calls it.
+ */
+int32_t twi_acquire_lock(twi_transfer_t *new_transfer) {
+
+	uint32_t ret;
+	asm volatile("ldrex %0, %1" : "=r"(ret) : "Q"(*twi_active_transfer));
+
+	return 0;
+}
+
 /** \brief Write to the TWI bus
  *
  * \param[in] saddr Slave address on the TWI bus

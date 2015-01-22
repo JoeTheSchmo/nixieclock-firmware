@@ -459,7 +459,7 @@ void console_init(void) {
 	// Enable the RTC Interrupt in the NVIC
 	ICER0 = (1 << PMC_ID_UART); // Disable Interrupt
 	ICPR0 = (1 << PMC_ID_UART); // Clear Pending
-	IPR(PMC_ID_UART)  = IPR_IP(0xF); // Set the Priority to 15
+	IPR(PMC_ID_UART) = (IPR(PMC_ID_UART) & ~(IPR_IP_Msk(PMC_ID_UART))) | IPR_IP(PMC_ID_UART, 0xC); // Set the Priority to 12
 	ISER0 = (1 << PMC_ID_UART); // Enable Interrupt
 	// Enable RX Interrupt for the UART
 	UART_IER = UART_IER_RXRDY;

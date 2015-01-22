@@ -113,10 +113,10 @@
  * \ingroup IPR
  * \{
  */
-#define IPR_IP(p)     (((p) & 0xF) << IPR_IP_Pos(p)) //!< IP Value
-#define IPR_IP_Pos(p) ((((p) & 0x3) * 4) + 4)        //!< IP Position
-#define IPR_IP_Len(p) (4)                            //!< IP Field Length
-#define IPR_IP_Msk(p) (0xF << IPR_IP_Pos(n))         //!< IP Mask
+#define IPR_IP(n, p)  (((p) & 0xF) << IPR_IP_Pos(n)) //!< IP Value
+#define IPR_IP_Pos(n) ((((n) & 0x3) * 8) + 4)        //!< IP Position
+#define IPR_IP_Len(n) (4)                            //!< IP Field Length
+#define IPR_IP_Msk(n) (0xF << IPR_IP_Pos(n))         //!< IP Mask
 /* \} */
 
 /** \defgroup IPR0 Interrupt Priority Register 0 Bit Definitions

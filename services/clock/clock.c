@@ -220,7 +220,7 @@ void clock_init(void) {
 	// Enable the RTC Interrupt in the NVIC
 	ICER0 = (1 << PMC_ID_RTC); // Disable Interrupt
 	ICPR0 = (1 << PMC_ID_RTC); // Clear Pending
-	IPR0  = (IPR0 & 0xFF00FFFF) | (0xF0 << 16); // Set the Priority to 15
+	IPR(PMC_ID_RTC) = (IPR(PMC_ID_RTC) & ~(IPR_IP_Msk(PMC_ID_RTC))) | IPR_IP(PMC_ID_RTC, 0x8); // Set the Priority to 8
 	ISER0 = (1 << PMC_ID_RTC); // Enable Interrupt
 	// Enable Interrupts for RTC
 	RTC_IER = RTC_IER_SECEN;
