@@ -19,6 +19,42 @@
 #include "services/display/display.h"
 #include "stdio.h"
 
+/** Hard Fault Handler
+ *
+ * This function is called when a hard fault exception has occurred.
+ */
+void __attribute__((naked)) hardfault_handler(void) {
+	kputs("Exception: Hard Fault\r\n");
+	while(1);
+}
+
+/** Memory Fault Handler
+ *
+ * This function is called when a memory fault exception has occurred.
+ */
+void __attribute__((naked)) memfault_handler(void) {
+	kputs("Exception: Memory Fault\r\n");
+	while (1);
+}
+
+/** Bus Fault Handler
+ *
+ * This function is called when a bus fault exception has occurred.
+ */
+void __attribute__((naked)) busfault_handler(void) {
+	kputs("Exception: Bus Fault\r\n");
+	while (1);
+}
+
+/** Usage Fault Handler
+ *
+ * This function is called when a usage fault exception has occurred.
+ */
+void __attribute__((naked)) usagefault_handler(void) {
+	kputs("Exception: Usage Fault\r\n");
+	while (1);
+}
+
 /** Print Reset Reason
  *
  *
