@@ -14,8 +14,8 @@ DOXYGEN         := doxygen
 LINK_SCRIPT     := flash.ld
 DBG_SCRIPT      := flash.gdb
 
-CFLAGS          := -mcpu=cortex-m3 -mthumb 
-CFLAGS          += -nostdinc -fno-builtin 
+CFLAGS          := -mcpu=cortex-m3 -mthumb
+CFLAGS          += -nostdinc -fno-builtin
 CFLAGS          += -I$(PWD) -iquote
 CFLAGS          += -O0 -g3 -ggdb
 CFLAGS          += -Wall -Werror
@@ -31,6 +31,7 @@ OBJS            += components/hv5530/hv5530.o
 OBJS            += components/ssd1306/ssd1306.o
 OBJS            += components/ssd1306/ssd1306_font8x8.o
 OBJS            += components/wm8731/wm8731.o
+OBJS            += cpu/svcall.o
 OBJS            += cpu/vectors.o
 OBJS            += drivers/twi/twi_master.o
 OBJS            += lib/ctype/isprint.o
