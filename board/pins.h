@@ -109,4 +109,10 @@
 #define PIN_UART_TXD_PIO PIOA
 #define PIN_UART_TXD_IDX 12
 
+//! XBEE Pin Definitions
+
+//! XBEE SHDN Pin Definition
+#define PIN_XBEE_SHDN_PIO PIOB
+#define PIN_XBEE_SHDN_IDX 4
+
 #endif //_BOARD_PINS_H_

@@ -202,8 +202,8 @@ void console_invoke_psu(int8_t argc, char *argv[]) {
 			kputs("psu help\t\tPrint this message\r\n");
 			kputs("psu {name} on\t\tTurn on the requested power supply\r\n");
 			kputs("psu {name} off\t\tTurn off the requested power supply\r\n");
-			kputs("psu {name} off\t\tShow the power supplies status\r\n");
-			kputs("\twhere {name} = 5v or hv\r\n");
+			kputs("psu {name} show\t\tShow the power supplies status\r\n");
+			kputs("\twhere {name} = 5v or hv or xbee\r\n");
 			kputs("\twhere {cmd} = on or off or show\r\n");
 		} else {
 			kputs("invalid arguments specified\r\n");
@@ -232,7 +232,7 @@ void console_invoke_psu(int8_t argc, char *argv[]) {
 
 				}
 			} else {
-				kputs("unrecognised psu command\r\n");
+				kputs("unrecognized psu command\r\n");
 			}
 		} else if (strcmp(argv[1], "hv") == 0) {
 			if (strcmp(argv[2], "on") == 0) {
@@ -248,10 +248,26 @@ void console_invoke_psu(int8_t argc, char *argv[]) {
 					kputs("hv psu is off\r\n");
 				}
 			} else {
-				kputs("unrecognised psu command\r\n");
+				kputs("unrecognized psu command\r\n");
+			}
+		} else if (strcmp(argv[1], "xbee") == 0) {
+			if (strcmp(argv[2], "on") == 0) {
+				// Turn on the XBee module
+				PIO_SODR(PIN_XBEE_SHDN_PIO) = (1 << PIN_XBEE_SHDN_IDX);
+			} else if (strcmp(argv[2], "off") == 0) {
+				// Shutdown the XBee module
+				PIO_CODR(PIN_XBEE_SHDN_PIO) = (1 << PIN_XBEE_SHDN_IDX);
+			} else if (strcmp(argv[2], "show") == 0) {
+				if (PIO_PDSR(PIN_XBEE_SHDN_PIO) & (1 << PIN_XBEE_SHDN_IDX)) {
+					kputs("xbee is on\r\n");
+				} else {
+					kputs("xbee is off\r\n");
+				}
+			} else {
+				kputs("unrecognized psu command\r\n");
 			}
 		} else {
-			kputs("unrecognised power supply name\r\n");
+			kputs("unrecognized power supply name\r\n");
 		}
 	} else {
 		kputs("invalid arguments specified\r\n");

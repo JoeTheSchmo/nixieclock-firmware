@@ -154,6 +154,14 @@ static inline void board_init_uart(void) {
 	PIO_ABSR(PIN_UART_TXD_PIO) &= ~(1 << PIN_UART_TXD_IDX); // Select Peripheral A
 }
 
+static inline void board_init_xbee(void) {
+	// Configure PIN_XBEE_SHDN
+	PIO_PER(PIN_XBEE_SHDN_PIO)  = (1 << PIN_XBEE_SHDN_IDX); // Enable PIO on Pin
+	PIO_OER(PIN_XBEE_SHDN_PIO)  = (1 << PIN_XBEE_SHDN_IDX); // Enable Output
+	PIO_PUER(PIN_XBEE_SHDN_PIO) = (1 << PIN_XBEE_SHDN_IDX); // Enable Pull-Up
+	PIO_CODR(PIN_XBEE_SHDN_PIO) = (1 << PIN_XBEE_SHDN_IDX); // Clear Output Data Register
+}
+
 void board_init(void) {
 	// Reset the Watch Dog Timer
 	WDT_CR = WDT_CR_WDRSTT | WDT_CR_KEY;
@@ -165,7 +173,7 @@ void board_init(void) {
 	// Assert NRST for 2^(11+1) Slow Clock Cycles (32 kHz * 4096 = 128ms)
 	RSTC_MR |= RSTC_MR_ERSTL(11) | RSTC_MR_KEY;
 
-	// Setup Verious I/O
+	// Setup Various I/O
 	board_init_5vpsu();
 	board_init_ds3231();
 	board_init_hv5530();
@@ -175,6 +183,7 @@ void board_init(void) {
 	board_init_ssc();
 	board_init_twi0();
 	board_init_uart();
+	board_init_xbee();
 }
 
 void sysclock_init(void) {
