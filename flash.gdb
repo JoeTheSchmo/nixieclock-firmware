@@ -1,6 +1,5 @@
 
 define reset
-target remote localhost:2331
 monitor reset
 monitor flash device = AT91SAM3U4E
 monitor flash download = 1

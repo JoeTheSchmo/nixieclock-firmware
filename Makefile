@@ -1,6 +1,9 @@
 
 CROSS_COMPILE   := arm-none-eabi-
 
+DEBUG_HOST		:= localhost
+DEBUG_PORT		:= 2331
+
 CC              := $(CROSS_COMPILE)gcc
 LD              := $(CROSS_COMPILE)ld
 GDB             := $(CROSS_COMPILE)gdb
@@ -17,7 +20,7 @@ DBG_SCRIPT      := flash.gdb
 CFLAGS          := -mcpu=cortex-m3 -mthumb
 CFLAGS          += -nostdinc -fno-builtin
 CFLAGS          += -I$(PWD) -iquote
-CFLAGS          += -O0 -g3 -ggdb
+CFLAGS          += -Os -g3 -ggdb
 CFLAGS          += -Wall -Werror
 
 LDFLAGS         := --script=$(LINK_SCRIPT)
@@ -77,7 +80,7 @@ $(BIN): $(ELF)
 
 .PHONY: debug
 debug: $(ELF)
-	$(GDB) -x $(DBG_SCRIPT) $(ELF)
+	$(GDB) -ex "target remote $(DEBUG_HOST):$(DEBUG_PORT)" -x $(DBG_SCRIPT) $(ELF)
 
 .PHONY: disasm
 disasm: $(ELF)
