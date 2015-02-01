@@ -7,14 +7,12 @@
  *
  */
 
-#include "types.h"
-
 /** Convert an unsigned long int to a string
  *
  * This function converts an unsigned long int to a string with the base
  * between 0 to 16.
  */
-char *ultostr(uint32_t value, char *str, int8_t base) {
+char *ultostr(unsigned long value, char *str, int base) {
 	// Working Pointer
 	char *p = str;
 
@@ -25,8 +23,8 @@ char *ultostr(uint32_t value, char *str, int8_t base) {
 	}
 
 	// Find number of digits and prepare pointer
-	uint32_t temp = value;
-	int8_t length = 0;
+	unsigned long temp = value;
+	int length = 0;
 	do {
 		*p++ = '0';
 		length++;

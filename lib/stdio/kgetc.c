@@ -7,14 +7,14 @@
  *
  */
 
-#include "cpu/peripherals/uart.h"
+#include "uart.h"
 
 /* Get Character from Console
  *
  * This function gets a single character from the UART.
  */
 int kgetc(char *c) {
-	while (!(UART_SR & UART_SR_RXRDY));
-	*c = UART_RHR;
-	return 0;
+     while (!(UART->UART_SR & UART_SR_RXRDY));
+     *c = UART->UART_RHR;
+     return 0;
 }

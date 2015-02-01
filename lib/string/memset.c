@@ -7,16 +7,16 @@
  *
  */
 
-#include "types.h"
+#include <stddef.h>
 
 /** Fill memory with constant
  *
  * This function sets the first n bytes of memory located at the pointer s with
  * the constant byte c.
  */
-void *memset(void *s, uint8_t c, size_t n) {
+void *memset(void *s, int c, size_t n) {
 	while (n--) {
-		*(uint8_t *)s++ = c;
+		*(char *)s++ = c;
 	}
 
 	return s;

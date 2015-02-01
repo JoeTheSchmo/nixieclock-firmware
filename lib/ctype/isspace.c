@@ -7,15 +7,13 @@
  *
  */
 
-#include "types.h"
-
 /** Checks for white-space characters
  *
  * This function returns 1 if the character is white-space. These characters
  * are: space, form-feed ('\f'), newline ('\n'), carriage return ('\r'), 
  * horizontal tab ('\t'), and vertical tab ('\v').
  */
-int32_t isspace(const char c) {
+int isspace(const char c) {
 	switch (c) {
 	case ' ':
 	case '\f':

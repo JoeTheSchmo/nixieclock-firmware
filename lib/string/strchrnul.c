@@ -7,8 +7,6 @@
  *
  */
 
-#include "types.h"
-
 char *strchrnul(const char *s, char c) {
 	while (*s != '\0') {
 		if (*s == c) {

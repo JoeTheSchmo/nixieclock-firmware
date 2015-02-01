@@ -7,8 +7,6 @@
  *
  */
 
-#include "types.h"
-
 char *strrchr(const char *s, char c) {
 	const char *p = 0;
 	while (*s != '\0') {

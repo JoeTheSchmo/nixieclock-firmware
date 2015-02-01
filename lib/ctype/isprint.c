@@ -7,10 +7,8 @@
  *
  */
 
-#include "types.h"
-
 /** Checks for a printable character including space. */
-int32_t isprint(const char c) {
+int isprint(const char c) {
 	if ((c >= ' ')&&(c <= '~')) {
 		return 1;
 	}

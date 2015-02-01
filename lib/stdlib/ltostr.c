@@ -7,15 +7,13 @@
  *
  */
 
-#include "types.h"
-
 /** Convert a long int to a string
  *
  * This function converts an long int to a string with the base between 0
  * to 16. If the number is negative, the sign will be set as the first
  * character.
  */
-char *ltostr(int32_t value, char *str, int8_t base) {
+char *ltostr(long value, char *str, int base) {
 	// Working Pointer
 	char *p = str;
 
@@ -35,8 +33,8 @@ char *ltostr(int32_t value, char *str, int8_t base) {
 	}
 
 	// Find number of digits and prepare pointer
-	int32_t temp = value;
-	int8_t length = 0;
+	long temp = value;
+	int length = 0;
 	do {
 		*p++ = '0';
 		length++;

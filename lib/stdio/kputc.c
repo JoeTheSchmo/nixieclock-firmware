@@ -7,14 +7,14 @@
  *
  */
 
-#include "cpu/peripherals/uart.h"
+#include "uart.h"
 
 /* Put Character on Console
  *
  * This function writes a single character to the UART.
  */
 int kputc(const char c) {
-	while (!(UART_SR & UART_SR_TXRDY));
-	UART_THR = c;
-	return 0;
+     while (!(UART->UART_SR & UART_SR_TXRDY));
+     UART->UART_THR = c;
+     return 0;
 }

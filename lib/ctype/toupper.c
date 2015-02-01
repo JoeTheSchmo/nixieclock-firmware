@@ -7,8 +7,6 @@
  *
  */
 
-#include "types.h"
-
 /** Converts the letter 'c' to upper case, if possible. */
 char toupper(const char c) {
 	if ((c >= 'a')&&(c <= 'z')) {

@@ -7,10 +7,11 @@
  *
  */
 
-#include "ctype.h"
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
 
 /** Formatted Output Conversion
  *
@@ -24,17 +25,17 @@ void kprintf(const char *format, ...) {
 
 	// Temporary buffer for numeric conversions
 	char ibuf[33];
-	ssize_t ibufl;
+	long ibufl;
 
 	// Finished Processing Modifier Flag
-	int8_t done = 0;
+	int done = 0;
 
 	// Flags
-	uint32_t flag_zero_pad = 0;
+	unsigned int flag_zero_pad = 0;
 
 	// Length Modifiers
-	int8_t mod_len_h = 0;
-	int8_t mod_len_l = 0;
+	int mod_len_h = 0;
+	int mod_len_l = 0;
 
 	// Process the output
 	while (*format) {

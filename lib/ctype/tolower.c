@@ -7,8 +7,6 @@
  *
  */
 
-#include "types.h"
-
 /** Converts the letter 'c' to lower case, if possible. */
 char tolower(const char c) {
 	if ((c >= 'A')&&(c <= 'Z')) {

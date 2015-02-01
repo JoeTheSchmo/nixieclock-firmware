@@ -7,7 +7,7 @@
  *
  */
 
-#include "types.h"
+#include <stddef.h>
 
 /** Append one string to another
  *

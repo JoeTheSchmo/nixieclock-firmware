@@ -7,8 +7,6 @@
  *
  */
 
-#include "types.h"
-
 /** Append one string to another
  *
  * This function appends the src string to the dest string.

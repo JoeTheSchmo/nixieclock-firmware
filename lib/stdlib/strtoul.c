@@ -7,8 +7,7 @@
  *
  */
 
-#include "ctype.h"
-#include "types.h"
+#include <ctype.h>
 
 /** Convert a string to an unsigned long int
  *
@@ -22,7 +21,7 @@
  * If endptr is not NULL, this function stores the address of the first
  * invalid character in *endptr (and returns 0). 
  */
-uint32_t strtoul(const char *nptr, const char **endptr, int8_t base) {
+unsigned long strtoul(const char *nptr, const char **endptr, int base) {
 	// Ignore leading White Space
 	while (isspace(*nptr)) {
 		nptr++;
@@ -51,7 +50,7 @@ uint32_t strtoul(const char *nptr, const char **endptr, int8_t base) {
 	}
 
 	// Extract the Number
-	uint32_t value = 0;
+	unsigned long value = 0;
 	while (*nptr) {
 		// Make sure we are working in lower case for hex
 		char c = tolower(*nptr);
