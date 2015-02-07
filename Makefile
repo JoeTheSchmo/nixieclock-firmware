@@ -66,6 +66,7 @@ OBJS            += asf/common/utils/interrupt/interrupt_sam_nvic.o
 OBJS            += asf/sam/drivers/efc/efc.o
 OBJS            += asf/sam/drivers/pio/pio.o
 OBJS            += asf/sam/drivers/pio/pio_handler.o
+OBJS            += asf/sam/drivers/pdc/pdc.o
 OBJS            += asf/sam/drivers/pmc/pmc.o
 OBJS            += asf/sam/drivers/pmc/sleep.o
 OBJS            += asf/sam/drivers/rstc/rstc.o
