@@ -11,7 +11,7 @@
 
 #include "twi.h"
 #include "wm8731.h"
-
+#include "svcall.h"
 //! Address of the Slave Device on the TWI Bus
 #define WM8731_SLAVE_ADDRESS 0x1B
 
@@ -48,7 +48,7 @@ inline int32_t wm8731_write_register(uint8_t reg, uint16_t value) {
 	pkt.length = 1;
 
 	// write the data to the bus
-	return twi_master_write(TWI0, &pkt) == TWI_SUCCESS ? 0 : -1;
+	return svcall(0, (uint32_t)TWI0, (uint32_t)&pkt, 0) == TWI_SUCCESS ? 0 : -1;
 }
 
 //

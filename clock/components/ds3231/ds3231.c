@@ -11,6 +11,7 @@
 #include <stdio.h>
 
 #include "ds3231.h"
+#include "svcall.h"
 #include "sysclk.h"
 #include "twi.h"
 
@@ -35,7 +36,7 @@ inline int32_t ds3231_write_register(uint8_t addr, uint8_t len, uint8_t *ptr) {
 	pkt.length = len;
 
 	// write the data to the bus
-	return twi_master_write(TWI0, &pkt) == TWI_SUCCESS ? 0 : -1;
+	return svcall(0, (uint32_t)TWI0, (uint32_t)&pkt, 0) == TWI_SUCCESS ? 0 : -1;
 }
 
 /** \brief Read from the DS3231 RTC via the TWI Bus
@@ -55,8 +56,8 @@ inline int32_t ds3231_read_register(uint8_t addr, uint8_t len, uint8_t *ptr) {
 	pkt.buffer = ptr;
 	pkt.length = len;
 
-	// write the data to the bus
-	return twi_master_read(TWI0, &pkt) == TWI_SUCCESS ? 0 : -1;
+	// read data from the bus
+	return svcall(1, (uint32_t)TWI0, (uint32_t)&pkt, 0) == TWI_SUCCESS ? 0 : -1;
 }
 
 /** \brief Initialize the DS3231 RTC

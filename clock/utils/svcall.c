@@ -10,12 +10,36 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "twi.h"
+
+// re-arrange the arguments and call twi_master_write
+int32_t __attribute__((naked)) _svcall_twi_write(uint8_t code, uint32_t p1, uint32_t p2, uint32_t p3) {
+	asm volatile (
+		"mov r0, r1" "\n\t" // place p1 in r0
+		"mov r1, r2" "\n\t" // place p2 in r1
+		"b twi_master_write" "\n\t" // call twi_master_write(p1, p2)
+	);
+}
+
+// re-arrange the arguments and call twi_master_read
+int32_t __attribute__((naked)) _svcall_twi_read(uint8_t code, uint32_t p1, uint32_t p2, uint32_t p3) {
+	asm volatile (
+		"mov r0, r1" "\n\t" // place p1 in r0
+		"mov r1, r2" "\n\t" // place p2 in r1
+		"b twi_master_read" "\n\t" // call twi_master_read(p1, p2)
+	);
+}
+
+// vector table for the svcall interrupt handler
 typedef int32_t (*svcall_t)(uint8_t, uint32_t, uint32_t, uint32_t);
 const svcall_t svcall_vectors[256] __attribute__ ((section(".rodata"))) = {
+	_svcall_twi_write,
+	_svcall_twi_read,
 	0,
 };
 
-void __attribute__((naked)) svcall_handler(void) {
+// dispatch the software interrupt
+void __attribute__((naked)) SVC_Handler(void) {
 	// restore the arguments from the stack
 	// they may already be there, but if a late arriving interrupt
 	// was processed in-between the svc instruction and this handler
@@ -55,10 +79,17 @@ void __attribute__((naked)) svcall_handler(void) {
 	asm volatile ("pop {r4, pc}");
 }
 
+// generate a software interrupt
 int32_t __attribute__((naked)) svcall(uint8_t code, uint32_t p1, uint32_t p2, uint32_t p3) {
 	// branch to exception handler (software interrupt)
 	asm volatile ("svc 0x00");
 
 	// return to caller
 	asm volatile ("bx lr");
+}
+
+// initialize the svcall framework and set the interrupt priority
+void svcall_init(void) {
+	// Set SVC Interrupt (Priority 4)
+	NVIC_SetPriority(SVCall_IRQn, 4);
 }

@@ -13,5 +13,6 @@
 #include <stdint.h>
 
 extern int32_t svcall(uint8_t code, uint32_t p1, uint32_t p2, uint32_t p3);
+extern void svcall_init(void);
 
 #endif // _SVCALL_H_

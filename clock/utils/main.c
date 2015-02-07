@@ -17,6 +17,7 @@
 #include "ioport.h"
 #include "rstc.h"
 #include "sleep.h"
+#include "svcall.h"
 #include "sysclk.h"
 
 /** NMI Handler
@@ -110,6 +111,9 @@ int main(void) {
 
 	// Enable CPU Interrupts and Exceptions
 	cpu_irq_enable();
+
+	// Configure the SVCall Interrupt
+	svcall_init();
 
 	// Enable the Console
 	console_init();

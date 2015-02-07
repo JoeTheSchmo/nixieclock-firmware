@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include "ssd1306.h"
+#include "svcall.h"
 #include "twi.h"
 
 //! Address of the Slave Device on the TWI Bus
@@ -33,7 +34,7 @@ inline int32_t ssd1306_write_register(uint8_t addr, uint8_t len, uint8_t *ptr) {
 	pkt.length = len;
 
 	// write the data to the bus
-	return twi_master_write(TWI0, &pkt) == TWI_SUCCESS ? 0 : -1;
+	return svcall(0, (uint32_t)TWI0, (uint32_t)&pkt, 0) == TWI_SUCCESS ? 0 : -1;
 }
 
 /** \brief Set Contrast Control
@@ -543,6 +544,12 @@ int32_t ssd1306_puts(const char *s) {
  * the display output
  */
 void ssd1306_init(void) {
+	// Verify the Display Controller is on the bus
+	if (twi_probe(TWI0, SSD1306_SLAVE_ADDRESS) != TWI_SUCCESS) {
+		kputs("ssd1306: failed to probe\r\n");
+		return;
+	}
+
 	// Initialize the Display Controller
 	ssd1306_set_display_on(0x0);
 	ssd1306_set_multiplex_ratio(0x1F);
