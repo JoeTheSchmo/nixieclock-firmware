@@ -244,16 +244,29 @@ void hv5530_init(void) {
 	spi_reset(SPI);
 	spi_set_master_mode(SPI);
 	spi_disable_mode_fault_detect(SPI);
+	spi_disable_loopback(SPI);
+	spi_set_peripheral_chip_select_value(SPI, spi_get_pcs(0));
+	spi_set_fixed_peripheral_select(SPI);
+	spi_disable_peripheral_select_decode(SPI);
+	spi_set_delay_between_chip_select(SPI, 0);
+	spi_set_transfer_delay(SPI, 0, 0, 0);
+	spi_set_bits_per_transfer(SPI, 0, 8);
+	spi_set_baudrate_div(SPI, 0, 32);
+	spi_configure_cs_behavior(SPI, 0, SPI_CS_KEEP_LOW);
+	spi_set_clock_polarity(SPI, 0, 1);
+	spi_set_clock_phase(SPI, 0, 0);
 	spi_enable(SPI);
 	// Enable SPI Interrupt (Priority 0)
 	irq_register_handler(ID_SPI, 0);
 
+	// Enable Peripheral Clock for TC0-0
+	sysclk_enable_peripheral_clock(ID_TC0);
 	// Setup TC0-0
 	tc_init(TC0, 0, TC_CMR_TCCLKS_TIMER_CLOCK2 | TC_CMR_WAVE);
 	// Start with a Duty Cycle of ~5%
 	tc_write_rc(TC0, 0, 0x100);
 	// Enable TC0 Interrupt (Priority 1)
-	irq_register_handler(ID_SPI, 1);
+	irq_register_handler(ID_TC0, 1);
 	// Enable Interrupts for TC0
 	tc_enable_interrupt(TC0, 0, TC_IER_COVFS | TC_IER_CPCS);
 	// Start TC0-0

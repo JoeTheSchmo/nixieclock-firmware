@@ -38,8 +38,8 @@ static inline void board_init_hv5530(void) {
 	ioport_set_pin_level(PIN_HV5530_HVEN, IOPORT_PIN_LEVEL_LOW);
 
 	// Configure PIN_HV5530_BLANK
-	ioport_set_pin_dir(PIN_HV5530_HVEN, IOPORT_DIR_OUTPUT);
-	ioport_set_pin_level(PIN_HV5530_HVEN, IOPORT_PIN_LEVEL_HIGH);
+	ioport_set_pin_dir(PIN_HV5530_BLANK, IOPORT_DIR_OUTPUT);
+	ioport_set_pin_level(PIN_HV5530_BLANK, IOPORT_PIN_LEVEL_HIGH);
 
 	// Configure PIN_HV5530_LATCH
 	ioport_set_pin_dir(PIN_HV5530_LATCH, IOPORT_DIR_OUTPUT);
