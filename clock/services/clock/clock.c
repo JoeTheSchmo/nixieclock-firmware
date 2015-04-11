@@ -63,7 +63,7 @@ int32_t clock_set(timespec_t *time) {
 	if ((time->year / 100) == 20) {
 		ds3231_regs[5] |= 0x80;
 	}
-	ds3231_regs[6] = 0xFF & (((time->year / 10) << 4) | (time->year % 10));
+	ds3231_regs[6] = 0xFF & ((((time->year % 100) / 10) << 4) | (time->year % 10));
 
 	// Write the Registers to the DS3231 RTC
 	if (ds3231_write_register(0x00, 7, ds3231_regs) < 0) {
