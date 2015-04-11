@@ -12,7 +12,6 @@
 
 #include <stdint.h>
 
-extern void hv5530_write_registers(void);
 extern void hv5530_set_digits(uint32_t ul_hour, uint32_t ul_minute, uint32_t ul_second);
 extern void hv5530_init(void);
 
