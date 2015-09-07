@@ -25,4 +25,4 @@
 extern void *memcpy(void *d, void *s, size_t n);
 extern void *memset(void *s, int c, size_t n);
 
-#endif __STRING_H_
+#endif // __STRING_H_

@@ -17,27 +17,18 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef __TYPES_H_
-#define __TYPES_H_
+#ifndef __SAM__RSTC_H_
+#define __SAM__RSTC_H_
 
-// Signed Numeric Types
-typedef __INT8_TYPE__   int8_t;
-typedef __INT16_TYPE__  int16_t;
-typedef __INT32_TYPE__  int32_t;
+#include <types.h>
 
-// Unsigned Numeric Types
-typedef __UINT8_TYPE__  uint8_t;
-typedef __UINT16_TYPE__ uint16_t;
-typedef __UINT32_TYPE__ uint32_t;
+#define RSTC_CR     (*(reg_wo_t*)(RSTC+0x0000))
+#define RSTC_SR     (*(reg_ro_t*)(RSTC+0x0004))
+#define RSTC_MR     (*(reg_rw_t*)(RSTC+0x0008))
 
-// Size Types
-typedef __UINT32_TYPE__ size_t;
-typedef __INT32_TYPE__  ssize_t;
+#define RSTC_MR_URSTEN      0x00000001
+#define RSTC_MR_ERSTL_Msk   0x00000F00
+#define RSTC_MR_ERSTL_Off   0x08
+#define RSTC_MR_KEY         0xA5000000
 
-// Register Types
-typedef volatile const __UINT32_TYPE__ reg_ro_t;
-typedef volatile       __UINT32_TYPE__ reg_wo_t;
-typedef volatile       __UINT32_TYPE__ reg_rw_t;
-
-
-#endif // __TYPES_H_
+#endif // __SAM__RSTC_H_

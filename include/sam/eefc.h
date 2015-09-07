@@ -17,27 +17,17 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef __TYPES_H_
-#define __TYPES_H_
+#ifndef __SAM__EEFC_H_
+#define __SAM__EEFC_H_
 
-// Signed Numeric Types
-typedef __INT8_TYPE__   int8_t;
-typedef __INT16_TYPE__  int16_t;
-typedef __INT32_TYPE__  int32_t;
+#include <types.h>
 
-// Unsigned Numeric Types
-typedef __UINT8_TYPE__  uint8_t;
-typedef __UINT16_TYPE__ uint16_t;
-typedef __UINT32_TYPE__ uint32_t;
+#define EEFC_FMR(EEFC)  (*(reg_rw_t*)(EEFC+0x0000))
+#define EEFC_FCR(EEFC)  (*(reg_wo_t*)(EEFC+0x0004))
+#define EEFC_FSR(EEFC)  (*(reg_ro_t*)(EEFC+0x0008))
+#define EEFC_FRR(EEFC)  (*(reg_ro_t*)(EEFC+0x000C))
 
-// Size Types
-typedef __UINT32_TYPE__ size_t;
-typedef __INT32_TYPE__  ssize_t;
+#define EEFC_FMR_FWS_Msk    0x00000F00
+#define EEFC_FMR_FWS_Off    0x08
 
-// Register Types
-typedef volatile const __UINT32_TYPE__ reg_ro_t;
-typedef volatile       __UINT32_TYPE__ reg_wo_t;
-typedef volatile       __UINT32_TYPE__ reg_rw_t;
-
-
-#endif // __TYPES_H_
+#endif // __SAM__EEFC_H_

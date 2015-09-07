@@ -17,6 +17,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include <sam3u4e.h>
 #include <string.h>
 
 extern void *bss_start;
@@ -26,13 +27,27 @@ extern void *data_end;
 extern void *data_load;
 
 void reset_handler() {
+    // Zero the uninitialized data segment
     if (bss_end - bss_start > 0) {
         memset(bss_start, 0, bss_end - bss_start);
     }
 
+    // Load the initialized data segment
     if (data_start != data_load) {
         memcpy(data_start, data_load, data_end - data_start);
     }
+
+    // Reset and Disable the Watchdog Timer
+    WDT_CR = WDT_CR_WDRSTT | WDT_CR_KEY;
+    WDT_MR = WDT_MR_WDDIS;
+
+    // Enable User Resets by Asserting the NRST Pin
+    // Assert NRST for 2^(11+1) Slow Clock Cycles (32 kHz * 4096 = 128ms)
+    RSTC_MR = RSTC_MR_URSTEN | (11 << RSTC_MR_ERSTL_Off) | RSTC_MR_KEY;
+
+    // Set the Flash Read/Write Cycles to 4 (for stable operation at 96MHz)
+    EEFC_FMR(EEFC0) = ((EEFC_FMR(EEFC0) & ~EEFC_FMR_FWS_Msk) | (4 << (EEFC_FMR_FWS_Off)));
+    EEFC_FMR(EEFC1) = ((EEFC_FMR(EEFC1) & ~EEFC_FMR_FWS_Msk) | (4 << (EEFC_FMR_FWS_Off)));
 
     while (1) {}
 }
