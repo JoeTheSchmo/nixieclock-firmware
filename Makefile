@@ -37,7 +37,7 @@ LINK_SCRIPT	= system/flash.ld
 
 CFLAGS		+= -mcpu=cortex-m3 -mthumb
 CFLAGS		+= -ffreestanding -nostdinc
-CFLAGS		+= -O0 -g3 -ggdb
+CFLAGS		+= -O3 -g3 -ggdb
 CFLAGS		+= -Wall -Werror
 CFLAGS		+= -isystem include
 
