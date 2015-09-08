@@ -22,6 +22,7 @@
 
 #include "sam/eefc.h"
 #include "sam/pio.h"
+#include "sam/pmc.h"
 #include "sam/rstc.h"
 #include "sam/wdt.h"
 

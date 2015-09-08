@@ -49,5 +49,44 @@ void reset_handler() {
     EEFC_FMR(EEFC0) = ((EEFC_FMR(EEFC0) & ~EEFC_FMR_FWS_Msk) | (4 << (EEFC_FMR_FWS_Off)));
     EEFC_FMR(EEFC1) = ((EEFC_FMR(EEFC1) & ~EEFC_FMR_FWS_Msk) | (4 << (EEFC_FMR_FWS_Off)));
 
+    // Configure Clock Generator Main Clock (External 12MHz Xtal)
+    // Startup time 15625uS for Xtal (65 for 65*8 cycles at slow clock, ~32000Hz)
+    CKGR_MOR = CKGR_MOR_KEY | (CKGR_MOR & ~(CKGR_MOR_MOSCXTBY)) | CKGR_MOR_MOSCXTEN | (65 << CKGR_MOR_MOSCXTST_Off);
+    // Wait the main Xtal to stabilize
+    while ((PMC_SR & PMC_SR_MOSCXTS) == 0);
+    // Select Xtal as the Main Clock Source
+    CKGR_MOR |= CKGR_MOR_KEY | CKGR_MOR_MOSCSEL;
+    // Wait for the selection to complete
+    while (!(PMC_SR & PMC_SR_MOSCSELS));
+
+    // Configure Clock Generator PLLA Clock (12MHz Xtal * 16 = 192MHz)
+    // Disable the PLL
+    CKGR_PLLAR = CKGR_PLLAR_ONE;
+    // Enable with the correct settings
+    CKGR_PLLAR = CKGR_PLLAR_ONE | (1 << CKGR_PLLAR_DIVA_Off) | (15 << CKGR_PLLAR_MULA_Off) | (0x3F << CKGR_PLLAR_PLLACOUNT_Off);
+    // Wait for a lock
+    while (!(PMC_SR & PMC_SR_LOCKA));
+
+    // Configure Clock Generator USB UTMI PLL (12MHz Xtal * 40 = 480MHz)
+    // Enable the UTMI PLLA
+    CKGR_UCKR = CKGR_UCKR_UPLLEN | (0xF << CKGR_UCKR_UPLLCOUNT_Off);
+    // Wait for a lock
+    while (!(PMC_SR & PMC_SR_LOCKU));
+
+    // Configure Master Clock Controller (MCK = PLLA / 2 = 96MHz)
+    // Program clock divider as 2
+    PMC_MCKR = (PMC_MCKR & ~(PMC_MCKR_PRES_Msk)) | PMC_MCKR_PRES_CLK_2;
+    // Program clock source as PLLA
+    PMC_MCKR = (PMC_MCKR & ~(PMC_MCKR_CSS_Msk)) | PMC_MCKR_CSS_PLLA_CLK;
+    // Wait for the master clock to be ready
+    while (!(PMC_SR & PMC_SR_MCKRDY));
+
+    // Configure Programmable Clock Controller (PCK0 = MCK / 8 = 12MHz)
+    PMC_PCK0 = PMC_PCKx_CSS_MCK | PMC_PCKx_PRES_CLK_8;
+    // Enable PCK0
+    PMC_SCER = PMC_SCER_PCK0;
+    // Wait for PCK0 to become ready
+    while (!(PMC_SR & PMC_SR_PCKRDY0));
+
     while (1) {}
 }
