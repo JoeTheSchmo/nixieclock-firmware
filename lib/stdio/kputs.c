@@ -17,20 +17,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef __STRING_H_
-#define __STRING_H_
+#include <sam3u4e.h>
 
-#include <types.h>
-
-extern void *memcpy(void *d, void *s, size_t n);
-extern void *memset(void *s, int c, size_t n);
-extern char *strcat(char *d, const char *s);
-extern char *strchr(const char *s, char c);
-extern char *strchrnul(const char *s, char c);
-extern int32_t strcmp(const char *s1, const char *s2);
-extern size_t strlen(const char *s);
-extern char *strncat(char *d, const char *s, size_t n);
-extern int32_t strncmp(const char *s1, const char *s2, size_t n);
-extern char *strrchr(const char *s, char c);
-
-#endif // __STRING_H_
+int kputs(const char *s) {
+    while (*s != '\0') {
+        while (!(UART_SR & UART_SR_TXRDY));
+        UART_THR = *s++;
+    }
+    return 0;
+}

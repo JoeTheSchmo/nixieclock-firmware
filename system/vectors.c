@@ -22,8 +22,8 @@ extern void reset_handler();
 
 void dummy_handler() { while (1) {}; };
 
-void stack_bottom() __attribute__ ((weak, alias("dummy_handler")));
-void reset_handler() __attribute__ ((weak, alias("dummy_handler")));
+extern void stack_bottom();
+extern void reset_handler();
 void nmi_handler() __attribute__ ((weak, alias("dummy_handler")));
 void hardfault_handler() __attribute__ ((weak, alias("dummy_handler")));
 void memmanage_handler() __attribute__ ((weak, alias("dummy_handler")));
@@ -64,9 +64,9 @@ void adc_handler() __attribute__ ((weak, alias("dummy_handler")));
 void dmac_handler() __attribute__ ((weak, alias("dummy_handler")));
 void udphs_handler() __attribute__ ((weak, alias("dummy_handler")));
 
-typedef void (*vector_entry)(void);
+typedef void (*vector_t)(void);
 __attribute__ ((section(".vectors")))
-vector_entry vector_table[] = {
+vector_t vector_table[] = {
     stack_bottom,
     reset_handler,
     nmi_handler,

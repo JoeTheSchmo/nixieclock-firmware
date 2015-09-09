@@ -17,20 +17,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef __STRING_H_
-#define __STRING_H_
-
 #include <types.h>
 
-extern void *memcpy(void *d, void *s, size_t n);
-extern void *memset(void *s, int c, size_t n);
-extern char *strcat(char *d, const char *s);
-extern char *strchr(const char *s, char c);
-extern char *strchrnul(const char *s, char c);
-extern int32_t strcmp(const char *s1, const char *s2);
-extern size_t strlen(const char *s);
-extern char *strncat(char *d, const char *s, size_t n);
-extern int32_t strncmp(const char *s1, const char *s2, size_t n);
-extern char *strrchr(const char *s, char c);
+int32_t strcmp(const char *s1, const char *s2) {
+    for (; *s1 == *s2; s1++, s2++) {
+        if (*s1 == '\0') {
+            return 0;
+        }
+    }
 
-#endif // __STRING_H_
+    return (*s1 > *s2 ? -1 : 1);
+}

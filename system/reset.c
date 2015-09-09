@@ -17,7 +17,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include <pins.h>
 #include <sam3u4e.h>
+#include <stdio.h>
 #include <string.h>
 
 extern void *bss_start;
@@ -27,14 +29,8 @@ extern void *data_end;
 extern void *data_load;
 
 void reset_handler() {
-    // Disable Exceptions and Interrupts
-    asm volatile("cpsie i");
+    // Disable Interrupts
     asm volatile("cpsid i");
-
-    // Enable Peripheral Clocks for the PIOs
-    PMC_PCER = (1 << PMC_ID_PIOA);
-    PMC_PCER = (1 << PMC_ID_PIOB);
-    PMC_PCER = (1 << PMC_ID_PIOC);
 
     // Enable Exceptions
     asm volatile ("cpsie f");
@@ -107,8 +103,46 @@ void reset_handler() {
     // lower priority will be serviced first.
     AIRCR = AIRCR_VECTKEY | (0x5 << AIRCR_PRIGROUP_Off);
 
-    // Enable Interrupts
+    // Enable Peripheral Clocks for the PIOs
+    PMC_PCER = (1 << PMC_ID_PIOA);
+    PMC_PCER = (1 << PMC_ID_PIOB);
+    PMC_PCER = (1 << PMC_ID_PIOC);
+
+    // Enable UART Pins
+    PIO_PDR(PIN_UART_RXD_PIO)   =  (1 << PIN_UART_RXD_IDX); // Disable PIO to Enable Peripheral on Pin
+    PIO_ABSR(PIN_UART_RXD_PIO) &= ~(1 << PIN_UART_RXD_IDX); // Select Peripheral A
+    PIO_PDR(PIN_UART_TXD_PIO)   =  (1 << PIN_UART_TXD_IDX); // Disable PIO to Enable Peripheral on Pin
+    PIO_ABSR(PIN_UART_TXD_PIO) &= ~(1 << PIN_UART_TXD_IDX); // Select Peripheral A
+
+    // Enable the peripheral clock for the UART
+    PMC_PCER = (1 << PMC_ID_UART);
+
+    // Reset and disable the UART
+    UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_RXDIS | UART_CR_TXDIS;// | UART_CR_RSTSTA;
+    // Set No Parity and Normal Mode
+    UART_MR = UART_MR_PAR_NO | UART_MR_CHMODE_NORMAL;
+
+    // Set the UART BAUD rate to 9600bps (96MHz / (16 * 625) = 9600)
+    UART_BRGR = 625;
+
+    // Enable the UART Interrupt in the NVIC
+    ICER0 = (1 << PMC_ID_UART); // Disable Interrupt
+    ICPR0 = (1 << PMC_ID_UART); // Clear Pending
+    IPR(PMC_ID_UART) = (IPR(PMC_ID_UART) & ~(IPR_IP_Msk(PMC_ID_UART))) | IPR_IP(PMC_ID_UART, 0xC); // Set the Priority to 12
+    ISER0 = (1 << PMC_ID_UART); // Enable Interrupt
+    // Enable RX Interrupt for the UART
+    UART_IER = UART_IER_RXRDY;
+
+    // Enable the UART TX
+    UART_CR = UART_CR_TXEN;
+
+    // Now that the debug serial console is available, Enable Interrupts
     asm volatile("cpsie i");
+
+    // TODO: Remaining Initialization
+
+    // Enable the UART RX
+    UART_CR = UART_CR_RXEN;
 
     // Initialization Complete
     while (1) {}

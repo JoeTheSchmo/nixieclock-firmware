@@ -17,20 +17,20 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef __STRING_H_
-#define __STRING_H_
+char *strcat(char *d, const char *s) {
+    // Working Pointer
+    char *p = d;
 
-#include <types.h>
+    // Iterate to the end of the Destination String
+    while (*p++ != '\0');
 
-extern void *memcpy(void *d, void *s, size_t n);
-extern void *memset(void *s, int c, size_t n);
-extern char *strcat(char *d, const char *s);
-extern char *strchr(const char *s, char c);
-extern char *strchrnul(const char *s, char c);
-extern int32_t strcmp(const char *s1, const char *s2);
-extern size_t strlen(const char *s);
-extern char *strncat(char *d, const char *s, size_t n);
-extern int32_t strncmp(const char *s1, const char *s2, size_t n);
-extern char *strrchr(const char *s, char c);
+    // Append the Source String to the Destination String
+    while (*s != '\0') {
+        *p++ = *s++;
+    }
 
-#endif // __STRING_H_
+    // Null Terminate the Destination
+    *p = '\0';
+
+    return d;
+}

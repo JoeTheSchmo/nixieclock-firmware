@@ -17,20 +17,35 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef __STRING_H_
-#define __STRING_H_
-
 #include <types.h>
 
-extern void *memcpy(void *d, void *s, size_t n);
-extern void *memset(void *s, int c, size_t n);
-extern char *strcat(char *d, const char *s);
-extern char *strchr(const char *s, char c);
-extern char *strchrnul(const char *s, char c);
-extern int32_t strcmp(const char *s1, const char *s2);
-extern size_t strlen(const char *s);
-extern char *strncat(char *d, const char *s, size_t n);
-extern int32_t strncmp(const char *s1, const char *s2, size_t n);
-extern char *strrchr(const char *s, char c);
+char *ultostr(uint32_t value, char *str, int8_t base) {
+    // Working Pointer
+    char *p = str;
 
-#endif // __STRING_H_
+    // Sanity Check
+    if (base > 16) {
+        *str = '\0';
+        return str;
+    }
+
+    // Find number of digits and prepare pointer
+    uint32_t temp = value;
+    int8_t length = 0;
+    do {
+        *p++ = '0';
+        length++;
+        temp /= base;
+    } while (temp > 0);
+
+    // Terminate the String
+    *p = '\0';
+
+    // Fill in the string backwards
+    do {
+        *--p = "0123456789abcdef"[(value % base)];
+        value /= base;
+    } while (value > 0);
+
+    return str;
+}

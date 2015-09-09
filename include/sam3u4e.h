@@ -20,10 +20,14 @@
 #ifndef __SAM3U4E_H_
 #define __SAM3U4E_H_
 
+#include "arm/nvic.h"
+#include "arm/scb.h"
+
 #include "sam/eefc.h"
 #include "sam/pio.h"
 #include "sam/pmc.h"
 #include "sam/rstc.h"
+#include "sam/uart.h"
 #include "sam/wdt.h"
 
 // Peripheral Address Table
