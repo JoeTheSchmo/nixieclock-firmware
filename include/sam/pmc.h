@@ -67,7 +67,7 @@
 #define CKGR_PLLAR_PLLACOUNT_Off 0x08
 #define CKGR_PLLAR_MULA_Msk     0x07FF0000
 #define CKGR_PLLAR_MULA_Off     0x10
-#define CKGR_PLLAR_ONE          0x40000000
+#define CKGR_PLLAR_ONE          0x20000000
 
 #define PMC_MCKR_CSS_Msk        0x00000003
 #define PMC_MCKR_CSS_PLLA_CLK   0x00000002
