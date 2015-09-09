@@ -27,6 +27,18 @@ extern void *data_end;
 extern void *data_load;
 
 void reset_handler() {
+    // Disable Exceptions and Interrupts
+    asm volatile("cpsie i");
+    asm volatile("cpsid i");
+
+    // Enable Peripheral Clocks for the PIOs
+    PMC_PCER = (1 << PMC_ID_PIOA);
+    PMC_PCER = (1 << PMC_ID_PIOB);
+    PMC_PCER = (1 << PMC_ID_PIOC);
+
+    // Enable Exceptions
+    asm volatile ("cpsie f");
+
     // Zero the uninitialized data segment
     if (bss_end - bss_start > 0) {
         memset(bss_start, 0, bss_end - bss_start);
@@ -59,7 +71,7 @@ void reset_handler() {
     // Wait for the selection to complete
     while (!(PMC_SR & PMC_SR_MOSCSELS));
 
-    // Configure Clock Generator PLLA Clock (12MHz Xtal * 16 = 192MHz)
+    // Configure Clock Generator PLLA Clock (12MHz Xtal * (15+1) = 192MHz)
     // Disable the PLL
     CKGR_PLLAR = CKGR_PLLAR_ONE;
     // Enable with the correct settings
@@ -88,5 +100,16 @@ void reset_handler() {
     // Wait for PCK0 to become ready
     while (!(PMC_SR & PMC_SR_PCKRDY0));
 
+    // Divide the interrupts into 4 groups of 4; 0-3, 4-7, 8-11, 12-15.
+    // Interrupts within the same group will not pre-empt each other but an
+    // interrupt from a group with a lower priority will. When two interrupts
+    // within the same group are received at the same time, the one with the
+    // lower priority will be serviced first.
+    AIRCR = AIRCR_VECTKEY | (0x5 << AIRCR_PRIGROUP_Off);
+
+    // Enable Interrupts
+    asm volatile("cpsie i");
+
+    // Initialization Complete
     while (1) {}
 }
