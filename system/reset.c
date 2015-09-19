@@ -151,6 +151,19 @@ void reset_handler() {
     kputs("This is free software, and you are welcome to redistribute it\r\n");
     kputs("under certain conditions; type 'show license' for details.\r\n");
 
+    // Print the reset cause
+    kputs("Reset Reason: ");
+    switch (RSTC_SR & RSTC_SR_RSTTYP_Msk) {
+    case RSTC_SR_RSTTYP_GENERAL:    kputs("General");   break;
+    case RSTC_SR_RSTTYP_BACKUP:     kputs("Backup");    break;
+    case RSTC_SR_RSTTYP_WATCHDOG:   kputs("Watchdog");  break;
+    case RSTC_SR_RSTTYP_SOFTWARE:   kputs("Software");  break;
+    case RSTC_SR_RSTTYP_USER:       kputs("User");      break;
+    default:
+        kprintf("Unknown (%lu)", ((RSTC_SR & RSTC_SR_RSTTYP_Msk) >> RSTC_SR_RSTTYP_Off));
+    }
+    kputs("\r\n");
+
     // TODO: Remaining Initialization
 
     // Terminal Notice

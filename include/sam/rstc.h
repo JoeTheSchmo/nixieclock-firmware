@@ -26,9 +26,17 @@
 #define RSTC_SR     (*(reg_ro_t*)(RSTC+0x0004))
 #define RSTC_MR     (*(reg_rw_t*)(RSTC+0x0008))
 
-#define RSTC_MR_URSTEN      0x00000001
-#define RSTC_MR_ERSTL_Msk   0x00000F00
-#define RSTC_MR_ERSTL_Off   0x08
-#define RSTC_MR_KEY         0xA5000000
+#define RSTC_SR_RSTTYP_Msk      0x00000700
+#define RSTC_SR_RSTTYP_Off      0x08
+#define RSTC_SR_RSTTYP_GENERAL  0x00000000
+#define RSTC_SR_RSTTYP_BACKUP   0x00000100
+#define RSTC_SR_RSTTYP_WATCHDOG 0x00000200
+#define RSTC_SR_RSTTYP_SOFTWARE 0x00000300
+#define RSTC_SR_RSTTYP_USER     0x00000400
+
+#define RSTC_MR_URSTEN          0x00000001
+#define RSTC_MR_ERSTL_Msk       0x00000F00
+#define RSTC_MR_ERSTL_Off       0x08
+#define RSTC_MR_KEY             0xA5000000
 
 #endif // __SAM__RSTC_H_
