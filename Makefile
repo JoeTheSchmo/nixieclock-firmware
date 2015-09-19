@@ -1,4 +1,4 @@
-# vim: set tabstop=8 noexpandtab
+# vim: set tabstop=8 noexpandtab :
 #
 # nixieclock-firmware - Nixie Clock Main Firmware Program
 # Copyright (C) 2013 - 2015 Joe Ciccone

@@ -1,4 +1,4 @@
-// vim: set tabstop=4 shiftwidth=4 expandtab
+// vim: set tabstop=4 shiftwidth=4 expandtab :
 //
 // nixieclock-firmware - Nixie Clock Main Firmware Program
 // Copyright (C) 2013 - 2015 Joe Ciccone
@@ -22,10 +22,13 @@
 #include <sam3u4e.h>
 #include <stdio.h>
 
+int count = 256;
+
 void console_invoke(char *cmd) {
     kputs("running command: ");
     kputs(cmd);
     kputs("\r\n");
+    kprintf
 }
 
 void uart_handler(void) {
