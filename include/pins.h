@@ -20,6 +20,10 @@
 #ifndef __PINS_H_
 #define __PINS_H_
 
+// HV5530 High Voltage Pin Defintions
+#define PIN_HV5530_HVEN_PIO PIOB
+#define PIN_HV5530_HVEN_IDX 0
+
 // UART Pin Defintions
 #define PIN_UART_RXD_PIO PIOA
 #define PIN_UART_RXD_IDX 11

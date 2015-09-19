@@ -37,6 +37,17 @@ void reset_handler() {
     WDT_CR = WDT_CR_WDRSTT | WDT_CR_KEY;
     WDT_MR = WDT_MR_WDDIS;
 
+    // Enable Peripheral Clocks for the PIOs
+    PMC_PCER = (1 << PMC_ID_PIOA);
+    PMC_PCER = (1 << PMC_ID_PIOB);
+    PMC_PCER = (1 << PMC_ID_PIOC);
+
+    // Disable the High-Voltage PSU
+    PIO_PER(PIN_HV5530_HVEN_PIO)  = (1 << PIN_HV5530_HVEN_IDX); // Enable PIO on Pin
+    PIO_OER(PIN_HV5530_HVEN_PIO)  = (1 << PIN_HV5530_HVEN_IDX); // Enable Output
+    PIO_PUDR(PIN_HV5530_HVEN_PIO) = (1 << PIN_HV5530_HVEN_IDX); // Disable Pull-Up
+    PIO_CODR(PIN_HV5530_HVEN_PIO) = (1 << PIN_HV5530_HVEN_IDX); // Clear Output Data Register
+
     // Enable User Resets by Asserting the NRST Pin
     // Assert NRST for 2^(11+1) Slow Clock Cycles (32 kHz * 4096 = 128ms)
     RSTC_MR = RSTC_MR_URSTEN | (11 << RSTC_MR_ERSTL_Off) | RSTC_MR_KEY;
@@ -109,11 +120,6 @@ void reset_handler() {
 
     // Enable Exceptions
     asm volatile ("cpsie f");
-
-    // Enable Peripheral Clocks for the PIOs
-    PMC_PCER = (1 << PMC_ID_PIOA);
-    PMC_PCER = (1 << PMC_ID_PIOB);
-    PMC_PCER = (1 << PMC_ID_PIOC);
 
     // Enable UART Pins
     PIO_PDR(PIN_UART_RXD_PIO)   =  (1 << PIN_UART_RXD_IDX); // Disable PIO to Enable Peripheral on Pin
