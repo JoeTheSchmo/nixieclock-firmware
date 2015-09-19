@@ -50,4 +50,7 @@
 
 #define CCR_DIV_0_TRP       0x00000010
 
+#define SHPR2_PRI_11_Msk    0xFF000000
+#define SHPR2_PRI_11_Off    0x18
+
 #endif // __ARM__SCB_H_

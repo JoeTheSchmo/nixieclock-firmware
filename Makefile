@@ -72,6 +72,7 @@ OBJS		+= lib/string/strrchr.o
 OBJS		+= system/console.o
 OBJS		+= system/exceptions.o
 OBJS		+= system/reset.o
+OBJS		+= system/svcall.o
 OBJS		+= system/vectors.o
 
 -include local.mk

@@ -101,6 +101,9 @@ void reset_handler() {
     // lower priority number will be serviced first.
     AIRCR = AIRCR_VECTKEY | (0x5 << AIRCR_PRIGROUP_Off);
 
+    // Set SVC Interrupt Priority to 4
+    SHPR2 = ((SHPR2 & ~SHPR2_PRI_11_Msk) | (0x40 << SHPR2_PRI_11_Off));
+
     // Trap Divide-by-0 as Hard Fault
     CCR |= CCR_DIV_0_TRP;
 
