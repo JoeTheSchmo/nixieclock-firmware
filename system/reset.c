@@ -29,21 +29,9 @@ extern uint8_t data_end;
 extern uint8_t data_load;
 
 void reset_handler() {
-    // Disable Interrupts
+    // Disable Exceptions and Interrupts
+    asm volatile("cpsid f");
     asm volatile("cpsid i");
-
-    // Enable Exceptions
-    asm volatile ("cpsie f");
-
-    // Zero the uninitialized data segment
-    if (&bss_end - &bss_start > 0) {
-        memset(&bss_start, 0, &bss_end - &bss_start);
-    }
-
-    // Load the initialized data segment
-    if (&data_start != &data_load) {
-        memcpy(&data_start, &data_load, &data_end - &data_start);
-    }
 
     // Reset and Disable the Watchdog Timer
     WDT_CR = WDT_CR_WDRSTT | WDT_CR_KEY;
@@ -96,12 +84,28 @@ void reset_handler() {
     // Wait for PCK0 to become ready
     while (!(PMC_SR & PMC_SR_PCKRDY0));
 
+    // Zero the uninitialized data segment
+    if (&bss_end - &bss_start > 0) {
+        memset(&bss_start, 0, &bss_end - &bss_start);
+    }
+
+    // Load the initialized data segment
+    if (&data_start != &data_load) {
+        memcpy(&data_start, &data_load, &data_end - &data_start);
+    }
+
     // Divide the interrupts into 4 groups of 4; 0-3, 4-7, 8-11, 12-15.
     // Interrupts within the same group will not preempt each other but an
     // interrupt from a group with a lower priority will. When two interrupts
     // within the same group are received at the same time, the one with the
     // lower priority number will be serviced first.
     AIRCR = AIRCR_VECTKEY | (0x5 << AIRCR_PRIGROUP_Off);
+
+    // Trap Divide-by-0 as Hard Fault
+    CCR |= CCR_DIV_0_TRP;
+
+    // Enable Exceptions
+    asm volatile ("cpsie f");
 
     // Enable Peripheral Clocks for the PIOs
     PMC_PCER = (1 << PMC_ID_PIOA);
@@ -118,7 +122,7 @@ void reset_handler() {
     PMC_PCER = (1 << PMC_ID_UART);
 
     // Reset and disable the UART
-    UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_RXDIS | UART_CR_TXDIS;// | UART_CR_RSTSTA;
+    UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_RXDIS | UART_CR_TXDIS | UART_CR_RSTSTA;
     // Set No Parity and Normal Mode
     UART_MR = UART_MR_PAR_NO | UART_MR_CHMODE_NORMAL;
 
@@ -139,7 +143,18 @@ void reset_handler() {
     // Now that the debug serial console is available, Enable Interrupts
     asm volatile("cpsie i");
 
+    // Print terminal headline
+    kputs("\r\n\r\n");
+    kputs("nixieclock-firmware: Nixie Clock Main Firmware Program\r\n");
+    kputs("Copyright (C) 2013 - 2015 Joe Ciccone and Ed Koloski\r\n");
+    kputs("This program comes with ABSOLUTELY NO WARRANTY; for details type 'show license'.\r\n");
+    kputs("This is free software, and you are welcome to redistribute it\r\n");
+    kputs("under certain conditions; type 'show license' for details.\r\n");
+
     // TODO: Remaining Initialization
+
+    // Terminal Notice
+    kputs("Press ENTER for a prompt\r\n");
 
     // Enable the UART RX
     UART_CR = UART_CR_RXEN;

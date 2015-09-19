@@ -48,4 +48,6 @@
 
 #define SCR_SLEEPONEXIT     0x00000002
 
+#define CCR_DIV_0_TRP       0x00000010
+
 #endif // __ARM__SCB_H_

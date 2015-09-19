@@ -61,6 +61,10 @@
 #define CKGR_MOR_MOSCSEL        0x01000000
 #define CKGR_MOR_KEY            0x00370000
 
+#define CKGR_MCFR_MAINF_Msk     0x0000FFFF
+#define CKGR_MCFD_MAINF_Off     0x00
+#define CKGR_MCFR_MAINFRDY      0x00010000
+
 #define CKGR_PLLAR_DIVA_Msk     0x000000FF
 #define CKGR_PLLAR_DIVA_Off     0x00
 #define CKGR_PLLAR_PLLACOUNT_Msk 0x00003F00

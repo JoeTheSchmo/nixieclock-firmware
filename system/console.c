@@ -21,14 +21,48 @@
 #include <pins.h>
 #include <sam3u4e.h>
 #include <stdio.h>
-
-int count = 256;
+#include <string.h>
 
 void console_invoke(char *cmd) {
-    kputs("running command: ");
-    kputs(cmd);
-    kputs("\r\n");
-    kprintf
+    // Check for a valid command string
+    if (!cmd) {
+        return;
+    }
+    if (strlen(cmd) <= 0) {
+        return;
+    }
+
+    // Trim leading space from the command
+    while (isspace(*cmd)) {
+        cmd++;
+    }
+
+    // Check for a valid command string
+
+    if (strncmp(cmd, "show ", 5) == 0) {
+        if (strcmp(cmd + 5, "license") == 0) {
+            kputs("\r\n");
+            kputs("nixieclock-firmware - Nixie Clock Main Firmware Program\r\n");
+            kputs("Copyright (C) 2013 - 2015 Joe Ciccone\r\n");
+            kputs("\r\n");
+            kputs("This program is free software: you can redistribute it and/or modify\r\n");
+            kputs("it under the terms of the GNU General Public License as published by\r\n");
+            kputs("the Free Software Foundation, either version 3 of the License, or\r\n");
+            kputs("(at your option) any later version.\r\n");
+            kputs("\r\n");
+            kputs("This program is distributed in the hope that it will be useful,\r\n");
+            kputs("but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n");
+            kputs("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\r\n");
+            kputs("GNU General Public License for more details.\r\n");
+            kputs("\r\n");
+            kputs("You should have received a copy of the GNU General Public License\r\n");
+            kputs("along with this program.  If not, see <http://www.gnu.org/licenses/>.\r\n");
+            kputs("\r\n");
+            return;
+        }
+    }    
+
+    kputs("Error: Unrecognized Command\r\n");
 }
 
 void uart_handler(void) {
