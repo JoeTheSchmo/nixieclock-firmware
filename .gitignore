@@ -1,5 +1,6 @@
-/local.mk
-*.o
-*.d
 *.bin
+*.d
 *.elf
+*.o
+*.swp
+/local.mk
