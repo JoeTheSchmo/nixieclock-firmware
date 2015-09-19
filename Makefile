@@ -37,7 +37,7 @@ LINK_SCRIPT	= system/flash.ld
 
 CFLAGS		+= -mcpu=cortex-m3 -mthumb
 CFLAGS		+= -ffreestanding -nostdinc
-CFLAGS		+= -O3 -g3 -ggdb
+CFLAGS		+= -O0 -g3 -ggdb
 CFLAGS		+= -Wall -Werror
 CFLAGS		+= -isystem include
 
@@ -70,6 +70,7 @@ OBJS		+= lib/string/strncat.o
 OBJS		+= lib/string/strncmp.o
 OBJS		+= lib/string/strrchr.o
 OBJS		+= system/console.o
+OBJS		+= system/exceptions.o
 OBJS		+= system/reset.o
 OBJS		+= system/vectors.o
 
