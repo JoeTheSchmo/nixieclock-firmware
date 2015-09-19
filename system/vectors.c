@@ -20,7 +20,9 @@
 extern void stack_bottom();
 extern void reset_handler();
 
-void dummy_handler() { while (1) {}; };
+void dummy_handler() {
+    while (1) {}
+}
 
 extern void stack_bottom();
 extern void reset_handler();

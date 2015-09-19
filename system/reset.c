@@ -22,11 +22,11 @@
 #include <stdio.h>
 #include <string.h>
 
-extern void *bss_start;
-extern void *bss_end;
-extern void *data_start;
-extern void *data_end;
-extern void *data_load;
+extern uint8_t bss_start;
+extern uint8_t bss_end;
+extern uint8_t data_start;
+extern uint8_t data_end;
+extern uint8_t data_load;
 
 void reset_handler() {
     // Disable Interrupts
@@ -36,13 +36,13 @@ void reset_handler() {
     asm volatile ("cpsie f");
 
     // Zero the uninitialized data segment
-    if (bss_end - bss_start > 0) {
-        memset(bss_start, 0, bss_end - bss_start);
+    if (&bss_end - &bss_start > 0) {
+        memset(&bss_start, 0, &bss_end - &bss_start);
     }
 
     // Load the initialized data segment
-    if (data_start != data_load) {
-        memcpy(data_start, data_load, data_end - data_start);
+    if (&data_start != &data_load) {
+        memcpy(&data_start, &data_load, &data_end - &data_start);
     }
 
     // Reset and Disable the Watchdog Timer
@@ -97,10 +97,10 @@ void reset_handler() {
     while (!(PMC_SR & PMC_SR_PCKRDY0));
 
     // Divide the interrupts into 4 groups of 4; 0-3, 4-7, 8-11, 12-15.
-    // Interrupts within the same group will not pre-empt each other but an
+    // Interrupts within the same group will not preempt each other but an
     // interrupt from a group with a lower priority will. When two interrupts
     // within the same group are received at the same time, the one with the
-    // lower priority will be serviced first.
+    // lower priority number will be serviced first.
     AIRCR = AIRCR_VECTKEY | (0x5 << AIRCR_PRIGROUP_Off);
 
     // Enable Peripheral Clocks for the PIOs
