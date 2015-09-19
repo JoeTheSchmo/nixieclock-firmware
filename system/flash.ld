@@ -29,11 +29,11 @@ HIDDEN(stack_size = 0x1000);
 SECTIONS {
     .text : {
         KEEP(*(.vectors))
-        *(.text)
+        *(.text *.text.*)
     } > ROM
 
     .rodata : {
-        *(.rodata)
+        *(.rodata *.rodata.*)
         HIDDEN(rodata_end = .);
     } > ROM
 
@@ -44,14 +44,14 @@ SECTIONS {
 
     .data : AT (rodata_end) {
         data_start = .;
-        *(.data)
+        *(.data *.data.*)
         data_end = .;
     } > RAM
     data_load = LOADADDR(.data);
 
     .bss : {
         bss_start = .;
-        *(.bss)
+        *(.bss *.bss.*)
         bss_end = .;
     } > RAM
 }
