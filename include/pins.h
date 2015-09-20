@@ -20,6 +20,12 @@
 #ifndef __PINS_H_
 #define __PINS_H_
 
+// 5V PSU Pin Definitions
+#define PIN_5VPSU_EN_PIO PIOC
+#define PIN_5VPSU_EN_IDX 13
+#define PIN_5VPSU_PG_PIO PIOA
+#define PIN_5VPSU_PG_IDX 20
+
 // HV5530 High Voltage Pin Defintions
 #define PIN_HV5530_HVEN_PIO PIOB
 #define PIN_HV5530_HVEN_IDX 0
@@ -35,5 +41,9 @@
 #define PIN_UART_RXD_IDX 11
 #define PIN_UART_TXD_PIO PIOA
 #define PIN_UART_TXD_IDX 12
+
+// ZIGBEE Pin Definition
+#define PIN_ZIGBEE_SHDN_PIO PIOB
+#define PIN_ZIGBEE_SHDN_IDX 4
 
 #endif // __PINS_H_

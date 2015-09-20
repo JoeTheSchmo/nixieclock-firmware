@@ -43,11 +43,23 @@ void reset_handler() {
     PMC_PCER = (1 << PMC_ID_PIOB);
     PMC_PCER = (1 << PMC_ID_PIOC);
 
-    // Disable the High-Voltage PSU
+    // Configure the High-Voltage Pin and Disable the PSU (HV Off)
     PIO_PER(PIN_HV5530_HVEN_PIO)  = (1 << PIN_HV5530_HVEN_IDX); // Enable PIO on Pin
     PIO_OER(PIN_HV5530_HVEN_PIO)  = (1 << PIN_HV5530_HVEN_IDX); // Enable Output
     PIO_PUDR(PIN_HV5530_HVEN_PIO) = (1 << PIN_HV5530_HVEN_IDX); // Disable Pull-Up
     PIO_CODR(PIN_HV5530_HVEN_PIO) = (1 << PIN_HV5530_HVEN_IDX); // Clear Output Data Register
+
+    // Configure the initial state of the 5v PSU (5v On)
+    PIO_PER(PIN_5VPSU_EN_PIO)  = (1 << PIN_5VPSU_EN_IDX);    // Enable PIO on Pin
+    PIO_OER(PIN_5VPSU_EN_PIO)  = (1 << PIN_5VPSU_EN_IDX);    // Enable Output
+    PIO_PUER(PIN_5VPSU_EN_PIO) = (1 << PIN_5VPSU_EN_IDX);    // Enable Pull-Up
+    PIO_CODR(PIN_5VPSU_EN_PIO) = (1 << PIN_5VPSU_EN_IDX);    // Clear Output Data Register
+
+    // Configure the ZigBee Shutdown Pin (ZigBee Off)
+    PIO_PER(PIN_ZIGBEE_SHDN_PIO)  = (1 << PIN_ZIGBEE_SHDN_IDX); // Enable PIO on Pin
+    PIO_OER(PIN_ZIGBEE_SHDN_PIO)  = (1 << PIN_ZIGBEE_SHDN_IDX); // Enable Output
+    PIO_PUER(PIN_ZIGBEE_SHDN_PIO) = (1 << PIN_ZIGBEE_SHDN_IDX); // Enable Pull-Up
+    PIO_CODR(PIN_ZIGBEE_SHDN_PIO) = (1 << PIN_ZIGBEE_SHDN_IDX); // Clear Output Data Register
 
     // Enable User Resets by Asserting the NRST Pin
     // Assert NRST for 2^(11+1) Slow Clock Cycles (32 kHz * 4096 = 128ms)
