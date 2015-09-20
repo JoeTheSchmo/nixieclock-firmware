@@ -37,3 +37,9 @@ define reset
     info reg
 end
 
+# Rebuild, Load, and Run
+define re
+    make
+    reset
+    continue
+end
