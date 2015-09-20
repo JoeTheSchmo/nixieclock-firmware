@@ -61,7 +61,7 @@ void console_invoke(char *cmd) {
             kputs("\r\n");
             return;
         }
-    }    
+    }
 
     kputs("Error: Unrecognized Command\r\n");
 }
