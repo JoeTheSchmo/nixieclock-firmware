@@ -19,15 +19,53 @@
 
 #include <types.h>
 
+// svcall wrapper for _internal_twi_write
+int32_t __attribute__((naked)) _svcall_twi_write(uint8_t code, uint32_t a0, uint32_t a1, uint32_t a2) {
+    asm volatile (
+        "mov r0, r1"    "\n\t"  // move a0 to caddr
+        "mov r1, r2"    "\n\t"  // move a1 to raddr
+        "mov r2, r3"    "\n\t"  // move a2 to dptr
+        "mov r3, r0"    "\n\t"  // move a0 to dlen
+        // r4 is already saved by svcall_handler
+        "mov r4, #0xFF" "\n\t"  // create mask 0xFF
+        "lsr r0, #0x10" "\n\t"  // move 23:16 from a0 to 7:0
+        "and r0, r4"    "\n\t"  // apply mask to a0 to get caddr
+        "lsl r4, #8"    "\n\t"  // create mask 0xFF00
+        "orr r4, #0xFF" "\n\t"  // creaet mask 0xFFFF
+        "and r3, r4"    "\n\t"  // apply mask to a0 to get 
+        "b _internal_twi_write" // call twi_master_write(r0, r1, r2, r3)
+    );
+}
+
+// svcall wrapper for _internal_twi_read
+int32_t __attribute__((naked)) _svcall_twi_read(uint8_t code, uint32_t a0, uint32_t a1, uint32_t a2) {
+    asm volatile (
+        "mov r0, r1"    "\n\t"  // move a0 to caddr
+        "mov r1, r2"    "\n\t"  // move a1 to raddr
+        "mov r2, r3"    "\n\t"  // move a2 to dptr
+        "mov r3, r0"    "\n\t"  // move a0 to dlen
+        // r4 is already saved by svcall_handler
+        "mov r4, #0xFF" "\n\t"  // create mask 0xFF
+        "lsr r0, #0x10" "\n\t"  // move 23:16 from a0 to 7:0
+        "and r0, r4"    "\n\t"  // apply mask to a0 to get caddr
+        "lsl r4, #8"    "\n\t"  // create mask 0xFF00
+        "orr r4, #0xFF" "\n\t"  // creaet mask 0xFFFF
+        "and r3, r4"    "\n\t"  // apply mask to a0 to get 
+        "b _internal_twi_read" // call twi_master_read(r0, r1, r2, r3)
+    );
+}
+
 // vector table for the svcall interrupt handler
 typedef int32_t (*svcall_t)(uint8_t, uint32_t, uint32_t, uint32_t);
 const svcall_t svcall_vectors[256] __attribute__ ((section(".rodata"))) = {
-    0,
+    _svcall_twi_write,
+    _svcall_twi_read,
+    0
 };
 
 // dispatch the software interrupt
-void __attribute__((naked)) SVC_Handler(void) {
-    // restore the arguments from the stack
+void __attribute__((naked)) svcall_handler(void) {
+    // restore the code from the stack
     // they may already be there, but if a late arriving interrupt
     // was processed in-between the svc instruction and this handler
     // being executed then the contents are unpredictable
@@ -67,7 +105,7 @@ void __attribute__((naked)) SVC_Handler(void) {
 }
 
 // generate a software interrupt
-int32_t __attribute__((naked)) svcall(uint8_t code, uint32_t p1, uint32_t p2, uint32_t p3) {
+int32_t __attribute__((naked)) svcall(uint8_t code, uint32_t a0, uint32_t a1, uint32_t a2) {
     // branch to exception handler (software interrupt)
     asm volatile ("svc 0x00");
 

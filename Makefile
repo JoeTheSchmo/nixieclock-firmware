@@ -48,6 +48,7 @@ LDFLAGS		+= --gc-sections
 BINFILE		= nixieclock-firmware.bin
 ELFFILE		= nixieclock-firmware.elf
 
+OBJS		+= drivers/twi.o
 OBJS		+= lib/ctype/isprint.o
 OBJS		+= lib/ctype/isspace.o
 OBJS		+= lib/ctype/tolower.o

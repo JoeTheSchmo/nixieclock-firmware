@@ -17,12 +17,30 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef __SVCALL_H_
-#define __SVCALL_H_
+#ifndef __SYSTEM_H_
+#define __SYSTEM_H_
 
 #include <types.h>
 
-extern int32_t svcall(uint8_t code, uint32_t p1, uint32_t p2, uint32_t p3);
+extern int32_t svcall(uint8_t code, uint32_t a0, uint32_t a1, uint32_t a2);
 
-#endif // __SVCALL_H_
+static inline int32_t __attribute__((always_inline))
+  twi_write(uint8_t caddr, uint32_t raddr, uint8_t *dptr, uint16_t dlen) {
+    return svcall(0x00,
+        (uint32_t)((caddr & 0xFF) << 0x10 | (dlen & 0xFFFF)),
+        (uint32_t)(raddr),
+        (uint32_t)(dptr)
+    );
+}
+
+static inline int32_t __attribute__((always_inline))
+  twi_read(uint8_t caddr, uint32_t raddr, uint8_t *dptr, uint16_t dlen) {
+    return svcall(0x01,
+        (uint32_t)((caddr & 0xFF) << 0x10 | (dlen & 0xFFFF)),
+        (uint32_t)(raddr),
+        (uint32_t)(dptr)
+    );
+}
+
+#endif // __SYSTEM_H_
 

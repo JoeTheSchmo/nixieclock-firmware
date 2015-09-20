@@ -24,9 +24,11 @@
 #include "arm/scb.h"
 
 #include "sam/eefc.h"
+#include "sam/pdc.h"
 #include "sam/pio.h"
 #include "sam/pmc.h"
 #include "sam/rstc.h"
+#include "sam/twi.h"
 #include "sam/uart.h"
 #include "sam/wdt.h"
 

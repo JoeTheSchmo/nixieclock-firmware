@@ -21,6 +21,7 @@
 #include <sam3u4e.h>
 #include <stdio.h>
 #include <string.h>
+#include <system.h>
 
 extern uint8_t bss_start;
 extern uint8_t bss_end;
@@ -58,7 +59,8 @@ void reset_handler() {
 
     // Configure Clock Generator Main Clock (External 12MHz Xtal)
     // Startup time 15625uS for Xtal (65 for 65*8 cycles at slow clock, ~32000Hz)
-    CKGR_MOR = CKGR_MOR_KEY | (CKGR_MOR & ~(CKGR_MOR_MOSCXTBY)) | CKGR_MOR_MOSCXTEN | (65 << CKGR_MOR_MOSCXTST_Off);
+    CKGR_MOR = CKGR_MOR_KEY | (CKGR_MOR & ~(CKGR_MOR_MOSCXTBY)) |
+        CKGR_MOR_MOSCXTEN | (65 << CKGR_MOR_MOSCXTST_Off);
     // Wait the main Xtal to stabilize
     while ((PMC_SR & PMC_SR_MOSCXTS) == 0);
     // Select Xtal as the Main Clock Source
@@ -70,7 +72,8 @@ void reset_handler() {
     // Disable the PLL
     CKGR_PLLAR = CKGR_PLLAR_ONE;
     // Enable with the correct settings
-    CKGR_PLLAR = CKGR_PLLAR_ONE | (1 << CKGR_PLLAR_DIVA_Off) | (15 << CKGR_PLLAR_MULA_Off) | (0x3F << CKGR_PLLAR_PLLACOUNT_Off);
+    CKGR_PLLAR = CKGR_PLLAR_ONE | (1 << CKGR_PLLAR_DIVA_Off) |
+        (15 << CKGR_PLLAR_MULA_Off) | (0x3F << CKGR_PLLAR_PLLACOUNT_Off);
     // Wait for a lock
     while (!(PMC_SR & PMC_SR_LOCKA));
 
@@ -121,16 +124,16 @@ void reset_handler() {
     // Enable Exceptions
     asm volatile ("cpsie f");
 
-    // Enable UART Pins
-    PIO_PDR(PIN_UART_RXD_PIO)   =  (1 << PIN_UART_RXD_IDX); // Disable PIO to Enable Peripheral on Pin
+    // Configure UART Pins
+    PIO_PDR(PIN_UART_RXD_PIO)   =  (1 << PIN_UART_RXD_IDX); // Disable PIO to Enable Peripheral
     PIO_ABSR(PIN_UART_RXD_PIO) &= ~(1 << PIN_UART_RXD_IDX); // Select Peripheral A
-    PIO_PDR(PIN_UART_TXD_PIO)   =  (1 << PIN_UART_TXD_IDX); // Disable PIO to Enable Peripheral on Pin
+    PIO_PDR(PIN_UART_TXD_PIO)   =  (1 << PIN_UART_TXD_IDX); // Disable PIO to Enable Peripheral
     PIO_ABSR(PIN_UART_TXD_PIO) &= ~(1 << PIN_UART_TXD_IDX); // Select Peripheral A
 
-    // Enable the peripheral clock for the UART
+    // Enable the UART Peripheral Clock
     PMC_PCER = (1 << PMC_ID_UART);
 
-    // Reset and disable the UART
+    // Reset and Disable the UART
     UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_RXDIS | UART_CR_TXDIS | UART_CR_RSTSTA;
     // Set No Parity and Normal Mode
     UART_MR = UART_MR_PAR_NO | UART_MR_CHMODE_NORMAL;
@@ -149,7 +152,25 @@ void reset_handler() {
     // Enable the UART TX
     UART_CR = UART_CR_TXEN;
 
-    // Now that the debug serial console is available, Enable Interrupts
+    // Configure TWI0 Pins
+    PIO_PDR(PIN_TWI0_SDA_PIO)   =  (1 << PIN_TWI0_SDA_IDX); // Disable PIO to Enable Peripheral
+    PIO_ABSR(PIN_TWI0_SDA_PIO) &= ~(1 << PIN_TWI0_SDA_IDX); // Select Peripheral A
+    PIO_PDR(PIN_TWI0_SCL_PIO)   =  (1 << PIN_TWI0_SCL_IDX); // Disable PIO to Enable Peripheral
+    PIO_ABSR(PIN_TWI0_SCL_PIO) &= ~(1 << PIN_TWI0_SCL_IDX); // Select Peripheral A
+
+    // Enable the TWI0 Peripheral Clock
+    PMC_PCER = (1 << PMC_ID_TWI0);
+
+    // Reset TWI0
+    TWI_CR(TWI0) = TWI_CR_SWRST;
+    // Set the Clock Waveform Generator Register (400 kHz) (96 MHz / ((236 * 2^0) + 4) == 400 kHz)
+    //TWI_CWGR(TWI0) = (236 << TWI_CWGR_CLDIV_Off) | (236 << TWI_CWGR_CHDIV_Off) | (0 << TWI_CWGR_CKDIV_Off);
+    // Set the Clock Waveform Generator Register (100 kHz) (96 MHz / ((239 * 2^2) + 4) == 100 kHz)
+    TWI_CWGR(TWI0) = (239 << TWI_CWGR_CLDIV_Off) | (239 << TWI_CWGR_CHDIV_Off) | (2 << TWI_CWGR_CKDIV_Off);
+    // Disable Slave Mode and Enable Master Mode
+    TWI_CR(TWI0) = TWI_CR_MSEN | TWI_CR_SVDIS;
+
+    // Enable Interrupts
     asm volatile("cpsie i");
 
     // Print terminal headline
@@ -159,6 +180,7 @@ void reset_handler() {
     kputs("This program comes with ABSOLUTELY NO WARRANTY; for details type 'show license'.\r\n");
     kputs("This is free software, and you are welcome to redistribute it\r\n");
     kputs("under certain conditions; type 'show license' for details.\r\n");
+    kputs("\r\n");
 
     // Print the reset cause
     kputs("Reset Reason: ");
@@ -176,7 +198,7 @@ void reset_handler() {
     // TODO: Remaining Initialization
 
     // Terminal Notice
-    kputs("Press ENTER for a prompt\r\n");
+    kputs("\r\nPress ENTER for a prompt\r\n");
 
     // Enable the UART RX
     UART_CR = UART_CR_RXEN;

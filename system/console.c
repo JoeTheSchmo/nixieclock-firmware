@@ -22,6 +22,7 @@
 #include <sam3u4e.h>
 #include <stdio.h>
 #include <string.h>
+#include <system.h>
 
 void console_invoke(char *cmd) {
     // Check for a valid command string

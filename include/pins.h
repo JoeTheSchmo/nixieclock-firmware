@@ -24,6 +24,12 @@
 #define PIN_HV5530_HVEN_PIO PIOB
 #define PIN_HV5530_HVEN_IDX 0
 
+// TWI0 Pin Defintions
+#define PIN_TWI0_SDA_PIO PIOA
+#define PIN_TWI0_SDA_IDX 9
+#define PIN_TWI0_SCL_PIO PIOA
+#define PIN_TWI0_SCL_IDX 10
+
 // UART Pin Defintions
 #define PIN_UART_RXD_PIO PIOA
 #define PIN_UART_RXD_IDX 11
