@@ -17,6 +17,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include <clock.h>
 #include <pins.h>
 #include <sam3u4e.h>
 #include <stdio.h>
@@ -207,12 +208,11 @@ void reset_handler() {
     }
     kputs("\r\n");
 
-    // TODO: Remaining Initialization
+    // Initialize Services
+    clock_init();
 
-    // Terminal Notice
+    // Start the Console
     kputs("\r\nPress ENTER for a prompt\r\n");
-
-    // Enable the UART RX
     UART_CR = UART_CR_RXEN;
 
     // Initialization Complete

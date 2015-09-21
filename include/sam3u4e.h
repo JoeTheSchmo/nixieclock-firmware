@@ -28,6 +28,8 @@
 #include "sam/pio.h"
 #include "sam/pmc.h"
 #include "sam/rstc.h"
+#include "sam/spi.h"
+#include "sam/tc.h"
 #include "sam/twi.h"
 #include "sam/uart.h"
 #include "sam/wdt.h"

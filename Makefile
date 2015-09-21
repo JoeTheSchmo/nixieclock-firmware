@@ -70,6 +70,7 @@ OBJS		+= lib/string/strlen.o
 OBJS		+= lib/string/strncat.o
 OBJS		+= lib/string/strncmp.o
 OBJS		+= lib/string/strrchr.o
+OBJS		+= services/clock.o
 OBJS		+= services/console.o
 OBJS		+= system/exceptions.o
 OBJS		+= system/reset.o
