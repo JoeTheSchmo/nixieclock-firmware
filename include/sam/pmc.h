@@ -84,6 +84,7 @@
 #define PMC_SR_MOSCXTS          0x00000001
 #define PMC_SR_LOCKA            0x00000002
 #define PMC_SR_MCKRDY           0x00000008
+#define PMC_SR_OSCSELS          0x00000080
 #define PMC_SR_PCKRDY0          0x00000100
 #define PMC_SR_LOCKU            0x00000040
 #define PMC_SR_MOSCSELS         0x00010000

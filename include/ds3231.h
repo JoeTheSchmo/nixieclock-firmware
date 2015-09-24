@@ -17,24 +17,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef __CLOCK_H_
-#define __CLOCK_H_
+#ifndef __DS3231_H_
+#define __DS3231_H_
 
 #include <types.h>
 
-typedef struct _timespec_t {
-    uint16_t year;
-    uint8_t  month;
-    uint8_t  date;
-    uint8_t  day;
-    uint8_t  hour;
-    uint8_t  minute;
-    uint8_t  second;
-} timespec_t;
+#define DS3231_TWI_ADDR     0x68
 
-extern volatile timespec_t clock;
+#define DS3231_CR           0x0100000E
+#define DS3231_SR           0x0100000F
 
-extern int clock_set(timespec_t *time);
-extern void clock_init(void);
-
-#endif // __CLOCK_H_
+#endif // __DS3231_H_

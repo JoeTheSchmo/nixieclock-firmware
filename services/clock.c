@@ -17,11 +17,21 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include <clock.h>
+#include <ds3231.h>
 #include <pins.h>
 #include <sam3u4e.h>
 #include <stdio.h>
 #include <system.h>
 #include <types.h>
+
+// Global Time of Day Cache
+volatile timespec_t clock;
+
+// Clock State
+volatile enum {
+    clock_state_sync = 1,
+} clock_state = 0;
 
 // Overall brightness of the display
 volatile uint32_t hv5530_duty_cycle = 0xB000;
@@ -137,7 +147,7 @@ void tc0_handler(void) {
     }
 }
 
-void hv5530_set_digits(uint32_t hour, uint32_t min, uint32_t sec) {
+void hv5530_set_digits(uint32_t hour, uint32_t minute, uint32_t second) {
     uint8_t i;
 
     // reset to a blank value and move the current value to the
@@ -147,7 +157,7 @@ void hv5530_set_digits(uint32_t hour, uint32_t min, uint32_t sec) {
         hv5530_xfade_new[i] = 0xFF;
     }
 
-    switch(sec % 10) {
+    switch(second % 10) {
     case 0: hv5530_xfade_new[0] &= 0b01111111; break; // 64: SEC_ONE_0
     case 9: hv5530_xfade_new[0] &= 0b10111111; break; // 63: SEC_ONE_9
     case 8: hv5530_xfade_new[0] &= 0b11011111; break; // 62: SEC_ONE_8
@@ -160,7 +170,7 @@ void hv5530_set_digits(uint32_t hour, uint32_t min, uint32_t sec) {
     case 1: hv5530_xfade_new[1] &= 0b10111111; break; // 55: SEC_ONE_1
     }
 
-    switch(sec / 10) {
+    switch(second / 10) {
     case 0: hv5530_xfade_new[1] &= 0b11011111; break; // 54: SEC_TEN_0
     case 9: hv5530_xfade_new[1] &= 0b11101111; break; // 53: SEC_TEN_9
     case 8: hv5530_xfade_new[1] &= 0b11110111; break; // 52: SEC_TEN_8
@@ -177,7 +187,7 @@ void hv5530_set_digits(uint32_t hour, uint32_t min, uint32_t sec) {
     //hv5530_xfade_new[2] &= 0b11110111; // 44: RCOL_TOP
     //hv5530_xfade_new[2] &= 0b11111011; // 43: RCOL_BOT
 
-    switch(min % 10) {
+    switch(minute % 10) {
     case 0: hv5530_xfade_new[2] &= 0b11111101; break; // 42: MIN_ONE_0
     case 9: hv5530_xfade_new[2] &= 0b11111110; break; // 41: MIN_ONE_9
     case 8: hv5530_xfade_new[3] &= 0b01111111; break; // 40: MIN_ONE_8
@@ -190,7 +200,7 @@ void hv5530_set_digits(uint32_t hour, uint32_t min, uint32_t sec) {
     case 1: hv5530_xfade_new[3] &= 0b11111110; break; // 33: MIN_ONE_1
     }
 
-    switch(min / 10) {
+    switch(minute / 10) {
     case 0: hv5530_xfade_new[4] &= 0b01111111; break; // 32: MIN_TEN_0
     case 9: hv5530_xfade_new[4] &= 0b10111111; break; // 31: MIN_TEN_9
     case 8: hv5530_xfade_new[4] &= 0b11011111; break; // 30: MIN_TEN_8
@@ -238,8 +248,178 @@ void hv5530_set_digits(uint32_t hour, uint32_t min, uint32_t sec) {
     TC_IER(TC0) = TC_IER_CPAS;
 }
 
+void clock_update_globaltime(void) {
+    uint32_t calr;
+    uint32_t timr;
+    uint32_t temp;
+
+    // Read the Date Register until 2 consecutive matching values
+    while (calr != RTC_CALR) {
+        calr = RTC_CALR;
+    }
+
+    // Read the Time Register until 2 consecutive matching values
+    while (timr != RTC_TIMR) {
+        timr = RTC_TIMR;
+    }
+
+    temp = (calr & RTC_CALR_CENT_Msk) >> RTC_CALR_CENT_Off;
+    clock.year = (1000 * ((temp & 0xF0) >> 4)) + (100 * (temp & 0xF));
+
+    temp = (calr & RTC_CALR_YEAR_Msk) >> RTC_CALR_YEAR_Off;
+    clock.year += (10 * ((temp & 0xF0) >> 4)) + (temp & 0xF);
+
+    temp = (calr & RTC_CALR_MONTH_Msk) >> RTC_CALR_MONTH_Off;
+    clock.month = (10 * ((temp & 0xF0) >> 4)) + (temp & 0xF);
+
+    temp = (calr & RTC_CALR_DAY_Msk) >> RTC_CALR_DAY_Off;
+    clock.day = temp;
+
+    temp = (calr & RTC_CALR_DATE_Msk) >> RTC_CALR_DATE_Off;
+    clock.date = (10 * ((temp & 0xF0) >> 4)) + (temp & 0xF);
+
+    temp = (timr & RTC_TIMR_HOUR_Msk) >> RTC_TIMR_HOUR_Off;
+    clock.hour = (10 * ((temp & 0xF0) >> 4)) + (temp & 0xF);
+
+    temp = (timr & RTC_TIMR_MIN_Msk) >> RTC_TIMR_MIN_Off;
+    clock.minute = (10 * ((temp & 0xF0) >> 4)) + (temp & 0xF);
+
+    temp = (timr & RTC_TIMR_SEC_Msk) >> RTC_TIMR_SEC_Off;
+    clock.second = (10 * ((temp & 0xF0) >> 4)) + (temp & 0xF);
+}
+
+int clock_set(timespec_t *time) {
+    // Working Register Set
+    uint8_t ds3231[7] = { 0, };
+
+    // Convert the Time to the BCD Encoded Register Mapping (24hr mode)
+    ds3231[0] = 0x7F & ((((time->second / 10) << 4) | (time->second % 10)));
+    ds3231[1] = 0x7F & (((time->minute / 10) << 4) | (time->minute % 10));
+    ds3231[2] = 0x3F & (((time->hour / 10) << 4) | (time->hour % 10));
+
+    // Convert the Date to the BCD Encoded Register Mapping
+    ds3231[3] = 0x07 & (time->day);
+    ds3231[4] = 0x3F & (((time->date / 10) << 4) | (time->date % 10));
+    ds3231[5] = 0x1F & (((time->month / 10) << 4) | (time->month % 10));
+    if ((time->year / 100) > 19) {
+        ds3231[5] |= 0x80;
+    }
+    ds3231[6] = 0xFF & ((((time->year % 100) / 10) << 4) | (time->year % 10));
+
+    // Write the Registers to the DS3231 RTC
+    if (twi_write(DS3231_TWI_ADDR, 0x01000000, ds3231, 7) < 0) {
+        kputs("Failed to Write Date/Time to External RTC\r\n");
+        return -1;
+    }
+
+    // Force the Internal RTC to re-sync
+    clock_state &= ~(clock_state_sync);
+
+    // Successfully Updated the RTC
+    return 0;
+}
+
+int clock_set_from_ds3231() {
+    int ret = 0;
+
+    // Stop the RTC and Request a Calendar and Time Update
+    RTC_CR |= RTC_CR_UPDTIM | RTC_CR_UPDCAL;
+    // Wait for Acknowledge
+    while (!(RTC_SR & RTC_SR_ACKUPD));
+    // Clear Acknowledge
+    RTC_SCCR = RTC_SCCR_ACKCLR;
+
+    // Read the Date/Time Registers from the External RTC
+    uint8_t ds3231[7];
+    if (twi_read(DS3231_TWI_ADDR, 0x01000000, ds3231, 7) < 0) {
+        kputs("Failed to Read Date/Time from External RTC\r\n");
+        ret = -1;
+    }
+
+    // Update the Internal RTC on valid data from the External RTC
+    if (ret >= 0) {
+        // State a new Time Register
+        uint32_t timr = 0;
+        timr |= ((ds3231[0] & 0x7F) << RTC_TIMR_SEC_Off) & RTC_TIMR_SEC_Msk;
+        timr |= ((ds3231[1] & 0x7F) << RTC_TIMR_MIN_Off) & RTC_TIMR_MIN_Msk;
+        if (ds3231[2] & 0x40) {
+            // 12 hour mode
+            RTC_MR |= RTC_MR_HRMOD;
+            timr |= ((ds3231[2] & 0x1F) << RTC_TIMR_HOUR_Off) & RTC_TIMR_HOUR_Msk;
+        } else {
+            // 24 hour mode
+            RTC_MR &= ~(RTC_MR_HRMOD);
+            timr |= ((ds3231[2] & 0x3F) << RTC_TIMR_HOUR_Off) & RTC_TIMR_HOUR_Msk;
+        }
+
+        // Stage a new Date Register
+        uint32_t calr = 0;
+        calr |= ((ds3231[3] & 0x07) << RTC_CALR_DAY_Off) & RTC_CALR_DAY_Msk;
+        calr |= ((ds3231[4] & 0x3F) << RTC_CALR_DATE_Off) & RTC_CALR_DATE_Msk;
+        calr |= ((ds3231[5] & 0x1F) << RTC_CALR_MONTH_Off) & RTC_CALR_MONTH_Msk;
+        if (ds3231[5] & 0x80) {
+            calr |= (0x20 << RTC_CALR_CENT_Off) & RTC_CALR_CENT_Msk;
+        } else {
+            calr |= (0x19 << RTC_CALR_CENT_Off) & RTC_CALR_CENT_Msk;
+        }
+        calr |= ((ds3231[6]) << RTC_CALR_YEAR_Off) & RTC_CALR_YEAR_Msk;
+
+        // Set the Date/Time Registers
+        RTC_TIMR = timr;
+        RTC_CALR = calr;
+    }
+
+    // Clear the Update Request in the Internal RTC
+    RTC_CR &= ~(RTC_CR_UPDTIM | RTC_CR_UPDCAL);
+
+    // Return an Error on Invalid Data
+    if (RTC_VER & (RTC_VER_NVTIM | RTC_VER_NVCAL)) {
+        ret = -1;
+    }
+
+    return ret;
+}
+
+void rtc_handler() {
+    // Update the clock face
+    if (RTC_SR * RTC_SR_SEC) {
+        // Check if the Internal RTC is in Sync with the External RTC
+        if (!(clock_state & clock_state_sync)) {
+            // Update the Internal RTC
+            if (clock_set_from_ds3231() >= 0) {
+                clock_state |= clock_state_sync;
+            }
+        }
+
+        // Update the Global Date/Time Structure
+        clock_update_globaltime();
+
+        // Update the clock face
+        hv5530_set_digits(clock.hour, clock.minute, clock.second);
+
+        // Clear the second flag in the status register
+        RTC_SCCR = RTC_SCCR_SECCLR;
+    }
+}
+
 // Initialize all components related to time keeping and the clock face
 void clock_init(void) {
+    // Initialize the DS3231 RTC and enable the 32kHz Output
+    uint8_t ds3231_cr[2] = {0x00, 0x08};
+    if (twi_write(DS3231_TWI_ADDR, DS3231_CR, ds3231_cr, 2) < 0) {
+        kputs("Failed write to DS3231 Control Register\r\n");
+    } else {
+        kputs("Switching Slow-Clock to External 32kHz Reference...");
+        // By-pass the Crystal Osc
+        SUPC_MR |= SUPC_MR_KEY | SUPC_MR_OSCBYPASS;
+        // Select the External Reference
+        SUPC_CR = SUPC_CR_KEY | SUPC_CR_XTALSEL;
+        // Wait for Selection to Complete
+        while (!(PMC_SR & PMC_SR_OSCSELS));
+
+        kputs("Done\r\n");
+    }
+
     // Configure PIN_HV5530_BLANK
     PIO_PER(PIN_HV5530_BLANK_PIO)  = (1 << PIN_HV5530_BLANK_IDX); // Enable PIO on Pin
     PIO_OER(PIN_HV5530_BLANK_PIO)  = (1 << PIN_HV5530_BLANK_IDX); // Enable Output
@@ -295,6 +475,14 @@ void clock_init(void) {
     TC_IER(TC0) = TC_IER_COVFS | TC_IER_CPCS;
     // Enable TC0 Clock and Start Counters
     TC_CCR(TC0) = TC_CCR_CLKEN | TC_CCR_SWTRG;
+
+    // Enable the RTC Interrupt in the NVIC
+    ICER0 = (1 << PMC_ID_RTC); // Disable Interrupt
+    ICPR0 = (1 << PMC_ID_RTC); // Clear Pending
+    IPR(PMC_ID_RTC) = (IPR(PMC_ID_RTC) & ~(IPR_IP_Msk(PMC_ID_RTC))) | IPR_IP(PMC_ID_RTC, 0x8); // Set the Priority to 8
+    ISER0 = (1 << PMC_ID_RTC); // Enable Interrupt
+    // Enable Interrupts for RTC
+    RTC_IER = RTC_IER_SECEN;
 
     // Enable the HV PSU
     PIO_SODR(PIN_HV5530_HVEN_PIO) = (1 << PIN_HV5530_HVEN_IDX);

@@ -17,24 +17,22 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef __CLOCK_H_
-#define __CLOCK_H_
+#ifndef __SAM__SUPC_H_
+#define __SAM__SUPC_H_
 
 #include <types.h>
 
-typedef struct _timespec_t {
-    uint16_t year;
-    uint8_t  month;
-    uint8_t  date;
-    uint8_t  day;
-    uint8_t  hour;
-    uint8_t  minute;
-    uint8_t  second;
-} timespec_t;
+#define SUPC_CR         (*(reg_wo_t*)(SUPC+0x0000))
+#define SUPC_SMMR       (*(reg_rw_t*)(SUPC+0x0004))
+#define SUPC_MR         (*(reg_rw_t*)(SUPC+0x0008))
+#define SUPC_WUMR       (*(reg_rw_t*)(SUPC+0x000C))
+#define SUPC_WUIR       (*(reg_rw_t*)(SUPC+0x0010))
+#define SUPC_SR         (*(reg_ro_t*)(SUPC+0x0014))
 
-extern volatile timespec_t clock;
+#define SUPC_CR_XTALSEL         0x00000008
+#define SUPC_CR_KEY             0xA5000000
 
-extern int clock_set(timespec_t *time);
-extern void clock_init(void);
+#define SUPC_MR_OSCBYPASS       0x00100000
+#define SUPC_MR_KEY             0xA5000000
 
-#endif // __CLOCK_H_
+#endif
