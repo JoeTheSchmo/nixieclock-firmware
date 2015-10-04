@@ -18,6 +18,7 @@
 //
 
 #include <clock.h>
+#include <console.h>
 #include <keyboard.h>
 #include <pins.h>
 #include <sam3u4e.h>
@@ -30,6 +31,8 @@ extern uint8_t bss_end;
 extern uint8_t data_start;
 extern uint8_t data_end;
 extern uint8_t data_load;
+
+extern void twi_init(void);
 
 void reset_handler() {
     // Disable Exceptions and Interrupts
@@ -143,51 +146,11 @@ void reset_handler() {
     // Enable Exceptions
     asm volatile ("cpsie f");
 
-    // Configure UART Pins
-    PIO_PDR(PIN_UART_RXD_PIO)   =  (1 << PIN_UART_RXD_IDX); // Disable PIO to Enable Peripheral
-    PIO_ABSR(PIN_UART_RXD_PIO) &= ~(1 << PIN_UART_RXD_IDX); // Select Peripheral A
-    PIO_PDR(PIN_UART_TXD_PIO)   =  (1 << PIN_UART_TXD_IDX); // Disable PIO to Enable Peripheral
-    PIO_ABSR(PIN_UART_TXD_PIO) &= ~(1 << PIN_UART_TXD_IDX); // Select Peripheral A
+    // Enable the Serial Console
+    console_init();
 
-    // Enable the UART Peripheral Clock
-    PMC_PCER = (1 << PMC_ID_UART);
-
-    // Reset and Disable the UART
-    UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_RXDIS | UART_CR_TXDIS | UART_CR_RSTSTA;
-    // Set No Parity and Normal Mode
-    UART_MR = UART_MR_PAR_NO | UART_MR_CHMODE_NORMAL;
-
-    // Set the UART BAUD rate to 9600bps (96MHz / (16 * 625) = 9600)
-    UART_BRGR = 625;
-
-    // Enable the UART Interrupt in the NVIC
-    ICER0 = (1 << PMC_ID_UART); // Disable Interrupt
-    ICPR0 = (1 << PMC_ID_UART); // Clear Pending
-    IPR(PMC_ID_UART) = (IPR(PMC_ID_UART) & ~(IPR_IP_Msk(PMC_ID_UART))) | IPR_IP(PMC_ID_UART, 0xC); // Set the Priority to 12
-    ISER0 = (1 << PMC_ID_UART); // Enable Interrupt
-    // Enable RX Interrupt for the UART
-    UART_IER = UART_IER_RXRDY;
-
-    // Enable the UART TX
-    UART_CR = UART_CR_TXEN;
-
-    // Configure TWI0 Pins
-    PIO_PDR(PIN_TWI0_SDA_PIO)   =  (1 << PIN_TWI0_SDA_IDX); // Disable PIO to Enable Peripheral
-    PIO_ABSR(PIN_TWI0_SDA_PIO) &= ~(1 << PIN_TWI0_SDA_IDX); // Select Peripheral A
-    PIO_PDR(PIN_TWI0_SCL_PIO)   =  (1 << PIN_TWI0_SCL_IDX); // Disable PIO to Enable Peripheral
-    PIO_ABSR(PIN_TWI0_SCL_PIO) &= ~(1 << PIN_TWI0_SCL_IDX); // Select Peripheral A
-
-    // Enable the TWI0 Peripheral Clock
-    PMC_PCER = (1 << PMC_ID_TWI0);
-
-    // Reset TWI0
-    TWI_CR(TWI0) = TWI_CR_SWRST;
-    // Set the Clock Waveform Generator Register (400 kHz) (96 MHz / ((236 * 2^0) + 4) == 400 kHz)
-    //TWI_CWGR(TWI0) = (236 << TWI_CWGR_CLDIV_Off) | (236 << TWI_CWGR_CHDIV_Off) | (0 << TWI_CWGR_CKDIV_Off);
-    // Set the Clock Waveform Generator Register (100 kHz) (96 MHz / ((239 * 2^2) + 4) == 100 kHz)
-    TWI_CWGR(TWI0) = (239 << TWI_CWGR_CLDIV_Off) | (239 << TWI_CWGR_CHDIV_Off) | (2 << TWI_CWGR_CKDIV_Off);
-    // Disable Slave Mode and Enable Master Mode
-    TWI_CR(TWI0) = TWI_CR_MSEN | TWI_CR_SVDIS;
+    // Initialize the TWI Driver
+    twi_init();
 
     // Enable Interrupts
     asm volatile("cpsie i");
@@ -196,9 +159,9 @@ void reset_handler() {
     kputs("\r\n\r\n");
     kputs("nixieclock-firmware: Nixie Clock Main Firmware Program\r\n");
     kputs("Copyright (C) 2013 - 2015 Joe Ciccone and Ed Koloski\r\n");
-    kputs("This program comes with ABSOLUTELY NO WARRANTY; for details type 'show license'.\r\n");
+    kputs("This program comes with ABSOLUTELY NO WARRANTY; for details type 'license show'.\r\n");
     kputs("This is free software, and you are welcome to redistribute it\r\n");
-    kputs("under certain conditions; type 'show license' for details.\r\n");
+    kputs("under certain conditions; type 'license show' for details.\r\n");
     kputs("\r\n");
 
     // Print the reset cause
@@ -218,9 +181,8 @@ void reset_handler() {
     clock_init();
     keyboard_init();
 
-    // Start the Console
-    kputs("\r\nPress ENTER for a prompt\r\n");
-    UART_CR = UART_CR_RXEN;
+    // Enable the Interactive Console
+    console_start();
 
     // Initialization Complete
     while (1) {}

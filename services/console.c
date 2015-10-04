@@ -265,3 +265,38 @@ void uart_handler(void) {
         }
     }
 }
+
+void console_init(void) {
+    // Configure UART Pins
+    PIO_PDR(PIN_UART_RXD_PIO)   =  (1 << PIN_UART_RXD_IDX); // Disable PIO to Enable Peripheral
+    PIO_ABSR(PIN_UART_RXD_PIO) &= ~(1 << PIN_UART_RXD_IDX); // Select Peripheral A
+    PIO_PDR(PIN_UART_TXD_PIO)   =  (1 << PIN_UART_TXD_IDX); // Disable PIO to Enable Peripheral
+    PIO_ABSR(PIN_UART_TXD_PIO) &= ~(1 << PIN_UART_TXD_IDX); // Select Peripheral A
+
+    // Enable the UART Peripheral Clock
+    PMC_PCER = (1 << PMC_ID_UART);
+
+    // Reset and Disable the UART
+    UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_RXDIS | UART_CR_TXDIS | UART_CR_RSTSTA;
+    // Set No Parity and Normal Mode
+    UART_MR = UART_MR_PAR_NO | UART_MR_CHMODE_NORMAL;
+
+    // Set the UART BAUD rate to 9600bps (96MHz / (16 * 625) = 9600)
+    UART_BRGR = 625;
+
+    // Enable the UART Interrupt in the NVIC
+    ICER0 = (1 << PMC_ID_UART); // Disable Interrupt
+    ICPR0 = (1 << PMC_ID_UART); // Clear Pending
+    IPR(PMC_ID_UART) = (IPR(PMC_ID_UART) & ~(IPR_IP_Msk(PMC_ID_UART))) | IPR_IP(PMC_ID_UART, 0xC); // Set the Priority to 12
+    ISER0 = (1 << PMC_ID_UART); // Enable Interrupt
+    // Enable RX Interrupt for the UART
+    UART_IER = UART_IER_RXRDY;
+
+    // Enable the UART TX
+    UART_CR = UART_CR_TXEN;
+}
+
+void console_start(void) {
+    kputs("\r\nPress ENTER for a prompt\r\n");
+    UART_CR = UART_CR_RXEN;
+}

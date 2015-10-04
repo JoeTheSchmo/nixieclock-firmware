@@ -17,6 +17,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include <pins.h>
 #include <sam3u4e.h>
 #include <types.h>
 
@@ -149,4 +150,24 @@ int32_t _internal_twi_read(uint8_t caddr, uint32_t raddr, uint8_t *dptr, uint16_
 
     // Otherwise return success
     return 0;
+}
+
+void twi_init(void) {
+    // Configure TWI0 Pins
+    PIO_PDR(PIN_TWI0_SDA_PIO)   =  (1 << PIN_TWI0_SDA_IDX); // Disable PIO to Enable Peripheral
+    PIO_ABSR(PIN_TWI0_SDA_PIO) &= ~(1 << PIN_TWI0_SDA_IDX); // Select Peripheral A
+    PIO_PDR(PIN_TWI0_SCL_PIO)   =  (1 << PIN_TWI0_SCL_IDX); // Disable PIO to Enable Peripheral
+    PIO_ABSR(PIN_TWI0_SCL_PIO) &= ~(1 << PIN_TWI0_SCL_IDX); // Select Peripheral A
+
+    // Enable the TWI0 Peripheral Clock
+    PMC_PCER = (1 << PMC_ID_TWI0);
+
+    // Reset TWI0
+    TWI_CR(TWI0) = TWI_CR_SWRST;
+    // Set the Clock Waveform Generator Register (400 kHz) (96 MHz / ((236 * 2^0) + 4) == 400 kHz)
+    //TWI_CWGR(TWI0) = (236 << TWI_CWGR_CLDIV_Off) | (236 << TWI_CWGR_CHDIV_Off) | (0 << TWI_CWGR_CKDIV_Off);
+    // Set the Clock Waveform Generator Register (100 kHz) (96 MHz / ((239 * 2^2) + 4) == 100 kHz)
+    TWI_CWGR(TWI0) = (239 << TWI_CWGR_CLDIV_Off) | (239 << TWI_CWGR_CHDIV_Off) | (2 << TWI_CWGR_CKDIV_Off);
+    // Disable Slave Mode and Enable Master Mode
+    TWI_CR(TWI0) = TWI_CR_MSEN | TWI_CR_SVDIS;
 }
