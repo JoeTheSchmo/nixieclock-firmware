@@ -18,6 +18,7 @@
 //
 
 #include <clock.h>
+#include <keyboard.h>
 #include <pins.h>
 #include <sam3u4e.h>
 #include <stdio.h>
@@ -43,6 +44,11 @@ void reset_handler() {
     PMC_PCER = (1 << PMC_ID_PIOA);
     PMC_PCER = (1 << PMC_ID_PIOB);
     PMC_PCER = (1 << PMC_ID_PIOC);
+
+    // Clear the PIO Interrupt Status Registers
+    PIO_ISR(PIOA);
+    PIO_ISR(PIOB);
+    PIO_ISR(PIOC);
 
     // Configure the High-Voltage Pin and Disable the PSU (HV Off)
     PIO_PER(PIN_HV5530_HVEN_PIO)  = (1 << PIN_HV5530_HVEN_IDX); // Enable PIO on Pin
@@ -210,6 +216,7 @@ void reset_handler() {
 
     // Initialize Services
     clock_init();
+    keyboard_init();
 
     // Start the Console
     kputs("\r\nPress ENTER for a prompt\r\n");

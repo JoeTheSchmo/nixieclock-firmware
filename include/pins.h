@@ -52,6 +52,10 @@
 #define PIN_HV5530_SPI_SPCK_PIO PIOA
 #define PIN_HV5530_SPI_SPCK_IDX 15
 
+// PCA9534A GPIO Expander Pin Definitions
+#define PIN_PCA9534A_INT_PIO PIOC
+#define PIN_PCA9534A_INT_IDX 28
+
 // TWI0 Pin Defintions
 #define PIN_TWI0_SDA_PIO PIOA
 #define PIN_TWI0_SDA_IDX 9

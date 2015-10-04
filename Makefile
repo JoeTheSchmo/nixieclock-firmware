@@ -72,6 +72,7 @@ OBJS		+= lib/string/strncmp.o
 OBJS		+= lib/string/strrchr.o
 OBJS		+= services/clock.o
 OBJS		+= services/console.o
+OBJS		+= services/keyboard.o
 OBJS		+= system/exceptions.o
 OBJS		+= system/reset.o
 OBJS		+= system/svcall.o
