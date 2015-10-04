@@ -26,6 +26,20 @@
 #define PIN_5VPSU_PG_PIO PIOA
 #define PIN_5VPSU_PG_IDX 20
 
+// DS3231 Pin Definitions
+#define PIN_DS3231_INT_PIO PIOC
+#define PIN_DS3231_INT_IDX 2
+
+// LED Pin Definitions
+#define PIN_LED0_PIO PIOC
+#define PIN_LED0_IDX 15
+#define PIN_LED1_PIO PIOC
+#define PIN_LED1_IDX 16
+#define PIN_LED2_PIO PIOC
+#define PIN_LED2_IDX 17
+#define PIN_LED3_PIO PIOC
+#define PIN_LED3_IDX 18
+
 // HV5530 High Voltage Pin Defintions
 #define PIN_HV5530_HVEN_PIO PIOB
 #define PIN_HV5530_HVEN_IDX 0
