@@ -36,8 +36,8 @@ extern void twi_init(void);
 
 void reset_handler() {
     // Disable Exceptions and Interrupts
-    asm volatile("cpsid f");
-    asm volatile("cpsid i");
+    asm volatile ("cpsid f");
+    asm volatile ("cpsid i");
 
     // Reset and Disable the Watchdog Timer
     WDT_CR = WDT_CR_WDRSTT | WDT_CR_KEY;
@@ -153,7 +153,7 @@ void reset_handler() {
     twi_init();
 
     // Enable Interrupts
-    asm volatile("cpsie i");
+    asm volatile ("cpsie i");
 
     // Print terminal headline
     kputs("\r\n\r\n");

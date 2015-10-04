@@ -229,6 +229,51 @@ void console_psu(int8_t argc, char *argv[]) {
 
 }
 
+void console_reset(int8_t argc, char *argv[]) {
+    if ((argc < 1)||(argc > 2)) {
+        // Should always be 1 or 2
+        kputs("Error: Invalid arguments specified\r\n");
+    } else if (argc == 1) {
+        // No argument, just do a plain reset
+        kputs("Resetting the CPU\r\n");
+        RSTC_CR = RSTC_CR_KEY | RSTC_CR_PROCRST | RSTC_CR_PERRST;
+    } else if (argc == 2) {
+        // One argument present
+        if (strcmp(argv[1], "help") == 0) {
+            kputs("reset help                          Display this message\r\n");
+            kputs("reset                               Reset the CPU\r\n");
+            kputs("reset sam-ba                        Reset the CPU into SAM-BA\r\n");
+        } else if (strcmp(argv[1], "sam-ba") == 0) {
+            kputs("Clearing the Boot-Mode Bit and Resetting the CPU\r\n");
+
+            // We're about to change vector tables
+            asm volatile ("cpsid i"); // Disable Interrupts
+            asm volatile ("cpsid f"); // Disable Exceptions
+            asm volatile ("dmb");     // Data Memory Barrier
+
+            // Wait for EEFC0 to be ready for a command
+            while (!(EEFC_FSR(EEFC0) & EEFC_FSR_FRDY));
+            // Clear the GPNVM boot mode bit
+            EEFC_FCR(EEFC0) = EEFC_FCR_FKEY | EEFC_FCR_FCMD_CGPB | (1 << EEFC_FCR_FARG_Off);
+            asm volatile ("dsb"); // Data Syncronization Barrier
+            asm volatile ("dmb"); // Data Memory Barrier
+
+            // Wait for EEFC0 to complete the command
+            while (!(EEFC_FSR(EEFC0) & EEFC_FSR_FRDY));
+
+            // Check for an error
+            if (EEFC_FSR(EEFC0) & EEFC_FSR_FCMDE) {
+                kputs("Flash Command Error: Unable to Clear Boot-Mode Bit\r\n");
+            }
+
+            // Reset the CPU (External Reset)
+            RSTC_CR = RSTC_CR_KEY | RSTC_CR_EXTRST;
+        } else {
+            kputs("Error: Invalid arguments specified\r\n");
+        }
+    }
+}
+
 void console_invoke(char *cmd) {
     // pointers to the tokenized command string
     #define argv_max 8
@@ -284,6 +329,7 @@ void console_invoke(char *cmd) {
         kputs("clock help\r\n");
         kputs("license help\r\n");
         kputs("psu help\r\n");
+        kputs("reset help\r\n");
         kputs("\r\n");
     } else if (strcmp(argv[0], "clock") == 0) {
         console_clock(argc, argv);
@@ -291,6 +337,8 @@ void console_invoke(char *cmd) {
         console_license(argc, argv);
     } else if (strcmp(argv[0], "psu") == 0) {
         console_psu(argc, argv);
+    } else if (strcmp(argv[0], "reset") == 0) {
+        console_reset(argc, argv);
     } else {
         kputs("Error: Unrecognized Command, Type \"help\" for more information\r\n");
     }

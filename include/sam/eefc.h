@@ -30,4 +30,14 @@
 #define EEFC_FMR_FWS_Msk    0x00000F00
 #define EEFC_FMR_FWS_Off    0x08
 
+#define EEFC_FCR_FCMD_Msk   0x000000FF
+#define EEFC_FCR_FCMD_Off   0x00
+#define EEFC_FCR_FCMD_CGPB  0x0C        // Clear GPNVM Bit
+#define EEFC_FCR_FARG_Msk   0x00FFFF00
+#define EEFC_FCR_FARG_Off   0x08
+#define EEFC_FCR_FKEY       0x5A000000
+
+#define EEFC_FSR_FRDY       0x00000001
+#define EEFC_FSR_FCMDE      0x00000002
+
 #endif // __SAM__EEFC_H_

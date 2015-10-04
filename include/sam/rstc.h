@@ -26,6 +26,11 @@
 #define RSTC_SR     (*(reg_ro_t*)(RSTC+0x0004))
 #define RSTC_MR     (*(reg_rw_t*)(RSTC+0x0008))
 
+#define RSTC_CR_PROCRST         0x00000001
+#define RSTC_CR_PERRST          0x00000004
+#define RSTC_CR_EXTRST          0x00000008
+#define RSTC_CR_KEY             0xA5000000
+
 #define RSTC_SR_RSTTYP_Msk      0x00000700
 #define RSTC_SR_RSTTYP_Off      0x08
 #define RSTC_SR_RSTTYP_GENERAL  0x00000000
