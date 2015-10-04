@@ -412,8 +412,8 @@ void console_init(void) {
     // Set No Parity and Normal Mode
     UART_MR = UART_MR_PAR_NO | UART_MR_CHMODE_NORMAL;
 
-    // Set the UART BAUD rate to 9600bps (96MHz / (16 * 625) = 9600)
-    UART_BRGR = 625;
+    // Set the UART BAUD rate to 115200bps (96MHz / (16 * 52) = 115384)
+    UART_BRGR = 52;
 
     // Enable the UART Interrupt in the NVIC
     ICER0 = (1 << PMC_ID_UART); // Disable Interrupt
