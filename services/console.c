@@ -149,6 +149,86 @@ void console_license(int8_t argc, char *argv[]) {
     }
 }
 
+void console_psu(int8_t argc, char *argv[]) {
+    if (argc == 1) {
+        kputs("Error: Incomplete command specified\r\n");
+    } else if (argc == 2) {
+        if (strcmp(argv[1], "help") == 0) {
+            kputs("psu help                            Display this message\r\n");
+            kputs("psu {name} on                       Turn on the requested power supply\r\n");
+            kputs("psu {name} off                      Turn off the requested power supply\r\n");
+            kputs("psu {name} show                     Show the power supplies status\r\n");
+            kputs("    where {name} = 5v or hv or zb\r\n");
+            kputs("    where {cmd} = on or off or show\r\n");
+        } else {
+            kputs("Error: Invalid arguments specified\r\n");
+        }
+    } else if (argc == 3) {
+        if (strcmp(argv[1], "5v") == 0) {
+            if (strcmp(argv[2], "on") == 0) {
+                // Turn on the 5v power supply (low enable = on)
+                PIO_CODR(PIN_5VPSU_EN_PIO) = (1 << PIN_5VPSU_EN_IDX);
+            } else if (strcmp(argv[2], "off") == 0) {
+                // Turn off the 5v power supply (high enable = off)
+                PIO_SODR(PIN_5VPSU_EN_PIO) = (1 << PIN_5VPSU_EN_IDX);
+            } else if (strcmp(argv[2], "show") == 0) {
+                if (PIO_PDSR(PIN_5VPSU_EN_PIO) & (1 << PIN_5VPSU_EN_IDX)) {
+                    if (PIO_PDSR(PIN_5VPSU_PG_PIO) & (1 << PIN_5VPSU_PG_IDX)) {
+                        kputs("5v is off, power is good (unexpected)\r\n");
+                    } else {
+                        kputs("5v is off, power is bad (expected)\r\n");
+                    }
+                } else {
+                    if (PIO_PDSR(PIN_5VPSU_PG_PIO) & (1 << PIN_5VPSU_PG_IDX)) {
+                        kputs("5v is on, power is good\r\n");
+                    } else {
+                        kputs("5v is on, power is bad\r\n");
+                    }
+                }
+            } else {
+                kputs("Error: Unrecognized power supply command\r\n");
+            }
+        } else if (strcmp(argv[1], "hv") == 0) {
+            if (strcmp(argv[2], "on") == 0) {
+                // Turn on the high voltage power supply
+                PIO_SODR(PIN_HV5530_HVEN_PIO) = (1 << PIN_HV5530_HVEN_IDX);
+            } else if (strcmp(argv[2], "off") == 0) {
+                // Turn off the high voltage power supply
+                PIO_CODR(PIN_HV5530_HVEN_PIO) = (1 << PIN_HV5530_HVEN_IDX);
+            } else if (strcmp(argv[2], "show") == 0) {
+                if (PIO_PDSR(PIN_HV5530_HVEN_PIO) & (1 << PIN_HV5530_HVEN_IDX)) {
+                    kputs("hv is on\r\n");
+                } else {
+                    kputs("hv is off\r\n");
+                }
+            } else {
+                kputs("Error: Unrecognized power supply command\r\n");
+            }
+        } else if (strcmp(argv[1], "zb") == 0) {
+            if (strcmp(argv[2], "on") == 0) {
+                // Turn on the ZigBee module (SHDN High)
+                PIO_SODR(PIN_ZIGBEE_SHDN_PIO) = (1 << PIN_ZIGBEE_SHDN_IDX);
+            } else if (strcmp(argv[2], "off") == 0) {
+                // Shutdown the ZigBee module (SHDN Low)
+                PIO_CODR(PIN_ZIGBEE_SHDN_PIO) = (1 << PIN_ZIGBEE_SHDN_IDX);
+            } else if (strcmp(argv[2], "show") == 0) {
+                if (PIO_PDSR(PIN_ZIGBEE_SHDN_PIO) & (1 << PIN_ZIGBEE_SHDN_IDX)) {
+                    kputs("zb is on\r\n");
+                } else {
+                    kputs("zb is off\r\n");
+                }
+            } else {
+                kputs("Error: Unrecognized power supply command\r\n");
+            }
+        } else {
+            kputs("Error: Unrecognized power supply name\r\n");
+        }
+    } else {
+        kputs("Error: Invalid arguments specified\r\n");
+    }
+
+}
+
 void console_invoke(char *cmd) {
     // pointers to the tokenized command string
     #define argv_max 8
@@ -203,11 +283,14 @@ void console_invoke(char *cmd) {
         kputs("\r\n");
         kputs("clock help\r\n");
         kputs("license help\r\n");
+        kputs("psu help\r\n");
         kputs("\r\n");
     } else if (strcmp(argv[0], "clock") == 0) {
         console_clock(argc, argv);
     } else if (strcmp(argv[0], "license") == 0) {
         console_license(argc, argv);
+    } else if (strcmp(argv[0], "psu") == 0) {
+        console_psu(argc, argv);
     } else {
         kputs("Error: Unrecognized Command, Type \"help\" for more information\r\n");
     }
