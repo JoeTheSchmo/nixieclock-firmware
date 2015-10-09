@@ -20,6 +20,7 @@
 #include <audio.h>
 #include <clock.h>
 #include <console.h>
+#include <display.h>
 #include <keyboard.h>
 #include <pins.h>
 #include <sam3u4e.h>
@@ -174,6 +175,7 @@ void reset_handler() {
     // Initialize Services
     clock_init();
     audio_init();
+    display_init();
     keyboard_init();
 
     // Enable the Interactive Console
