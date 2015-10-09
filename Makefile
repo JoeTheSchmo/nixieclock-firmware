@@ -48,6 +48,7 @@ LDFLAGS		+= --gc-sections
 BINFILE		= nixieclock-firmware.bin
 ELFFILE		= nixieclock-firmware.elf
 
+OBJS		+= components/wm8731.o
 OBJS		+= drivers/twi.o
 OBJS		+= lib/ctype/isprint.o
 OBJS		+= lib/ctype/isspace.o
@@ -70,6 +71,7 @@ OBJS		+= lib/string/strlen.o
 OBJS		+= lib/string/strncat.o
 OBJS		+= lib/string/strncmp.o
 OBJS		+= lib/string/strrchr.o
+OBJS		+= services/audio.o
 OBJS		+= services/clock.o
 OBJS		+= services/console.o
 OBJS		+= services/keyboard.o

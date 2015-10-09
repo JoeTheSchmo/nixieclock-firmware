@@ -17,6 +17,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include <audio.h>
 #include <clock.h>
 #include <console.h>
 #include <keyboard.h>
@@ -113,13 +114,6 @@ void reset_handler() {
     // Wait for the master clock to be ready
     while (!(PMC_SR & PMC_SR_MCKRDY));
 
-    // Configure Programmable Clock Controller (PCK0 = MCK / 8 = 12MHz)
-    PMC_PCK0 = PMC_PCKx_CSS_MCK | PMC_PCKx_PRES_CLK_8;
-    // Enable PCK0
-    PMC_SCER = PMC_SCER_PCK0;
-    // Wait for PCK0 to become ready
-    while (!(PMC_SR & PMC_SR_PCKRDY0));
-
     // Zero the uninitialized data segment
     if (&bss_end - &bss_start > 0) {
         memset(&bss_start, 0, &bss_end - &bss_start);
@@ -179,6 +173,7 @@ void reset_handler() {
 
     // Initialize Services
     clock_init();
+    audio_init();
     keyboard_init();
 
     // Enable the Interactive Console
