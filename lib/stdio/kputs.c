@@ -19,10 +19,12 @@
 
 #include <sam3u4e.h>
 
-int kputs(const char *s) {
+ssize_t kputs(const char *s) {
+    ssize_t r = 0;
     while (*s != '\0') {
         while (!(UART_SR & UART_SR_TXRDY));
         UART_THR = *s++;
+        r++;
     }
-    return 0;
+    return r;
 }

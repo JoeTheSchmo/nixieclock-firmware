@@ -59,6 +59,7 @@ OBJS		+= lib/stdio/kgetc.o
 OBJS		+= lib/stdio/kprintf.o
 OBJS		+= lib/stdio/kputc.o
 OBJS		+= lib/stdio/kputs.o
+OBJS		+= lib/stdio/vxprintf.o
 OBJS		+= lib/stdlib/ltostr.o
 OBJS		+= lib/stdlib/strtoul.o
 OBJS		+= lib/stdlib/ultostr.o

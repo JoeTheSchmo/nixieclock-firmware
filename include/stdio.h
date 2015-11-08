@@ -20,9 +20,17 @@
 #ifndef __STDIO_H_
 #define __STDIO_H_
 
-extern int kgetc(char *c);
-extern int kputc(const char c);
-extern int kputs(const char *s);
-extern void kprintf(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
+#include <types.h>
+
+extern ssize_t kgetc(char *c);
+extern ssize_t kputc(const char c);
+extern ssize_t kputs(const char *s);
+extern void vxprintf(
+  ssize_t (*putc)(const char),
+  ssize_t (*puts)(const char *),
+  const char *format,
+  __builtin_va_list args);
+extern void kprintf(const char *format, ...)
+  __attribute__ ((format (printf, 1, 2)));
 
 #endif // __STDIO_H_

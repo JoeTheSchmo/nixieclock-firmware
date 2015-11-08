@@ -22,5 +22,5 @@
 int kputc(const char c) {
     while (!(UART_SR & UART_SR_TXRDY));
     UART_THR = c;
-    return 0;
+    return 1;
 }
