@@ -78,6 +78,7 @@ OBJS		+= services/clock.o
 OBJS		+= services/console.o
 OBJS		+= services/display.o
 OBJS		+= services/keyboard.o
+OBJS		+= services/timer.o
 OBJS		+= system/exceptions.o
 OBJS		+= system/reset.o
 OBJS		+= system/svcall.o

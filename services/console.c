@@ -274,6 +274,44 @@ void console_reset(int8_t argc, char *argv[]) {
     }
 }
 
+void console_uptime(int8_t argc, char *argv[]) {
+    if (argc == 1) {
+        uint32_t vr = RTT_VR;
+        while (vr != RTT_VR) {
+            vr = RTT_VR;
+        }
+
+        uint16_t days; uint8_t hours, mins, secs;
+
+        secs = vr % 60;
+        vr /= 60;
+        mins = vr % 60;
+        vr /= 60;
+        hours = vr % 24;
+        vr /= 60;
+        days = vr;
+
+        kputs("Uptime: ");
+        if (days > 0) {
+            kprintf("%u days %u hours %u mins %u secs\r\n", days, hours, mins, secs);
+        } else if (hours > 0) {
+            kprintf("%u hours %u mins %u secs\r\n", hours, mins, secs);
+        } else if (mins > 0) {
+            kprintf("%u mins %u secs\r\n", mins, secs);
+        } else {
+            kprintf("%u secs\r\n", secs);
+        }
+    } else if (argc == 2) {
+        if (strcmp(argv[1], "help") == 0) {
+            kputs("uptime help                         Display this message\r\n");
+            kputs("uptime                              Display the System Uptime\r\n");
+        } else {
+            kputs("Error: Invalid arguments specified\r\n");
+        }
+    } else {
+        kputs("Error: Invalid arguments specified\r\n");
+    }
+}
 void console_invoke(char *cmd) {
     // pointers to the tokenized command string
     #define argv_max 8
@@ -330,6 +368,7 @@ void console_invoke(char *cmd) {
         kputs("license help\r\n");
         kputs("psu help\r\n");
         kputs("reset help\r\n");
+        kputs("uptime help\r\n");
         kputs("\r\n");
     } else if (strcmp(argv[0], "clock") == 0) {
         console_clock(argc, argv);
@@ -339,6 +378,8 @@ void console_invoke(char *cmd) {
         console_psu(argc, argv);
     } else if (strcmp(argv[0], "reset") == 0) {
         console_reset(argc, argv);
+    } else if (strcmp(argv[0], "uptime") == 0) {
+        console_uptime(argc, argv);
     } else {
         kputs("Error: Unrecognized Command, Type \"help\" for more information\r\n");
     }

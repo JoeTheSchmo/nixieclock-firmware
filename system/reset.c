@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <system.h>
+#include <timer.h>
 
 extern uint8_t bss_start;
 extern uint8_t bss_end;
@@ -40,6 +41,9 @@ void reset_handler() {
     // Disable Exceptions and Interrupts
     asm volatile ("cpsid f");
     asm volatile ("cpsid i");
+
+    // Initialize the RTT and Event Timer
+    timer_init();
 
     // Reset and Disable the Watchdog Timer
     WDT_CR = WDT_CR_WDRSTT | WDT_CR_KEY;
