@@ -31,8 +31,11 @@ typedef struct _timespec_t {
     uint8_t  minute;
     uint8_t  second;
 } timespec_t;
-
 extern volatile timespec_t clock;
+
+extern char clock_month_name[13][4];
+extern uint8_t clock_month_days[13];
+extern char clock_day_name[8][4];
 
 extern int clock_set(timespec_t *time);
 extern void clock_init(void);

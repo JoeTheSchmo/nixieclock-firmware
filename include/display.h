@@ -22,8 +22,26 @@
 
 #include <types.h>
 
-extern ssize_t display_putc(const char c);
-extern ssize_t display_puts(const char *s);
+typedef enum _display_state {
+    display_state_init   = 1,
+    display_state_invert = 2,
+    display_state_dimm   = 4,
+    display_state_menu   = 8,
+} display_state_t;
+extern display_state_t display_state;
+
+extern ssize_t dputc(const char c);
+extern ssize_t dputs(const char *s);
+extern ssize_t dprintf(const char *format, ...)
+  __attribute__ ((format (printf, 1, 2)));
+extern ssize_t dprintfr(const uint8_t row, const char *format, ...)
+  __attribute__ ((format (printf, 2, 3)));
+
+extern void display_invert_font(int8_t invert);
+
+extern void display_event_menu(int open);
+extern void display_event_clock(void);
+extern int display_erase_pages(uint8_t page_start, uint8_t page_count);
 extern void display_init(void);
 
 #endif // __DISPLAY_H_

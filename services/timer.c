@@ -71,7 +71,7 @@ void rtt_handler(void) {
     }
 }
 
-int timer_set(void (*cb)(uint32_t *), uint32_t sec) {
+int8_t timer_set(void (*cb)(uint32_t *), uint32_t sec) {
     uint32_t at;
     int8_t i;
 
@@ -100,7 +100,7 @@ int timer_set(void (*cb)(uint32_t *), uint32_t sec) {
     return -1;
 }
 
-int timer_del(int8_t id) {
+int8_t timer_del(int8_t id) {
     if (id < TIMER_SLOTS) {
         timer_slots[id].at = 0xFFFFFFFF;
         timer_slots[id].cb = 0;

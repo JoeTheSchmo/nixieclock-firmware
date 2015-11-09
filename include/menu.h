@@ -17,14 +17,20 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef __TIMER_H_
-#define __TIMER_H_
+#ifndef __MENU_H_
+#define __MENU_H_
 
 #include <types.h>
 
-extern int8_t timer_set(void (*callback)(uint32_t *), uint32_t sec);
-extern int8_t timer_del(int8_t id);
-extern void timer_init(void);
+typedef enum _menu_key_e {
+    menu_key_enter  = 1,
+    menu_key_back   = 2,
+    menu_key_north  = 3,
+    menu_key_south  = 4,
+    menu_key_east   = 5,
+    menu_key_west   = 6,
+} menu_key_e;
 
-#endif // __TIMER_H_
+extern void menu_key_press(menu_key_e key);
 
+#endif // __MENU_H_

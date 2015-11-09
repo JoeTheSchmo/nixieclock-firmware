@@ -17,6 +17,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include <display.h>
+#include <menu.h>
 #include <pca9534a.h>
 #include <pins.h>
 #include <sam3u4e.h>
@@ -40,7 +42,7 @@ void pioc_handler(void) {
 
     // Check for a Button Board IO Expander Interrupt
     if (pioc_sr & (1 << PIN_PCA9534A_INT_IDX)) {
-        uint8_t pca9534a_now, pca9534a_press, pca9534a_release;
+        uint8_t pca9534a_now, pca9534a_press;
         if (twi_read(PCA9534A_TWI_ADDR, PCA9534A_IR, &pca9534a_now, 1) < 0) {
             kputs("Failed to read PCA9534A, Disabling Interrupt\r\n");
             PIO_IDR(PIN_PCA9534A_INT_PIO) = (1 << PIN_PCA9534A_INT_IDX); // Disable Interrupt
@@ -48,13 +50,35 @@ void pioc_handler(void) {
             // Check for Key-Press (0 -> 1)
             pca9534a_press = ~pca9534a_last & pca9534a_now;
             if (pca9534a_press) {
-                kprintf("\rP:%02X\r\n", pca9534a_press);
-            }
+                // Enter Key
+                if (pca9534a_press & PCA9534A_CENTER) {
+                    menu_key_press(menu_key_enter);
+                }
 
-            // Check for Key-Release (1 -> 0)
-            pca9534a_release = pca9534a_last & ~pca9534a_now;
-            if (pca9534a_release) {
-                kprintf("\rR:%02X\r\n", pca9534a_release);
+                // Back Key
+                if (pca9534a_press & PCA9534A_BACK) {
+                    menu_key_press(menu_key_back);
+                }
+
+                // North Key
+                if (pca9534a_press & PCA9534A_NORTH) {
+                    menu_key_press(menu_key_north);
+                }
+
+                // South Key
+                if (pca9534a_press & PCA9534A_SOUTH) {
+                    menu_key_press(menu_key_south);
+                }
+
+                // East Key
+                if (pca9534a_press & PCA9534A_EAST) {
+                    menu_key_press(menu_key_east);
+                }
+
+                // West Key
+                if (pca9534a_press & PCA9534A_WEST) {
+                    menu_key_press(menu_key_west);
+                }
             }
 
             // Store the last known state for the next run through

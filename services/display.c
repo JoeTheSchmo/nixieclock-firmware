@@ -17,15 +17,20 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include <clock.h>
 #include <display.h>
 #include <ssd1306.h>
 #include <stdio.h>
+#include <timer.h>
 #include <types.h>
 
-enum {
-    display_state_init = 1,
-} display_state = 0;
+// Display State
+display_state_t display_state = 0;
 
+// Display Dimm Timer ID
+volatile int8_t display_dimm_timer = -1;
+
+// Font Table for SSD1306 in Horizontal Address Mode
 uint8_t dfont8x8[0x80][8] = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // 0x00 = [   ]
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // 0x01 = [   ]
@@ -161,8 +166,19 @@ ssize_t dputc(const char c) {
     if (!(display_state & display_state_init)) {
         return 0;
     }
-    if (ssd1306_write_data(dfont8x8[c & 0x7F], 8) < 0) {
-        return -1;
+    if (display_state & display_state_invert) {
+        uint8_t inverted_char[8];
+        int i;
+        for (i = 0; i < 8; i++) {
+            inverted_char[i] = ~(dfont8x8[c & 0x7F][i]);
+        }
+        if (ssd1306_write_data(inverted_char, 8) < 0) {
+            return -1;
+        }
+    } else {
+        if (ssd1306_write_data(dfont8x8[c & 0x7F], 8) < 0) {
+            return -1;
+        }
     }
     return 1;
 }
@@ -173,13 +189,162 @@ ssize_t dputs(const char *s) {
         return 0;
     }
     while (*s) {
-        if (ssd1306_write_data(dfont8x8[*s++ & 0x7F], 8) < 0) {
-            r = -1;
-            break;
+        if (display_state & display_state_invert) {
+            uint8_t inverted_char[8];
+            int i;
+            for (i = 0; i < 8; i++) {
+                inverted_char[i] = ~(dfont8x8[*s & 0x7F][i]);
+            }
+            s++;
+            if (ssd1306_write_data(inverted_char, 8) < 0) {
+                r = -1;
+                break;
+            }
+        } else {
+            if (ssd1306_write_data(dfont8x8[*s++ & 0x7F], 8) < 0) {
+                r = -1;
+                break;
+            }
         }
         r++;
     }
     return r;
+}
+
+ssize_t dprintf(const char *format, ...) {
+    // Start the argument list
+    __builtin_va_list args;
+    __builtin_va_start(args, format);
+
+    // Call the real printf
+    ssize_t r = vxprintf(dputc, dputs, format, args);
+
+    // Finish the argument list
+    __builtin_va_end(args);
+
+    // Return the Number of Printed Characers
+    return r;
+}
+
+ssize_t dprintfr(const uint8_t row, const char *format, ...) {
+    // Start the argument list
+    __builtin_va_list args;
+    __builtin_va_start(args, format);
+
+    // Select the page and start at column 0
+    ssd1306_set_page_start_addr(row);
+    ssd1306_set_column_start_addr(0x00);
+
+    // Call the real printf
+    ssize_t r = vxprintf(dputc, dputs, format, args);
+
+    // Finish the argument list
+    __builtin_va_end(args);
+
+    // Ensure an entire row is filled
+    if ((r >= 0)) {
+        while (r++ < 16) {
+            dputc(' ');
+        }
+    }
+
+    // Return the Number of Printed Characers
+    return r;
+}
+
+void display_event_menu(int open) {
+    if (open) {
+        // Update the state
+        display_state = (display_state & (~display_state_dimm)) | display_state_menu;
+
+        // If the display is already bright, don't dimm it
+        if (display_dimm_timer >= 0) {
+            timer_del(display_dimm_timer);
+            display_dimm_timer = -1;
+        }
+
+        // Brighten the display
+        ssd1306_set_contrast(0xFF);
+    } else {
+        // Update the state
+        if (!(display_state & display_state_menu)) {
+            return;
+        }
+
+        // Clear the video memory
+        display_erase_pages(0, 4);
+
+        // Update the display state
+        display_state = (display_state & (~display_state_menu));
+    }
+}
+
+void display_event_dimm(uint32_t *again) {
+    // Make sure the timer wasn't disabled in the meantime
+    if (display_dimm_timer < 0) {
+        return;
+    }
+
+    // Timer called back, update state and forget id
+    display_state |= display_state_dimm;
+    display_dimm_timer = -1;
+
+    // Dimm the display
+    ssd1306_set_contrast(0x00);
+}
+
+void display_event_clock(void) {
+    // Skip if the display isn't idle
+    if ((display_state & display_state_menu)) {
+            return;
+    }
+
+    // Check if the display has been dimmed
+    if (!(display_state & display_state_dimm)) {
+        // Display is not dimm, are we waiting on a timer?
+        if (display_dimm_timer < 0) {
+            // No timer is set, set one
+            display_dimm_timer = timer_set(display_event_dimm, 5);
+        }
+    }
+
+    // Draw the Date
+    ssd1306_set_page_start_addr(0x00);
+    ssd1306_set_column_start_addr(0x00);
+    dprintf("%s, %s %02u %04u",
+        clock_day_name[clock.day],
+        clock_month_name[clock.month],
+        clock.date,
+        clock.year);
+
+    // Draw the Time
+    ssd1306_set_page_start_addr(0x02);
+    ssd1306_set_column_start_addr(0x1C);
+    dprintf("%02u:%02u:%02u",
+        clock.hour,
+        clock.minute,
+        clock.second);
+
+}
+
+int display_erase_pages(uint8_t page_start, uint8_t page_count) {
+    uint8_t page, col;
+    for (page = page_start; page < page_start + page_count; page++) {
+        if (ssd1306_set_page_start_addr(page) < 0) {
+            return -1;
+        }
+
+        if (ssd1306_set_column_start_addr(0x00) < 0) {
+            return -1;
+        }
+
+        for (col = 0; col < 0x80; col += 0x08) {
+            if (ssd1306_write_data(dfont8x8[' '], 8) < 0) {
+                return -1;
+            }
+        }
+    }
+    return 0;
 }
 
 void display_init(void) {
@@ -193,22 +358,14 @@ void display_init(void) {
         ssd1306_set_segment_remap(0x1);
         ssd1306_set_com_scan_dir(0x1);
         ssd1306_set_com_pins(0x0, 0x0);
-        ssd1306_set_contrast(0x8F);
+        ssd1306_set_contrast(0xFF);
         ssd1306_set_precharge_period(0xF, 0x1);
         ssd1306_set_vcomh(0x4);
         ssd1306_set_entire_display_on(0x0);
         ssd1306_set_display_invert(0x0);
 
         // Clear the RAM
-        uint8_t zerobuf[16] = { 0, };
-        uint8_t page, col;
-        for (page = 0; page < 8; page++) {
-            ssd1306_set_page_start_addr(page);
-            for (col = 0; col < 128; col += 16) {
-                ssd1306_write_data(zerobuf, 16);
-            }
-        }
-        ssd1306_set_page_start_addr(0x00);
+        display_erase_pages(0, 8);
 
         // Enable the Charge Pump and Turn On the Display
         ssd1306_set_clock_ratio(0x8, 0x0);

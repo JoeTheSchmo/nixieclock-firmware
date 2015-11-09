@@ -18,6 +18,7 @@
 //
 
 #include <clock.h>
+#include <display.h>
 #include <ds3231.h>
 #include <pins.h>
 #include <sam3u4e.h>
@@ -27,6 +28,22 @@
 
 // Global Time of Day Cache
 volatile timespec_t clock;
+
+// Month Names
+char clock_month_name[13][4] = { "   ",
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+};
+
+// Days in each Month
+uint8_t clock_month_days[13] = { 0,
+    31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31,
+};
+
+// Day of Week Names
+char clock_day_name[8][4] = { "   ",
+    "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat",
+};
 
 // Clock State
 volatile enum {
@@ -396,6 +413,9 @@ void rtc_handler() {
 
         // Update the clock face
         hv5530_set_digits(clock.hour, clock.minute, clock.second);
+
+        // Send and event to the display service
+        display_event_clock();
 
         // Clear the second flag in the status register
         RTC_SCCR = RTC_SCCR_SECCLR;
