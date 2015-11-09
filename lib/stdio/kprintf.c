@@ -19,14 +19,17 @@
 
 #include <stdio.h>
 
-void kprintf(const char *format, ...) {
+ssize_t kprintf(const char *format, ...) {
     // Start the argument list
     __builtin_va_list args;
     __builtin_va_start(args, format);
 
     // Call the real printf
-    vxprintf(kputc, kputs, format, args);
+    ssize_t r = vxprintf(kputc, kputs, format, args);
 
     // Finish the argument list
     __builtin_va_end(args);
+
+    // Return the Number of Printed Characters
+    return r;
 }

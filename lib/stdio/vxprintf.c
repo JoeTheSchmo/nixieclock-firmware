@@ -22,11 +22,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-void vxprintf(
+ssize_t vxprintf(
   ssize_t (*putc)(const char),
   ssize_t (*puts)(const char *),
   const char *format,
   __builtin_va_list args) {
+    // Number of Printed Characters for Return
+    ssize_t r = 0;
+    ssize_t r_t = 0;
+
     // Temporary buffer for numeric conversions
     char ibuf[33];
     ssize_t ibufl;
@@ -74,17 +78,26 @@ void vxprintf(
                     if (flag_zero_pad > 0) {
                         ibufl = flag_zero_pad - strlen(ibuf);
                         if (ibuf[0] == '-') {
-                            putc('-');
+                            if ((r_t = putc('-')) < 0) {
+                                return -1;
+                            }
+                            r += r_t;
                             ibuf[0] = '0';
                             ibufl--;
                         }
                         while (ibufl-- > 0) {
-                            putc('0');
+                            if ((r_t = putc('0')) < 0) {
+                                return -1;
+                            }
+                            r += r_t;
                         }
                     }
 
                     // Print the String and Finish
-                    puts(ibuf);
+                    if ((r_t = puts(ibuf)) < 0) {
+                        return -1;
+                    }
+                    r += r_t;
                     done = 1;
                     break;
                 case 'o': // Octal
@@ -95,12 +108,18 @@ void vxprintf(
                     if (flag_zero_pad > 0) {
                         ibufl = flag_zero_pad - strlen(ibuf);
                         while (ibufl-- > 0) {
-                            putc('0');
+                            if ((r_t = putc('0')) < 0) {
+                                return -1;
+                            }
+                            r += r_t;
                         }
                     }
 
                     // Print the String and Finish
-                    puts(ibuf);
+                    if ((r_t = puts(ibuf)) < 0) {
+                        return -1;
+                    }
+                    r += r_t;
                     done = 1;
                     break;
                 case 'u': // Unsigned Integer
@@ -111,12 +130,18 @@ void vxprintf(
                     if (flag_zero_pad > 0) {
                         ibufl = flag_zero_pad - strlen(ibuf);
                         while (ibufl-- > 0) {
-                            putc('0');
+                            if ((r_t = putc('0')) < 0) {
+                                return -1;
+                            }
+                            r += r_t;
                         }
                     }
 
                     // Print the String and Finish
-                    puts(ibuf);
+                    if ((r_t = puts(ibuf)) < 0) {
+                        return -1;
+                    }
+                    r += r_t;
                     done = 1;
                     break;
                 case 'x': // Lower Case Hex
@@ -127,12 +152,18 @@ void vxprintf(
                     if (flag_zero_pad > 0) {
                         ibufl = flag_zero_pad - strlen(ibuf);
                         while (ibufl-- > 0) {
-                            putc('0');
+                            if ((r_t = putc('0')) < 0) {
+                                return -1;
+                            }
+                            r += r_t;
                         }
                     }
 
                     // Print the String and Finish
-                    puts(ibuf);
+                    if ((r_t = puts(ibuf)) < 0) {
+                        return -1;
+                    }
+                    r += r_t;
                     done = 1;
                     break;
                 case 'X': // Upper Case Hex
@@ -143,7 +174,10 @@ void vxprintf(
                     if (flag_zero_pad > 0) {
                         ibufl = flag_zero_pad - strlen(ibuf);
                         while (ibufl-- > 0) {
-                            putc('0');
+                            if ((r_t = putc('0')) < 0) {
+                                return -1;
+                            }
+                            r += r_t;
                         }
                     }
 
@@ -155,11 +189,17 @@ void vxprintf(
                     }
 
                     // Print the String and Finish
-                    puts(ibuf);
+                    if ((r_t = puts(ibuf)) < 0) {
+                        return -1;
+                    }
+                    r += r_t;
                     done = 1;
                     break;
                 case 's': // String
-                    puts(__builtin_va_arg(args, char*));
+                    if ((r_t = puts(__builtin_va_arg(args, char*))) < 0) {
+                        return -1;
+                    }
+                    r += r_t;
                     done = 1;
                     break;
                 }
@@ -167,10 +207,15 @@ void vxprintf(
             break;
         default:
             // Output the Character
-            putc(*format);
+            if ((r_t = putc(*format)) < 0) {
+                return -1;
+            }
+            r += r_t;
         }
 
         // Increment Pointer for the Next Iteration
         format++;
     }
+
+    return r;
 }
