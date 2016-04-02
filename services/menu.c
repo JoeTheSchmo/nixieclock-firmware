@@ -186,6 +186,10 @@ void menu_setclock(menu_key_e key) {
     } else {
         dprintf("%02u", newtime.second);
     }
+
+    // Ensure no unwanted trailers from other menus
+    // Finish writing the row
+    dputs("        ");
 }
 
 void menu_set24hr_mode(menu_key_e key) {
