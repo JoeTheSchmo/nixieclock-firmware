@@ -188,6 +188,41 @@ void menu_setclock(menu_key_e key) {
     }
 }
 
+void menu_set24hr_mode(menu_key_e key) {
+    static uint8_t new_24hr;
+
+    if (key == 0) {
+        menu_state = menu_state_form;
+        display_erase_pages(0, 3);
+        dprintfr(3, "Enter to Set");
+
+        new_24hr = clock_display_24hr;
+    } else if (key == menu_key_back) {
+        menu_root(0);
+        return;
+    } else if (key == menu_key_enter) {
+        clock_display_24hr = new_24hr;
+        menu_root(menu_key_back);
+        return;
+    } else if (key == menu_key_north) {
+        new_24hr = 0;
+    } else if (key == menu_key_south) {
+        new_24hr = 1;
+    }
+
+    ssd1306_set_page_start_addr(0x00);
+    ssd1306_set_column_start_addr(0x00);
+
+    dputs("Clock Mode: ");
+    display_state |= display_state_invert;
+    if (new_24hr) {
+        dputs("24Hr");
+    } else {
+        dputs("12Hr");
+    }
+    display_state &= ~display_state_invert;
+}
+
 extern void menu_uptime(menu_key_e key);
 void menu_uptime_refresh(uint32_t *again) {
     menu_uptime(menu_key_enter);
@@ -249,6 +284,7 @@ struct _menu_form {
     void (*handler)(menu_key_e);
 } menu_form[] = {
     { .title = "Set Clock",     .handler = menu_setclock, },
+    { .title = "Set 24Hr Mode", .handler = menu_set24hr_mode, },
     { .title = "Show Uptime",   .handler = menu_uptime, },
     { .title = "Reset",         .handler = menu_reset, },
 };

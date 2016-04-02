@@ -33,6 +33,8 @@ typedef struct _timespec_t {
 } timespec_t;
 extern volatile timespec_t clock;
 
+extern volatile uint8_t clock_display_24hr;
+
 extern char clock_month_name[13][4];
 extern uint8_t clock_month_days[13];
 extern char clock_day_name[8][4];

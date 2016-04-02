@@ -29,6 +29,9 @@
 // Global Time of Day Cache
 volatile timespec_t clock;
 
+// Global Time Format Flag
+volatile uint8_t clock_display_24hr = 0;
+
 // Month Names
 char clock_month_name[13][4] = { "   ",
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -423,7 +426,10 @@ void rtc_handler() {
         clock_update_globaltime();
 
         // Update the clock face
-        hv5530_set_digits(clock.hour, clock.minute, clock.second);
+        hv5530_set_digits(
+            (clock_display_24hr ? clock.hour : clock.hour % 12),
+            clock.minute,
+            clock.second);
 
         // Send and event to the display service
         display_event_clock();

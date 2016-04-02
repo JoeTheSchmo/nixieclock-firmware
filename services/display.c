@@ -318,13 +318,22 @@ void display_event_clock(void) {
         clock.year);
 
     // Draw the Time
-    ssd1306_set_page_start_addr(0x02);
-    ssd1306_set_column_start_addr(0x1C);
-    dprintf("%02u:%02u:%02u",
-        clock.hour,
-        clock.minute,
-        clock.second);
-
+    if (clock_display_24hr) {
+        ssd1306_set_page_start_addr(0x02);
+        ssd1306_set_column_start_addr(0x1C);
+        dprintf("%02u:%02u:%02u",
+            clock.hour,
+            clock.minute,
+            clock.second);
+    } else {
+        ssd1306_set_page_start_addr(0x02);
+        ssd1306_set_column_start_addr(0x14);
+        dprintf("%02u:%02u:%02u %s",
+            clock.hour % 12,
+            clock.minute,
+            clock.second,
+            (clock.hour < 12 ? "AM" : "PM"));
+    }
 }
 
 int display_erase_pages(uint8_t page_start, uint8_t page_count) {
