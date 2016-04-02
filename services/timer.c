@@ -71,6 +71,30 @@ void rtt_handler(void) {
     }
 }
 
+int8_t timer_rearm(int8_t id, uint32_t sec) {
+    uint32_t at;
+
+    if (id < 0) {
+        return id;
+    }
+
+    if (id > TIMER_SLOTS) {
+        return -1;
+    }
+
+    if (timer_slots[id].cb == 0) {
+        return -1;
+    }
+
+    // Calculate the new time of the event
+    while (at != RTT_VR) {
+        at = RTT_VR;
+    }
+    timer_slots[id].at = at + sec;
+
+    return id;
+}
+
 int8_t timer_set(void (*cb)(uint32_t *), uint32_t sec) {
     uint32_t at;
     int8_t i;

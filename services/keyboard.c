@@ -52,7 +52,11 @@ void pioc_handler(void) {
             if (pca9534a_press) {
                 // Enter Key
                 if (pca9534a_press & PCA9534A_CENTER) {
-                    menu_key_press(menu_key_enter);
+                    if ((!(display_state & display_state_on))||((display_state & display_state_dimm))) {
+                        display_wakeup();
+                    } else {
+                        menu_key_press(menu_key_enter);
+                    }
                 }
 
                 // Back Key

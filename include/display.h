@@ -25,8 +25,9 @@
 typedef enum _display_state {
     display_state_init   = 1,
     display_state_invert = 2,
-    display_state_dimm   = 4,
-    display_state_menu   = 8,
+    display_state_on     = 4,
+    display_state_dimm   = 8,
+    display_state_menu   = 16,
 } display_state_t;
 extern display_state_t display_state;
 
@@ -39,6 +40,7 @@ extern ssize_t dprintfr(const uint8_t row, const char *format, ...)
 
 extern void display_invert_font(int8_t invert);
 
+extern void display_wakeup();
 extern void display_event_menu(int open);
 extern void display_event_clock(void);
 extern int display_erase_pages(uint8_t page_start, uint8_t page_count);

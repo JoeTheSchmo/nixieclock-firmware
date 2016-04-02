@@ -32,6 +32,8 @@ enum _menu_state {
 
 extern void menu_root(menu_key_e key);
 
+volatile int8_t menu_close_timer = -1;
+
 void menu_setclock(menu_key_e key) {
     static timespec_t newtime;
     static uint8_t field;
@@ -335,7 +337,29 @@ void menu_root(menu_key_e key) {
     }
 }
 
+void menu_event_close(uint32_t *again) {
+    int i;
+    for (i = 0; i < 4; i++) {
+        if (display_state & display_state_menu) {
+            menu_key_press(menu_key_back);
+        } else {
+            break;
+        }
+    }
+
+    if (display_state & display_state_menu) {
+        menu_root(menu_key_back);
+    }
+
+    menu_close_timer = -1;
+}
+
 void menu_key_press(menu_key_e key) {
+    menu_close_timer = timer_rearm(menu_close_timer, 30);
+    if (menu_close_timer < 0) {
+        menu_close_timer = timer_set(menu_event_close, 30);
+    }
+
     if (!(display_state & display_state_menu)) {
         // No menu is opened
         if (key == menu_key_enter) {

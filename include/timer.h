@@ -22,6 +22,7 @@
 
 #include <types.h>
 
+extern int8_t timer_rearm(int8_t id, uint32_t sec);
 extern int8_t timer_set(void (*callback)(uint32_t *), uint32_t sec);
 extern int8_t timer_del(int8_t id);
 extern void timer_init(void);

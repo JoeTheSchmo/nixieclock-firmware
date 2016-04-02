@@ -29,6 +29,8 @@ display_state_t display_state = 0;
 
 // Display Dimm Timer ID
 volatile int8_t display_dimm_timer = -1;
+// Display Sleep Timer ID
+volatile int8_t display_sleep_timer = -1;
 
 // Font Table for SSD1306 in Horizontal Address Mode
 uint8_t dfont8x8[0x80][8] = {
@@ -252,19 +254,36 @@ ssize_t dprintfr(const uint8_t row, const char *format, ...) {
     return r;
 }
 
+void display_wakeup() {
+    if (!(display_state & display_state_on)) {
+        ssd1306_set_display_on(1);
+        display_state |= display_state_on;
+    }
+
+    // Stop the Dimm timer if its running
+    if (display_dimm_timer >= 0) {
+        timer_del(display_dimm_timer);
+        display_dimm_timer = -1;
+    }
+
+    // Stop the Sleep timer if it's running
+    if (display_sleep_timer > 0) {
+        timer_del(display_sleep_timer);
+        display_sleep_timer = -1;
+    }
+
+    // Brighten the display
+    display_state &= ~display_state_dimm;
+    ssd1306_set_contrast(0xFF);
+}
+
 void display_event_menu(int open) {
     if (open) {
         // Update the state
-        display_state = (display_state & (~display_state_dimm)) | display_state_menu;
+        display_state |= display_state_menu;
 
-        // If the display is already bright, don't dimm it
-        if (display_dimm_timer >= 0) {
-            timer_del(display_dimm_timer);
-            display_dimm_timer = -1;
-        }
-
-        // Brighten the display
-        ssd1306_set_contrast(0xFF);
+        // Wake up the display
+        display_wakeup();
     } else {
         // Update the state
         if (!(display_state & display_state_menu)) {
@@ -279,6 +298,16 @@ void display_event_menu(int open) {
     }
 }
 
+void display_event_sleep(uint32_t *again) {
+    if (display_state & display_state_on) {
+        ssd1306_set_display_on(0);
+        display_state &= ~display_state_on;
+    }
+
+    // Time called back, forget id
+    display_sleep_timer = -1;
+}
+
 void display_event_dimm(uint32_t *again) {
     // Make sure the timer wasn't disabled in the meantime
     if (display_dimm_timer < 0) {
@@ -291,11 +320,19 @@ void display_event_dimm(uint32_t *again) {
 
     // Dimm the display
     ssd1306_set_contrast(0x00);
+
+    // Set the sleep timer for 30 second
+    display_sleep_timer = timer_set(display_event_sleep, 30);
 }
 
 void display_event_clock(void) {
     // Skip if the display isn't idle
     if ((display_state & display_state_menu)) {
+            return;
+    }
+
+    // Skip if the display isn't on
+    if (!(display_state & display_state_on)) {
             return;
     }
 
@@ -382,6 +419,6 @@ void display_init(void) {
         ssd1306_set_display_on(0x1);
 
         // Mark the service as initialized
-        display_state |= display_state_init;
+        display_state |= display_state_init | display_state_on;
     }
 }
