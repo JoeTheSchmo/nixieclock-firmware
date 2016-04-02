@@ -1,7 +1,7 @@
 // vim: set tabstop=4 shiftwidth=4 expandtab :
 //
 // nixieclock-firmware - Nixie Clock Main Firmware Program
-// Copyright (C) 2013 - 2015 Joe Ciccone
+// Copyright (C) 2013 - 2016 Joe Ciccone
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
