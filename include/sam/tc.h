@@ -50,12 +50,15 @@
 
 #define TC_SR_COVFS                     0x00000001
 #define TC_SR_CPAS                      0x00000004
+#define TC_SR_CPBS                      0x00000008
 #define TC_SR_CPCS                      0x00000010
 
 #define TC_IER_COVFS                    0x00000001
 #define TC_IER_CPAS                     0x00000004
+#define TC_IER_CPBS                     0x00000008
 #define TC_IER_CPCS                     0x00000010
 
 #define TC_IDR_CPAS                     0x00000004
+#define TC_IDR_CPBS                     0x00000008
 
 #endif // __TC_H_
