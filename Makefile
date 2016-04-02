@@ -28,10 +28,12 @@ GDB		= $(CROSS_COMPILE)gdb
 OBJCOPY		= $(CROSS_COMPILE)objcopy
 OBJDUMP		= $(CROSS_COMPILE)objdump
 SIZE		= $(CROSS_COMPILE)size
+JLinkExe	= JLinkExe
 
 RM		= rm
 ECHO		= echo
 
+PROGRAM_SCRIPT	= system/flash.jlink
 DEBUG_SCRIPT	= system/flash.gdb
 LINK_SCRIPT	= system/flash.ld
 
@@ -103,6 +105,10 @@ $(ELFFILE): $(OBJS) $(LINK_SCRIPT)
 
 $(BINFILE): $(ELFFILE)
 	$(OBJCOPY) -O binary $(ELFFILE) $(BINFILE)
+
+.PHONY: program
+program: $(BINFILE)
+	$(JLinkExe) -CommanderScript $(PROGRAM_SCRIPT)
 
 .PHONY: debug
 debug: $(ELFFILE)
