@@ -87,20 +87,17 @@ void spi_handler(void) {
         // Disable the Transmit Empty Interrupt
         SPI_IDR = SPI_IDR_TXEMPTY;
 
-        // Drop the Latch Line (Part 1)
+        // Drop the Latch Line (start latching)
         PIO_CODR(PIN_HV5530_LATCH_PIO) = (1 << PIN_HV5530_LATCH_IDX); // Low
-
-        // Latch on Compare B
-        TC_RB(TC0) = TC_CV(TC0) + 4;
-
-        // Enable Interrupt on Compare B
-        TC_IER(TC0) = TC_IER_CPBS;
     }
 }
 
 void hv5530_write_registers(void) {
     // reset the register buffer idx
     hv5530_tx_pos = 0;
+
+    // Raise the latch line (stop latching)
+    PIO_SODR(PIN_HV5530_LATCH_PIO) = (1 << PIN_HV5530_LATCH_IDX); // High
 
     // Enable the TDRE and TXEMPTY Interrupts
     SPI_IER = SPI_IER_TDRE | SPI_IER_TXEMPTY;
@@ -137,14 +134,6 @@ void tc0_handler(void) {
             TC_IDR(TC0) = TC_IDR_CPAS;
             ra = 0;
         }
-    }
-
-    if (sr & TC_SR_CPBS) {
-        // Latch the Shift Registers (Part 2)
-        PIO_SODR(PIN_HV5530_LATCH_PIO) = (1 << PIN_HV5530_LATCH_IDX); // High
-
-        // Disable RB Compare
-        TC_IDR(TC0) = TC_IDR_CPBS;
     }
 
     if (sr & TC_SR_COVFS) {
