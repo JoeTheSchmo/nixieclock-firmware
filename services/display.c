@@ -363,14 +363,20 @@ void display_event_clock(void) {
             clock.minute,
             clock.second);
     } else {
+        uint8_t hour = clock.hour % 12;
+        if (hour == 0) {
+            hour = 12;
+        }
         ssd1306_set_page_start_addr(0x02);
         ssd1306_set_column_start_addr(0x14);
         dprintf("%02u:%02u:%02u %s",
-            clock.hour % 12,
+            hour,
             clock.minute,
             clock.second,
             (clock.hour < 12 ? "AM" : "PM"));
     }
+
+    
 }
 
 int display_erase_pages(uint8_t page_start, uint8_t page_count) {

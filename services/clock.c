@@ -415,10 +415,16 @@ void rtc_handler() {
         clock_update_globaltime();
 
         // Update the clock face
-        hv5530_set_digits(
-            (clock_display_24hr ? clock.hour : clock.hour % 12),
-            clock.minute,
-            clock.second);
+        uint8_t hour;
+        if (clock_display_24hr) {
+            hour = clock.hour;
+        } else {
+            hour = clock.hour % 12;
+            if (hour == 0) {
+                hour = 12;
+            }
+        }
+        hv5530_set_digits(hour, clock.minute, clock.second);
 
         // Send and event to the display service
         display_event_clock();
