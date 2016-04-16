@@ -185,6 +185,9 @@ void reset_handler() {
     // Enable the Interactive Console
     console_start();
 
+    // Play a sine-wave to debugging
+    audio_play_sine();
+
     // Initialization Complete
     while (1) {}
 }

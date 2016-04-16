@@ -17,6 +17,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include <audio.h>
 #include <display.h>
 #include <menu.h>
 #include <pca9534a.h>
@@ -29,7 +30,13 @@
 uint8_t pca9534a_last = 0x00;
 
 void pioa_handler(void) {
-    // Do Nothing
+    // Read the Status Register
+    uint32_t pioa_sr = PIO_ISR(PIOA) & PIO_IMR(PIOA);
+
+    // Check for a Headphones State Change Interrupt
+    if (pioa_sr & (1 << PIN_WM8731_HP_DET_IDX)) {
+        audio_check_headphones();
+    }
 }
 
 void piob_handler(void) {

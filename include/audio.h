@@ -22,6 +22,8 @@
 
 #include <types.h>
 
+extern void audio_play_sine(void);
+extern void audio_check_headphones(void);
 extern void audio_init(void);
 
 #endif // __AUDIO_H_

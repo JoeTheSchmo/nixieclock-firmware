@@ -31,6 +31,7 @@
 #include "sam/rtc.h"
 #include "sam/rtt.h"
 #include "sam/spi.h"
+#include "sam/ssc.h"
 #include "sam/supc.h"
 #include "sam/tc.h"
 #include "sam/twi.h"
