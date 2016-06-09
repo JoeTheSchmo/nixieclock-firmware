@@ -84,20 +84,22 @@ void audio_check_headphones(void) {
     // Check if the headphones are plugged in
     if (PIO_PDSR(PIN_WM8731_HP_DET_PIO) & (1 << PIN_WM8731_HP_DET_IDX)) {
         // Headphones are plugged in, Shutdown the Amplifier
-        // TODO: Uncomment next line after hardware fix
-        //PIO_CODR(PIN_WM8731_AMP_SD_PIO)  = (1 << PIN_WM8731_AMP_SD_IDX); // Clear Output Data Register
+        PIO_CODR(PIN_WM8731_AMP_SD_PIO)  = (1 << PIN_WM8731_AMP_SD_IDX); // Clear Output Data Register
+        kprintf("Headphones connected\n\r");
     } else {
         // Headphones are unplugged, Enable Amplifier
-        // TODO: Uncomment next line after hardware fix
-        //PIO_SODR(PIN_WM8731_AMP_SD_PIO)  = (1 << PIN_WM8731_AMP_SD_IDX); // Set Output Data Register
+        PIO_SODR(PIN_WM8731_AMP_SD_PIO)  = (1 << PIN_WM8731_AMP_SD_IDX); // Set Output Data Register
+        kprintf("Headphones disconnected\n\r");
     }
 }
 
 void audio_init(void) {
     // Configure MAX9717 Amplifier Shutdown (Amp Off by Default, Pin Low)
-    PIO_PER(PIN_WM8731_AMP_SD_PIO)  = (1 << PIN_WM8731_AMP_SD_IDX); // Enable PIO on Pin
-    PIO_OER(PIN_WM8731_AMP_SD_PIO)  = (1 << PIN_WM8731_AMP_SD_IDX); // Enable Output
-    PIO_CODR(PIN_WM8731_AMP_SD_PIO) = (1 << PIN_WM8731_AMP_SD_IDX); // Clear Output Data Register
+    PIO_PER(PIN_WM8731_AMP_SD_PIO)  = (1 << PIN_WM8731_AMP_SD_IDX);   // Enable PIO on Pin
+    PIO_OER(PIN_WM8731_AMP_SD_PIO)  = (1 << PIN_WM8731_AMP_SD_IDX);   // Enable Output
+
+    PIO_PUDR(PIN_WM8731_AMP_SD_PIO) &= ~(1 << PIN_WM8731_AMP_SD_IDX);   // Enable Pull-Up
+    PIO_SODR(PIN_WM8731_AMP_SD_PIO)  = (1 << PIN_WM8731_AMP_SD_IDX); // Set Output Data Register
 
     // Configure Programmable Clock Controller (PCK0 = MCK / 8 = 12MHz)
     PMC_PCK0 = PMC_PCKx_CSS_MCK | PMC_PCKx_PRES_CLK_8;
@@ -111,10 +113,6 @@ void audio_init(void) {
     PIO_ABSR(PIN_WM8731_PCK0_PIO) |= (1 << PIN_WM8731_PCK0_IDX); // Select Peripheral B
 
     // Configure the SSC Pins for the WM8731 ADC/DAC
-    PIO_PDR(PIN_WM8731_SSC_RD_PIO)   =  (1 << PIN_WM8731_SSC_RD_IDX); // Disable PIO on Pin
-    PIO_ABSR(PIN_WM8731_SSC_RD_PIO) &= ~(1 << PIN_WM8731_SSC_RD_IDX); // Select Peripheral A
-    PIO_PDR(PIN_WM8731_SSC_RF_PIO)   =  (1 << PIN_WM8731_SSC_RF_IDX); // Disable PIO on Pin
-    PIO_ABSR(PIN_WM8731_SSC_RF_PIO) &= ~(1 << PIN_WM8731_SSC_RF_IDX); // Select Peripheral A
     PIO_PDR(PIN_WM8731_SSC_RK_PIO)   =  (1 << PIN_WM8731_SSC_RK_IDX); // Disable PIO on Pin
     PIO_ABSR(PIN_WM8731_SSC_RK_PIO) &= ~(1 << PIN_WM8731_SSC_RK_IDX); // Select Peripheral A
     PIO_PDR(PIN_WM8731_SSC_TD_PIO)   =  (1 << PIN_WM8731_SSC_TD_IDX); // Disable PIO on Pin
