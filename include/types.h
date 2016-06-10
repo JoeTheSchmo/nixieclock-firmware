@@ -39,5 +39,4 @@ typedef volatile const __UINT32_TYPE__ reg_ro_t;
 typedef volatile       __UINT32_TYPE__ reg_wo_t;
 typedef volatile       __UINT32_TYPE__ reg_rw_t;
 
-
 #endif // __TYPES_H_

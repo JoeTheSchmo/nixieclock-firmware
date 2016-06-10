@@ -50,6 +50,7 @@ LDFLAGS		+= --gc-sections
 BINFILE		= nixieclock-firmware.bin
 ELFFILE		= nixieclock-firmware.elf
 
+OBJS		+= components/max6656.o
 OBJS		+= components/ssd1306.o
 OBJS		+= components/wm8731.o
 OBJS		+= drivers/twi.o

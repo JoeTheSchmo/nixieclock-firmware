@@ -20,6 +20,7 @@
 #include <clock.h>
 #include <ctype.h>
 #include <ds3231.h>
+#include <max6656.h>
 #include <pins.h>
 #include <sam3u4e.h>
 #include <stdio.h>
@@ -160,6 +161,7 @@ void console_psu(int8_t argc, char *argv[]) {
             kputs("psu {name} show                     Show the power supplies status\r\n");
             kputs("    where {name} = 5v or hv or zb\r\n");
             kputs("    where {cmd} = on or off or show\r\n");
+            kputs("psu rails show                      Show power supply rail voltages\r\n");
         } else {
             kputs("Error: Invalid arguments specified\r\n");
         }
@@ -219,6 +221,20 @@ void console_psu(int8_t argc, char *argv[]) {
                 }
             } else {
                 kputs("Error: Unrecognized power supply command\r\n");
+            }
+        } else if (strcmp(argv[1], "rails") == 0) {
+            if (strcmp(argv[2], "show") == 0) {
+                int32_t rail_3_3v = max6656_get_3_3v_value();
+                int32_t rail_12v = max6656_get_12v_value();
+                int32_t rail_5v = max6656_get_5v_value();
+                int32_t rail_1_8v = max6656_get_1_8v_value();
+
+                kprintf(" 3.3v PSU = %2ld.%03ldv\r\n", rail_3_3v / 1000, rail_3_3v % 1000);
+                kprintf("12.0v PSU = %2ld.%03ldv\r\n", rail_12v / 1000, rail_12v % 1000);
+                kprintf(" 5.0v PSU = %2ld.%03ldv\r\n", rail_5v / 1000, rail_5v % 1000);
+                kprintf(" 1.8v PSU = %2ld.%03ldv\r\n", rail_1_8v / 1000, rail_1_8v % 1000);
+            } else {
+                kputs("Error: Unregocnized power supply command\r\n");
             }
         } else {
             kputs("Error: Unrecognized power supply name\r\n");
