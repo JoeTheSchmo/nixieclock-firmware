@@ -31,6 +31,9 @@ ssize_t vxprintf(
     ssize_t r = 0;
     ssize_t r_t = 0;
 
+    // Temporary pointer
+    char *p;
+
     // Temporary buffer for numeric conversions
     char ibuf[33];
     ssize_t ibufl;
@@ -39,7 +42,8 @@ ssize_t vxprintf(
     int8_t done = 0;
 
     // Flags
-    uint32_t flag_zero_pad = 0;
+    uint32_t flag_left_pad = 0;
+    char flag_left_pad_c = ' ';
 
     // Length Modifiers
     int8_t mod_len_h = 0;
@@ -51,7 +55,7 @@ ssize_t vxprintf(
         case '%':
             // Reset the Flags
             done = 0;
-            flag_zero_pad = 0;
+            flag_left_pad = 0;
             mod_len_h = 0;
             mod_len_l = 0;
 
@@ -60,7 +64,22 @@ ssize_t vxprintf(
                 switch(*++format) {
                 // Flags
                 case '0':
-                    flag_zero_pad = strtoul(++format, &format, 10);
+                    flag_left_pad = strtoul(++format, &format, 10);
+                    flag_left_pad_c = '0';
+                    format--;
+                    break;
+
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    flag_left_pad = strtoul(format, &format, 10);
+                    flag_left_pad_c = ' ';
                     format--;
                     break;
 
@@ -75,8 +94,8 @@ ssize_t vxprintf(
                     ltostr(__builtin_va_arg(args, int32_t), ibuf, 10);
 
                     // Apply the Padding if Requested
-                    if (flag_zero_pad > 0) {
-                        ibufl = flag_zero_pad - strlen(ibuf);
+                    if (flag_left_pad > 0) {
+                        ibufl = flag_left_pad - strlen(ibuf);
                         if (ibuf[0] == '-') {
                             if ((r_t = putc('-')) < 0) {
                                 return -1;
@@ -86,7 +105,7 @@ ssize_t vxprintf(
                             ibufl--;
                         }
                         while (ibufl-- > 0) {
-                            if ((r_t = putc('0')) < 0) {
+                            if ((r_t = putc(flag_left_pad_c)) < 0) {
                                 return -1;
                             }
                             r += r_t;
@@ -105,10 +124,10 @@ ssize_t vxprintf(
                     ultostr(__builtin_va_arg(args, uint32_t), ibuf, 8);
 
                     // Apply the Padding if Requested
-                    if (flag_zero_pad > 0) {
-                        ibufl = flag_zero_pad - strlen(ibuf);
+                    if (flag_left_pad > 0) {
+                        ibufl = flag_left_pad - strlen(ibuf);
                         while (ibufl-- > 0) {
-                            if ((r_t = putc('0')) < 0) {
+                            if ((r_t = putc(flag_left_pad_c)) < 0) {
                                 return -1;
                             }
                             r += r_t;
@@ -127,10 +146,10 @@ ssize_t vxprintf(
                     ultostr(__builtin_va_arg(args, uint32_t), ibuf, 10);
 
                     // Apply the Padding if Requested
-                    if (flag_zero_pad > 0) {
-                        ibufl = flag_zero_pad - strlen(ibuf);
+                    if (flag_left_pad > 0) {
+                        ibufl = flag_left_pad - strlen(ibuf);
                         while (ibufl-- > 0) {
-                            if ((r_t = putc('0')) < 0) {
+                            if ((r_t = putc(flag_left_pad_c)) < 0) {
                                 return -1;
                             }
                             r += r_t;
@@ -149,10 +168,10 @@ ssize_t vxprintf(
                     ultostr(__builtin_va_arg(args, uint32_t), ibuf, 16);
 
                     // Apply the Padding if Requested
-                    if (flag_zero_pad > 0) {
-                        ibufl = flag_zero_pad - strlen(ibuf);
+                    if (flag_left_pad > 0) {
+                        ibufl = flag_left_pad - strlen(ibuf);
                         while (ibufl-- > 0) {
-                            if ((r_t = putc('0')) < 0) {
+                            if ((r_t = putc(flag_left_pad_c)) < 0) {
                                 return -1;
                             }
                             r += r_t;
@@ -171,10 +190,10 @@ ssize_t vxprintf(
                     ultostr(__builtin_va_arg(args, uint32_t), ibuf, 16);
 
                     // Apply the Padding if Requested
-                    if (flag_zero_pad > 0) {
-                        ibufl = flag_zero_pad - strlen(ibuf);
+                    if (flag_left_pad > 0) {
+                        ibufl = flag_left_pad - strlen(ibuf);
                         while (ibufl-- > 0) {
-                            if ((r_t = putc('0')) < 0) {
+                            if ((r_t = putc(flag_left_pad_c)) < 0) {
                                 return -1;
                             }
                             r += r_t;
@@ -182,7 +201,7 @@ ssize_t vxprintf(
                     }
 
                     // Convert the String to Upper Case
-                    char *p = ibuf;
+                    p = ibuf;
                     while (*p) {
                         *p = toupper(*p);
                         p++;
@@ -196,7 +215,20 @@ ssize_t vxprintf(
                     done = 1;
                     break;
                 case 's': // String
-                    if ((r_t = puts(__builtin_va_arg(args, char*))) < 0) {
+                    p = __builtin_va_arg(args, char*);
+
+                    // Apply the Padding if Requested
+                    if (flag_left_pad > 0) {
+                        ibufl = flag_left_pad - strlen(p);
+                        while (ibufl-- > 0) {
+                            if ((r_t = putc(flag_left_pad_c)) < 0) {
+                                return -1;
+                            }
+                            r += r_t;
+                        }
+                    }
+
+                    if ((r_t = puts(p)) < 0) {
                         return -1;
                     }
                     r += r_t;
