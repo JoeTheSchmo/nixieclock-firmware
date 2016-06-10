@@ -71,11 +71,11 @@ void reset_handler() {
     PIO_PUER(PIN_5VPSU_EN_PIO) = (1 << PIN_5VPSU_EN_IDX);    // Enable Pull-Up
     PIO_CODR(PIN_5VPSU_EN_PIO) = (1 << PIN_5VPSU_EN_IDX);    // Clear Output Data Register
 
-    // Configure the ZigBee Shutdown Pin (ZigBee Off)
+    // Configure the ZigBee Shutdown Pin (ZigBee On)
     PIO_PER(PIN_ZIGBEE_SHDN_PIO)  = (1 << PIN_ZIGBEE_SHDN_IDX); // Enable PIO on Pin
     PIO_OER(PIN_ZIGBEE_SHDN_PIO)  = (1 << PIN_ZIGBEE_SHDN_IDX); // Enable Output
     PIO_PUER(PIN_ZIGBEE_SHDN_PIO) = (1 << PIN_ZIGBEE_SHDN_IDX); // Enable Pull-Up
-    PIO_CODR(PIN_ZIGBEE_SHDN_PIO) = (1 << PIN_ZIGBEE_SHDN_IDX); // Clear Output Data Register
+    PIO_SODR(PIN_ZIGBEE_SHDN_PIO) = (1 << PIN_ZIGBEE_SHDN_IDX); // Set Output Data Register
 
     // Enable User Resets by Asserting the NRST Pin
     // Assert NRST for 2^(11+1) Slow Clock Cycles (32 kHz * 4096 = 128ms)
