@@ -274,14 +274,14 @@ void clock_update_globaltime(void) {
     uint32_t temp;
 
     // Read the Date Register until 2 consecutive matching values
-    while (calr != RTC_CALR) {
+    do {
         calr = RTC_CALR;
-    }
+    } while (calr != RTC_CALR);
 
     // Read the Time Register until 2 consecutive matching values
-    while (timr != RTC_TIMR) {
+    do {
         timr = RTC_TIMR;
-    }
+    } while (timr != RTC_TIMR);
 
     temp = (calr & RTC_CALR_CENT_Msk) >> RTC_CALR_CENT_Off;
     clock.year = (1000 * ((temp & 0xF0) >> 4)) + (100 * (temp & 0xF));
@@ -402,7 +402,7 @@ int clock_set_from_ds3231() {
 
 void rtc_handler() {
     // Update the clock face
-    if (RTC_SR * RTC_SR_SEC) {
+    if (RTC_SR & RTC_SR_SEC) {
         // Check if the Internal RTC is in Sync with the External RTC
         if (!(clock_state & clock_state_sync)) {
             // Update the Internal RTC

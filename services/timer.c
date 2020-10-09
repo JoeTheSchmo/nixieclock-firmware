@@ -37,9 +37,9 @@ void rtt_handler(void) {
     uint8_t future_event;
 
     // Get the current RTT value
-    while (vr != RTT_VR) {
+    do {
         vr = RTT_VR;
-    }
+    } while (vr != RTT_VR);
 
     // Iterate through each timer slot
     future_event = 0;
@@ -72,7 +72,7 @@ void rtt_handler(void) {
 }
 
 int8_t timer_rearm(int8_t id, uint32_t sec) {
-    uint32_t at;
+    uint32_t at = 0;
 
     if (id < 0) {
         return id;
@@ -100,9 +100,9 @@ int8_t timer_set(void (*cb)(uint32_t *), uint32_t sec) {
     int8_t i;
 
     // Calulate the time of the event
-    while (at != RTT_VR) {
+    do {
         at = RTT_VR;
-    }
+    } while (at != RTT_VR);
     at += sec;
 
     // Find an open slot and store the value
