@@ -1,6 +1,3 @@
-*.bin
-*.d
-*.elf
-*.o
-*.swp
-/local.mk
+/build
+/build-*
+/cmake-build-*
