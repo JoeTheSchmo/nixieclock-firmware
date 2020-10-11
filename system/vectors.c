@@ -19,12 +19,10 @@
 extern void stack_bottom();
 extern void reset_handler();
 
-void dummy_handler() {
+__attribute__((unused)) _Noreturn void dummy_handler() {
     while (1) {}
 }
 
-extern void stack_bottom();
-extern void reset_handler();
 void nmi_handler() __attribute__ ((weak, alias("dummy_handler")));
 void hardfault_handler() __attribute__ ((weak, alias("dummy_handler")));
 void memmanage_handler() __attribute__ ((weak, alias("dummy_handler")));
