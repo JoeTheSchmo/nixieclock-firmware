@@ -117,3 +117,9 @@ add_custom_target(program
         COMMAND ${JLinkExe} ${CMAKE_CURRENT_SOURCE_DIR}/system/flash.jlink
         DEPENDS ${PROJECT_NAME}.elf
         COMMENT "Flashing the firmware")
+
+add_custom_target(debug
+        COMMAND ${TARGET_GDB} -ex "target remote localhost:2331"
+        -x ${CMAKE_CURRENT_SOURCE_DIR}/system/flash.gdb ${PROJECT_NAME}.elf
+        DEPENDS ${PROJECT_NAME}.elf
+        COMMENT "Flashing the firmware and starting gdb")
