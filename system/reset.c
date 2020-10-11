@@ -1,6 +1,6 @@
 //
 // nixieclock-firmware - Nixie Clock Main Firmware Program
-// Copyright (C) 2013 - 2015 Joe Ciccone
+// Copyright (C) 2015 Joe Ciccone
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ void reset_handler() {
     // Print terminal headline
     kputs("\r\n\r\n");
     kputs("nixieclock-firmware: Nixie Clock Main Firmware Program\r\n");
-    kputs("Copyright (C) 2013 - 2015 Joe Ciccone and Ed Koloski\r\n");
+    kputs("Copyright (C) 2015 Joe Ciccone and Ed Koloski\r\n");
     kputs("This program comes with ABSOLUTELY NO WARRANTY; for details type 'license show'.\r\n");
     kputs("This is free software, and you are welcome to redistribute it\r\n");
     kputs("under certain conditions; type 'license show' for details.\r\n");
