@@ -2,7 +2,7 @@ si SWD
 speed 8000
 device at91sam3u4e
 halt
-loadbin nixieclock-firmware.bin, 0x000E0000
+loadbin nixieclock_firmware.bin, 0x000E0000
 r
 go
 exit

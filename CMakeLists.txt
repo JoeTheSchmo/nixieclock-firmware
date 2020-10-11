@@ -17,7 +17,10 @@
 #
 
 cmake_minimum_required(VERSION 3.16)
+
 include(cmake/compiler.cmake)
+include(cmake/jlink.cmake)
+
 project(nixieclock_firmware C CXX ASM)
 
 include_directories(include)
@@ -109,3 +112,8 @@ add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
 add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
         COMMAND ${TARGET_SIZE} -x -G ${PROJECT_NAME}.elf
         COMMENT "Displaying ${PROJECT_NAME}.elf section sizes in gnu format")
+
+add_custom_target(program
+        COMMAND ${JLinkExe} ${CMAKE_CURRENT_SOURCE_DIR}/system/flash.jlink
+        DEPENDS ${PROJECT_NAME}.elf
+        COMMENT "Flashing the firmware")
