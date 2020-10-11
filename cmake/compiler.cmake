@@ -48,6 +48,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb -DNDEBUG")
 
 find_program(TARGET_OBJCOPY ${TARGET_TRIPLET}-objcopy)
+find_program(TARGET_OBJDUMP ${TARGET_TRIPLET}-objdump)
 find_program(TARGET_SIZE ${TARGET_TRIPLET}-size)
 
 find_program(TARGET_GDB NAMES ${TARGET_TRIPLET}-gdb gdb-multiarch gdb)

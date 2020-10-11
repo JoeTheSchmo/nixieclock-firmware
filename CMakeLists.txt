@@ -123,3 +123,8 @@ add_custom_target(debug
         -x ${CMAKE_CURRENT_SOURCE_DIR}/system/flash.gdb ${PROJECT_NAME}.elf
         DEPENDS ${PROJECT_NAME}.elf
         COMMENT "Flashing the firmware and starting gdb")
+
+add_custom_target(disasm
+        COMMAND ${TARGET_OBJDUMP} -drS --show-raw-insn ${PROJECT_NAME}.elf
+        DEPENDS ${PROJECT_NAME}.elf
+        COMMENT "Disassembling the firmware")
