@@ -130,7 +130,7 @@ void console_license(int8_t argc, char *argv[]) {
     } else if ((argc > 0)&&(strcmp(argv[1], "show") == 0)) {
         kputs("\r\n");
         kputs("nixieclock-firmware - Nixie Clock Main Firmware Program\r\n");
-        kputs("Copyright (C) 2013 - 2015 Joe Ciccone\r\n");
+        kputs("Copyright (C) 2013 Joe Ciccone and Ed Koloski\r\n");
         kputs("\r\n");
         kputs("This program is free software: you can redistribute it and/or modify\r\n");
         kputs("it under the terms of the GNU General Public License as published by\r\n");

@@ -1,6 +1,6 @@
 #
 # nixieclock-firmware - Nixie Clock Main Firmware Program
-# Copyright (c) 2020 Joe Ciccone and Ed Koloski
+# Copyright (C) 2020 Joe Ciccone and Ed Koloski
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
